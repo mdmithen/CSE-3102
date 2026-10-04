@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>District Sports Management System</title>
+</head>
+
+<body>
+
+    <!-- ==================== HEADER ==================== -->
+    <header>
+        <h1>District Sports</h1>
+
+        <nav>
+            <ul>
+                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#clubs">Clubs</a></li>
+                <li><a href="#players">Players</a></li>
+                <li><a href="#tournaments">Tournaments</a></li>
+                <li><a href="#rankings">Rankings</a></li>
+                <li><a href="#news">News</a></li>
+                <li><a href="#login">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- LOGIN PORTAL -->
+        <section id="login">
+            <h2>District Sports Login Portal</h2>
+
+            <!-- Super Admin Login -->
+            <article>
+                <h3>Super Admin Login</h3>
+                <form>
+                    <p>
+                        <label for="super-admin-email">Admin Email</label>
+                        <input type="email" id="super-admin-email" name="super_admin_email" placeholder="admin@districtsports.com">
+                    </p>
+                    <p>
+                        <label for="super-admin-password">Password</label>
+                        <input type="password" id="super-admin-password" name="super_admin_password">
+                    </p>
+                    <p>
+                        <button type="submit">Login as Super Admin</button>
+                    </p>
+                    <p>
+                        <a href="#">Forgot Password?</a>
+                    </p>
+                </form>
+            </article>
+
+            <!-- Club Admin Login -->
+            <article>
+                <h3>Club Admin Login</h3>
+                <form>
+                    <p>
+                        <label for="club-admin-email">Club Admin Email</label>
+                        <input type="email" id="club-admin-email" name="club_admin_email" placeholder="clubadmin@districtsports.com">
+                    </p>
+                    <p>
+                        <label for="club-admin-password">Password</label>
+                        <input type="password" id="club-admin-password" name="club_admin_password">
+                    </p>
+                    <p>
+                        <button type="submit">Login as Club Admin</button>
+                    </p>
+                    <p>
+                        <a href="#">Forgot Password?</a>
+                    </p>
+                </form>
+            </article>
+
+            <!-- Player Login -->
+            <article>
+                <h3>Player Login</h3>
+                <form>
+                    <p>
+                        <label for="player-id-email">Player ID / Email</label>
+                        <input type="text" id="player-id-email" name="player_id_email" placeholder="PLY-001 or player@example.com">
+                    </p>
+                    <p>
+                        <label for="player-password">Password</label>
+                        <input type="password" id="player-password" name="player_password">
+                    </p>
+                    <p>
+                        <button type="submit">Login as Player</button>
+                    </p>
+                    <p>
+                        <a href="#">Forgot Password?</a>
+                    </p>
+                    <p>Don't have an account? Contact your Club Admin.</p>
+                </form>
+            </article>
+        </section>
+
+
+        <!-- SUPER ADMIN DASHBOARD -->
+        <section id="dashboard">
+            <h2>Main System Admin (Super Admin)</h2>
+            <p>Manage registered sports clubs across different districts.</p>
+
+            <!-- Add New Club -->
+            <article>
+                <h3>Add New Club</h3>
+                <form>
+                    <p>
+                        <label for="club-name">Club Name</label>
+                        <input type="text" id="club-name" name="club_name" placeholder="Club name">
+                    </p>
+                    <p>
+                        <label for="club-district">District</label>
+                        <select id="club-district" name="club_district">
+                            <option value="">Select District</option>
+                            <option>Dhaka</option>
+                            <option>Rajshahi</option>
+                            <option>Chattogram</option>
+                            <option>Sylhet</option>
+                            <option>Khulna</option>
+                            <option>Barishal</option>
+                            <option>Rangpur</option>
+                            <option>Mymensingh</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="club-address">Club Address</label>
+                        <textarea id="club-address" name="club_address" rows="3" placeholder="Full club address"></textarea>
+                    </p>
+                    <p>
+                        <label for="club-contact">Contact Number</label>
+                        <input type="tel" id="club-contact" name="club_contact" placeholder="01XXXXXXXXX">
+                    </p>
+                    <p>
+                        <label for="club-email">Email</label>
+                        <input type="email" id="club-email" name="club_email" placeholder="club@example.com">
+                    </p>
+                    <p>
+                        <label for="club-manager-name">Club Manager Name</label>
+                        <input type="text" id="club-manager-name" name="club_manager_name" placeholder="Manager full name">
+                    </p>
+                    <p>
+                        <button type="submit">Register Club</button>
+                    </p>
+                </form>
+            </article>
+
+            <!-- Registered Clubs -->
+            <article>
+                <h3>Registered Clubs</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Club ID</th>
+                            <th scope="col">Club Name</th>
+                            <th scope="col">District</th>
+                            <th scope="col">Manager</th>
+                            <th scope="col">Contact</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>DSC-001</td>
+                            <td>Rajshahi Sports Club</td>
+                            <td>Rajshahi</td>
+                            <td>Ahmed Rahman</td>
+                            <td>01700000001</td>
+                            <td>Active</td>
+                            <td>
+                                <a href="#">View</a>
+                                <a href="#">Edit</a>
+                                <a href="#">Delete</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>DSC-002</td>
+                            <td>Dhaka United Club</td>
+                            <td>Dhaka</td>
+                            <td>Tanvir Hasan</td>
+                            <td>01700000002</td>
+                            <td>Active</td>
+                            <td>
+                                <a href="#">View</a>
+                                <a href="#">Edit</a>
+                                <a href="#">Delete</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>DSC-003</td>
+                            <td>Chattogram Warriors</td>
+                            <td>Chattogram</td>
+                            <td>Rakib Hossain</td>
+                            <td>01700000003</td>
+                            <td>Pending</td>
+                            <td>
+                                <a href="#">View</a>
+                                <a href="#">Edit</a>
+                                <a href="#">Delete</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>DSC-004</td>
+                            <td>Sylhet Sports Academy</td>
+                            <td>Sylhet</td>
+                            <td>Fahim Ahmed</td>
+                            <td>01700000004</td>
+                            <td>Active</td>
+                            <td>
+                                <a href="#">View</a>
+                                <a href="#">Edit</a>
+                                <a href="#">Delete</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </article>
+        </section>
+
+
+        <!-- CLUB ADMIN DASHBOARD -->
+        <section id="clubs">
+            <h2>Club Admin (Club Manager)</h2>
+            <p>Manage players registered under a specific sports club.</p>
+
+            <!-- Register New Player -->
+            <article>
+                <h3>Register New Player</h3>
+                <form>
+                    <p>
+                        <label for="player-name">Player Name</label>
+                        <input type="text" id="player-name" name="player_name" placeholder="Player full name">
+                    </p>
+                    <p>
+                        <label for="player-id">Player ID</label>
+                        <input type="text" id="player-id" name="player_id" placeholder="PLY-005">
+                    </p>
+                    <p>
+                        <label for="player-dob">Date of Birth</label>
+                        <input type="date" id="player-dob" name="player_dob">
+                    </p>
+                    <p>
+                        <label for="player-gender">Gender</label>
+                        <select id="player-gender" name="player_gender">
+                            <option value="">Select Gender</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="player-district">District</label>
+                        <select id="player-district" name="player_district">
+                            <option value="">Select District</option>
+                            <option>Dhaka</option>
+                            <option>Rajshahi</option>
+                            <option>Chattogram</option>
+                            <option>Sylhet</option>
+                            <option>Khulna</option>
+                            <option>Barishal</option>
+                            <option>Rangpur</option>
+                            <option>Mymensingh</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="player-sport">Sport</label>
+                        <select id="player-sport" name="player_sport">
+                            <option value="">Select Sport</option>
+                            <option>Football</option>
+                            <option>Cricket</option>
+                            <option>Badminton</option>
+                            <option>Athletics</option>
+                            <option>Basketball</option>
+                            <option>Volleyball</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="player-position">Position</label>
+                        <input type="text" id="player-position" name="player_position" placeholder="e.g. Midfielder">
+                    </p>
+                    <p>
+                        <label for="player-contact">Contact Number</label>
+                        <input type="tel" id="player-contact" name="player_contact" placeholder="01XXXXXXXXX">
+                    </p>
+                    <p>
+                        <label for="player-email">Email</label>
+                        <input type="email" id="player-email" name="player_email" placeholder="player@example.com">
+                    </p>
+                    <p>
+                        <button type="submit">Register Player</button>
+                    </p>
+                </form>
+            </article>
+
+            <!-- Club Player Roster -->
+            <article>
+                <h3>Club Player Roster</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Player ID</th>
+                            <th scope="col">Player Name</th>
+                            <th scope="col">Sport</th>
+                            <th scope="col">Position</th>
+                            <th scope="col">District</th>
+                            <th scope="col">Contact</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>PLY-001</td>
+                            <td>Rahim Ahmed</td>
+                            <td>Football</td>
+                            <td>Midfielder</td>
+                            <td>Rajshahi</td>
+                            <td>01800000001</td>
+                            <td>Active</td>
+                            <td>
+                                <a href="#">View</a>
+                                <a href="#">Edit</a>
+                                <a href="#">Remove</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>PLY-002</td>
+                            <td>Sakib Hasan</td>
+                            <td>Cricket</td>
+                            <td>Batsman</td>
+                            <td>Dhaka</td>
+                            <td>01800000002</td>
+                            <td>Active</td>
+                            <td>
+                                <a href="#">View</a>
+                                <a href="#">Edit</a>
+                                <a href="#">Remove</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>PLY-003</td>
+                            <td>Nayeem Islam</td>
+                            <td>Football</td>
+                            <td>Goalkeeper</td>
+                            <td>Chattogram</td>
+                            <td>01800000003</td>
+                            <td>Active</td>
+                            <td>
+                                <a href="#">View</a>
+                                <a href="#">Edit</a>
+                                <a href="#">Remove</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>PLY-004</td>
+                            <td>Arif Hossain</td>
+                            <td>Badminton</td>
+                            <td>Singles</td>
+                            <td>Sylhet</td>
+                            <td>01800000004</td>
+                            <td>Pending</td>
+                            <td>
+                                <a href="#">View</a>
+                                <a href="#">Edit</a>
+                                <a href="#">Remove</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </article>
+        </section>
+
+
+        <!-- PLAYER DASHBOARD -->
+        <section id="players">
+            <h2>Player Dashboard</h2>
+            <p>
+                Players can view their personal information, club information,
+                sports information, tournament participation, performance,
+                and achievements.
+            </p>
+
+            <!-- My Profile -->
+            <article>
+                <h3>My Profile</h3>
+                <dl>
+                    <dt>Player Name</dt>
+                    <dd>Rahim Ahmed</dd>
+
+                    <dt>Player ID</dt>
+                    <dd>PLY-001</dd>
+
+                    <dt>Date of Birth</dt>
+                    <dd>15 March 2004</dd>
+
+                    <dt>Gender</dt>
+                    <dd>Male</dd>
+
+                    <dt>District</dt>
+                    <dd>Rajshahi</dd>
+
+                    <dt>Contact</dt>
+                    <dd>01800000001</dd>
+
+                    <dt>Email</dt>
+                    <dd>rahim@example.com</dd>
+
+                    <dt>Status</dt>
+                    <dd>Active</dd>
+                </dl>
+            </article>
+
+            <!-- My Club -->
+            <article>
+                <h3>My Club</h3>
+                <dl>
+                    <dt>Club</dt>
+                    <dd>Rajshahi Sports Club</dd>
+
+                    <dt>Manager</dt>
+                    <dd>Ahmed Rahman</dd>
+
+                    <dt>District</dt>
+                    <dd>Rajshahi</dd>
+
+                    <dt>Status</dt>
+                    <dd>Active</dd>
+                </dl>
+            </article>
+
+            <!-- My Sport -->
+            <article>
+                <h3>My Sport</h3>
+                <dl>
+                    <dt>Sport</dt>
+                    <dd>Football</dd>
+
+                    <dt>Position</dt>
+                    <dd>Midfielder</dd>
+
+                    <dt>Jersey Number</dt>
+                    <dd>10</dd>
+                </dl>
+            </article>
+
+            <!-- Tournament Participation -->
+            <article>
+                <h3>Tournament Participation</h3>
+                <dl>
+                    <dt>Tournament</dt>
+                    <dd>District Football Championship 2026</dd>
+
+                    <dt>Matches Played</dt>
+                    <dd>12</dd>
+
+                    <dt>Status</dt>
+                    <dd>Participating</dd>
+                </dl>
+            </article>
+
+            <!-- Performance -->
+            <article>
+                <h3>Performance</h3>
+                <dl>
+                    <dt>Matches</dt>
+                    <dd>12</dd>
+
+                    <dt>Goals</dt>
+                    <dd>7</dd>
+
+                    <dt>Assists</dt>
+                    <dd>5</dd>
+
+                    <dt>Yellow Cards</dt>
+                    <dd>1</dd>
+
+                    <dt>Red Cards</dt>
+                    <dd>0</dd>
+                </dl>
+            </article>
+
+            <!-- Achievements -->
+            <article>
+                <h3>Achievements</h3>
+                <ul>
+                    <li>District Champion 2025</li>
+                    <li>Best Midfielder 2025</li>
+                    <li>Man of the Match x3</li>
+                </ul>
+            </article>
+        </section>
+
+
+        <!-- PUBLIC & SCOUT PORTAL -->
+        <section id="scout">
+            <h2>Public &amp; Scout Portal</h2>
+            <p>Search players, clubs, tournament results, and district sports information.</p>
+
+            <!-- Search & Filter -->
+            <article>
+                <h3>Search &amp; Filter</h3>
+                <form>
+                    <p>
+                        <label for="search-query">Search Player or Club</label>
+                        <input type="search" id="search-query" name="search_query" placeholder="Player or club name">
+                    </p>
+                    <p>
+                        <label for="filter-district">District</label>
+                        <select id="filter-district" name="filter_district">
+                            <option value="">All Districts</option>
+                            <option>Dhaka</option>
+                            <option>Rajshahi</option>
+                            <option>Chattogram</option>
+                            <option>Sylhet</option>
+                            <option>Khulna</option>
+                            <option>Barishal</option>
+                            <option>Rangpur</option>
+                            <option>Mymensingh</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="filter-sport">Sport</label>
+                        <select id="filter-sport" name="filter_sport">
+                            <option value="">All Sports</option>
+                            <option>Football</option>
+                            <option>Cricket</option>
+                            <option>Badminton</option>
+                            <option>Athletics</option>
+                            <option>Basketball</option>
+                            <option>Volleyball</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="filter-player-status">Player Status</label>
+                        <select id="filter-player-status" name="filter_player_status">
+                            <option value="">All Status</option>
+                            <option>Active</option>
+                            <option>Pending</option>
+                            <option>Inactive</option>
+                        </select>
+                    </p>
+                    <p>
+                        <button type="submit">Search</button>
+                    </p>
+                </form>
+            </article>
+
+            <!-- District Championship Points Table -->
+            <article>
+                <h3>District Championship Points Table</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Rank</th>
+                            <th scope="col">District</th>
+                            <th scope="col">Football</th>
+                            <th scope="col">Cricket</th>
+                            <th scope="col">Badminton</th>
+                            <th scope="col">Athletics</th>
+                            <th scope="col">Total Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Rajshahi</td>
+                            <td>80</td>
+                            <td>70</td>
+                            <td>60</td>
+                            <td>55</td>
+                            <td>265</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Dhaka</td>
+                            <td>75</td>
+                            <td>80</td>
+                            <td>55</td>
+                            <td>50</td>
+                            <td>260</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Chattogram</td>
+                            <td>70</td>
+                            <td>65</td>
+                            <td>70</td>
+                            <td>45</td>
+                            <td>250</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Sylhet</td>
+                            <td>60</td>
+                            <td>55</td>
+                            <td>65</td>
+                            <td>50</td>
+                            <td>230</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </article>
+        </section>
+
+
+        <!-- TOURNAMENTS -->
+        <section id="tournaments">
+            <h2>Tournaments</h2>
+
+            <article>
+                <h3>District Football Championship 2026</h3>
+                <dl>
+                    <dt>Sport</dt>
+                    <dd>Football</dd>
+
+                    <dt>Registration Status</dt>
+                    <dd>Open</dd>
+
+                    <dt>Date</dt>
+                    <dd>15 October 2026</dd>
+
+                    <dt>District</dt>
+                    <dd>Rajshahi</dd>
+
+                    <dt>Description</dt>
+                    <dd>The annual district level football championship where clubs compete for the district title.</dd>
+                </dl>
+                <p>
+                    <a href="#">View Details</a>
+                    <a href="#">Register</a>
+                </p>
+            </article>
+
+            <article>
+                <h3>Inter-District Cricket Tournament</h3>
+                <dl>
+                    <dt>Sport</dt>
+                    <dd>Cricket</dd>
+
+                    <dt>Registration Status</dt>
+                    <dd>Closing Soon</dd>
+
+                    <dt>Date</dt>
+                    <dd>28 October 2026</dd>
+
+                    <dt>District</dt>
+                    <dd>Dhaka</dd>
+
+                    <dt>Description</dt>
+                    <dd>A multi district cricket tournament where clubs submit their player lists before the deadline.</dd>
+                </dl>
+                <p>
+                    <a href="#">View Details</a>
+                    <a href="#">Register</a>
+                </p>
+            </article>
+
+            <article>
+                <h3>National Badminton Championship</h3>
+                <dl>
+                    <dt>Sport</dt>
+                    <dd>Badminton</dd>
+
+                    <dt>Registration Status</dt>
+                    <dd>Open</dd>
+
+                    <dt>Date</dt>
+                    <dd>12 November 2026</dd>
+
+                    <dt>District</dt>
+                    <dd>Chattogram</dd>
+
+                    <dt>Description</dt>
+                    <dd>A national level badminton championship featuring players from all districts.</dd>
+                </dl>
+                <p>
+                    <a href="#">View Details</a>
+                    <a href="#">Register</a>
+                </p>
+            </article>
+
+            <article>
+                <h3>District Athletics Championship</h3>
+                <dl>
+                    <dt>Sport</dt>
+                    <dd>Athletics</dd>
+
+                    <dt>Registration Status</dt>
+                    <dd>Closed</dd>
+
+                    <dt>Date</dt>
+                    <dd>5 December 2026</dd>
+
+                    <dt>District</dt>
+                    <dd>Sylhet</dd>
+
+                    <dt>Description</dt>
+                    <dd>A district level athletics championship covering track and field events.</dd>
+                </dl>
+                <p>
+                    <a href="#">View Details</a>
+                    <a href="#">Register</a>
+                </p>
+            </article>
+        </section>
+
+
+        <!-- RANKINGS -->
+        <section id="rankings">
+            <h2>District Sports Rankings</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">Rank</th>
+                        <th scope="col">District</th>
+                        <th scope="col">Total Points</th>
+                        <th scope="col">Clubs</th>
+                        <th scope="col">Players</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Rajshahi</td>
+                        <td>265</td>
+                        <td>12</td>
+                        <td>145</td>
+                        <td>Leading</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Dhaka</td>
+                        <td>260</td>
+                        <td>18</td>
+                        <td>210</td>
+                        <td>Active</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Chattogram</td>
+                        <td>250</td>
+                        <td>14</td>
+                        <td>170</td>
+                        <td>Active</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Sylhet</td>
+                        <td>230</td>
+                        <td>10</td>
+                        <td>120</td>
+                        <td>Active</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+
+        <!-- NEWS -->
+        <section id="news">
+            <h2>News &amp; Announcements</h2>
+
+            <article>
+                <h3>District Football Championship 2026</h3>
+                <p>Registration for the district football championship is now open.</p>
+                <p><a href="#">Read More</a></p>
+            </article>
+
+            <article>
+                <h3>Inter-District Cricket Tournament</h3>
+                <p>Clubs can submit their player lists before the registration deadline.</p>
+                <p><a href="#">Read More</a></p>
+            </article>
+
+            <article>
+                <h3>New Sports Clubs Added</h3>
+                <p>Several new clubs have recently joined the District Sports platform.</p>
+                <p><a href="#">Read More</a></p>
+            </article>
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer>
+        <h2>District Sports</h2>
+        <p>Sports Excellence Across Bangladesh</p>
+
+        <nav>
+            <ul>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Contact</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms &amp; Conditions</a></li>
+            </ul>
+        </nav>
+
+        <p>&copy; 2026 District Sports. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>
