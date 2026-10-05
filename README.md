@@ -329,23 +329,6 @@ This project is developed as an **academic software engineering project** with t
 ---
 
 
-## 👨‍💻 Contributors
-
-
-Add your team members here:
-
-
-| Name | Role |
-|---|---|
-| Team Member 1 | Project Manager / Developer |
-| Team Member 2 | Developer |
-| Team Member 3 | UI/UX Designer |
-| Team Member 4 | Database / Backend |
-| Team Member 5 | Documentation |
-
-
----
-
 
 ## 📄 License
 
