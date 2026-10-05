@@ -248,12 +248,8 @@ Security considerations include:
 - JavaScript
 
 
-### Backend
-- [Add your backend technology here]
-
-
 ### Database
-- [Add your database here]
+- Supabase
 
 
 ### Tools
