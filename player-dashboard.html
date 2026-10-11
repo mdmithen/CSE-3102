@@ -180,7 +180,7 @@
     <!-- ============== VIEW: MY CLUB ============== -->
     <section class="pd-view" id="view-club">
       <div class="box pd-club-head">
-        <img class="pd-club-img" src="images/clubs.png" alt="Club (demo)" loading="lazy"
+        <img class="pd-club-img" id="clubLogo" src="images/clubs.png" alt="Club logo (demo)" loading="lazy"
              onerror="this.style.display='none';">
         <div>
           <h3 id="clubName">Rajshahi Sports Club</h3>
@@ -200,6 +200,17 @@
           <dl class="pd-details" id="clubContact"></dl>
         </div>
       </div>
+
+      <div class="box">
+        <div class="box-head">
+          <div>
+            <h3>👥 Members</h3>
+            <p class="muted">A preview of the squad — see the full list for filters and profiles.</p>
+          </div>
+          <a href="#members" class="btn btn-green small pd-jump" data-view="members">View all members →</a>
+        </div>
+        <div class="pd-member-strip" id="clubMemberStrip"></div>
+      </div>
     </section>
 
     <!-- ============== VIEW: CLUB MEMBERS ============== -->
@@ -207,26 +218,53 @@
       <div class="box">
         <div class="box-head">
           <div>
-            <h3>👥 Club Roster</h3>
-            <p class="muted">Players registered at <span class="pd-inline-club">Rajshahi Sports Club</span> (demo)</p>
+            <h3>👥 Club Members</h3>
+            <p class="muted">Registered at <span class="pd-inline-club">Rajshahi Sports Club</span> — sample data</p>
           </div>
-          <input type="search" class="mini-select pd-roster-search" id="rosterSearch"
-                 placeholder="🔍 Search members..." aria-label="Search club members">
+          <span class="badge green" id="memberCount">0 members</span>
         </div>
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">Player ID</th>
-              <th scope="col">Name</th>
-              <th scope="col">Sport</th>
-              <th scope="col">Position</th>
-              <th scope="col">District</th>
-              <th scope="col">Status</th>
-            </tr>
-          </thead>
-          <tbody id="rosterBody"></tbody>
-        </table>
-        <p class="muted pd-note" id="rosterEmpty" hidden>No members match your search.</p>
+
+        <!-- Search + filters -->
+        <div class="pd-filters">
+          <div class="pd-filter-grow">
+            <label for="memberSearch">Search</label>
+            <input type="search" id="memberSearch" placeholder="🔍 Name, player ID, position..."
+                   aria-label="Search club members">
+          </div>
+          <div>
+            <label for="memberPosition">Position</label>
+            <select id="memberPosition" aria-label="Filter by position">
+              <option value="">All positions</option>
+            </select>
+          </div>
+          <div>
+            <label for="memberSport">Sport</label>
+            <select id="memberSport" aria-label="Filter by sport">
+              <option value="">All sports</option>
+            </select>
+          </div>
+          <div>
+            <label for="memberStatus">Status</label>
+            <select id="memberStatus" aria-label="Filter by status">
+              <option value="">All statuses</option>
+              <option value="Active">Active</option>
+              <option value="Pending">Pending</option>
+            </select>
+          </div>
+          <div class="pd-filter-btn">
+            <button class="btn btn-outline small" id="memberClear" type="button">Clear</button>
+          </div>
+        </div>
+
+        <p class="muted pd-count-line" id="memberCountText"></p>
+
+        <div class="pd-member-grid" id="memberGrid"></div>
+
+        <div class="pd-empty" id="memberEmpty" hidden>
+          <p>🔍 <b>No members match your search.</b></p>
+          <p class="muted">Try a different name, player ID, or clear the filters.</p>
+          <button class="btn btn-outline small" id="memberEmptyClear" type="button">Clear all filters</button>
+        </div>
       </div>
     </section>
 
@@ -236,7 +274,7 @@
         <div class="box-head">
           <div>
             <h3>⚽ Season Summary</h3>
-            <p class="muted">District Football Championship 2026 (demo)</p>
+            <p class="muted" id="perfSeasonLabel">Derived from the match history below — sample data</p>
           </div>
           <span class="badge green">Midfielder</span>
         </div>
@@ -251,9 +289,11 @@
               <tr>
                 <th scope="col">Competition</th>
                 <th scope="col">P</th>
+                <th scope="col">W</th>
+                <th scope="col">D</th>
+                <th scope="col">L</th>
                 <th scope="col">G</th>
                 <th scope="col">A</th>
-                <th scope="col">Points</th>
               </tr>
             </thead>
             <tbody id="perfTable"></tbody>
@@ -263,6 +303,86 @@
         <div class="box">
           <h3>🏅 Achievements</h3>
           <ul class="pd-awards" id="awardsList"></ul>
+        </div>
+      </div>
+
+      <!-- Progress chart -->
+      <div class="box">
+        <div class="box-head">
+          <div>
+            <h3>📊 Progress Over Time</h3>
+            <p class="muted">Cumulative goals and assists across every match this season — sample data</p>
+          </div>
+          <span class="badge yellow">Demo chart</span>
+        </div>
+        <div class="pd-chart" id="perfChart" role="img"
+             aria-label="Line chart of cumulative goals and assists over the season"></div>
+        <div class="pd-chart-legend">
+          <span><i class="pd-key pd-key-goals"></i>Goals</span>
+          <span><i class="pd-key pd-key-assists"></i>Assists</span>
+        </div>
+        <h4 class="pd-subhead">Recent form (last 5)</h4>
+        <div class="pd-form-strip" id="perfForm"></div>
+      </div>
+
+      <!-- Match history with filters -->
+      <div class="box">
+        <div class="box-head">
+          <div>
+            <h3>📜 Match History</h3>
+            <p class="muted" id="perfHistoryMeta">Every match this season — sample data</p>
+          </div>
+        </div>
+
+        <div class="pd-filters">
+          <div>
+            <label for="histPeriod">Period</label>
+            <select id="histPeriod" aria-label="Filter matches by month">
+              <option value="">All months</option>
+            </select>
+          </div>
+          <div>
+            <label for="histTournament">Tournament</label>
+            <select id="histTournament" aria-label="Filter matches by tournament">
+              <option value="">All tournaments</option>
+            </select>
+          </div>
+          <div>
+            <label for="histResult">Result</label>
+            <select id="histResult" aria-label="Filter matches by result">
+              <option value="">All results</option>
+              <option value="win">Wins</option>
+              <option value="draw">Draws</option>
+              <option value="loss">Losses</option>
+            </select>
+          </div>
+          <div class="pd-filter-btn">
+            <button class="btn btn-outline small" id="histClear" type="button">Clear</button>
+          </div>
+        </div>
+
+        <p class="muted pd-count-line" id="histCountText"></p>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Date</th>
+              <th scope="col">Opponent</th>
+              <th scope="col">Tournament</th>
+              <th scope="col">Result</th>
+              <th scope="col">Score</th>
+              <th scope="col">My performance</th>
+              <th scope="col">Details</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+
+        <div class="pd-empty" id="histEmpty" hidden>
+          <p>🔍 <b>No matches match these filters.</b></p>
+          <p class="muted">Try a different month, tournament or result.</p>
+          <button class="btn btn-outline small" id="histEmptyClear" type="button">Clear all filters</button>
         </div>
       </div>
     </section>
@@ -346,19 +466,13 @@
       </div>
 
       <div class="box">
-        <h3>📜 Match History</h3>
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">Date</th>
-              <th scope="col">Tournament</th>
-              <th scope="col">Opponent</th>
-              <th scope="col">Result</th>
-              <th scope="col">Score</th>
-            </tr>
-          </thead>
-          <tbody id="historyBody"></tbody>
-        </table>
+        <div class="box-head">
+          <div>
+            <h3>📜 Match History</h3>
+            <p class="muted">Completed matches with filters and per-match detail live in My Performance.</p>
+          </div>
+          <a href="#performance" class="btn btn-green small pd-jump" data-view="performance">Open My Performance →</a>
+        </div>
       </div>
     </section>
 
@@ -455,10 +569,22 @@
     </section>
 
     <footer class="foot">
-      © 2026 District Sports — Player Dashboard · Part 1 demo build · All data below is sample data,
+      © 2026 District Sports — Player Dashboard · Part 2 demo build · All data below is sample data,
       no database or Supabase connection yet.
     </footer>
   </main>
+
+  <!-- Shared detail popup (member profile / match details) -->
+  <div class="pd-modal" id="pdModal" hidden>
+    <div class="pd-modal-backdrop" data-modal-close="1"></div>
+    <div class="pd-modal-card" role="dialog" aria-modal="true" aria-labelledby="pdModalTitle">
+      <div class="pd-modal-head">
+        <h3 id="pdModalTitle"></h3>
+        <button type="button" class="pd-modal-close" id="pdModalClose" aria-label="Close details">✕</button>
+      </div>
+      <div class="pd-modal-body" id="pdModalBody"></div>
+    </div>
+  </div>
 
   <!-- Toast -->
   <div class="pd-toast" id="pdToast" role="status" aria-live="polite" hidden></div>
