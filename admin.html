@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — District Sports</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- ========== SIDEBAR (left menu) ========== -->
+  <aside class="sidebar">
+    <div class="logo">
+      <span>🏆</span>
+      <div><h1>District Sports</h1><p>Super Admin</p></div>
+    </div>
+
+    <nav>
+      <ul>
+        <li><a href="index.html">🏠 Back to Home</a></li>
+        <li><a href="login.html">🚪 Logout</a></li>
+      </ul>
+    </nav>
+
+    <div class="admin-card">
+      <p>👨‍💼</p>
+      <b>Admin</b>
+      <small>admin@districtsports.com</small>
+    </div>
+  </aside>
+
+  <!-- ========== MAIN (right side) ========== -->
+  <main class="main">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div>
+        <h2>Dashboard</h2>
+        <p>Manage clubs across all districts.</p>
+      </div>
+      <div class="top-actions">
+        <input type="search" placeholder="🔍 Search club...">
+        <a href="#add-club" class="btn btn-green">+ Add Club</a>
+      </div>
+    </header>
+
+    <!-- 4 small stat boxes -->
+    <section class="grid-4">
+      <div class="stat-card"><span>🏟️</span><div><b>48</b><small>Total Clubs</small></div></div>
+      <div class="stat-card"><span>👥</span><div><b>620</b><small>Total Players</small></div></div>
+      <div class="stat-card"><span>🏆</span><div><b>12</b><small>Tournaments</small></div></div>
+      <div class="stat-card"><span>🗺️</span><div><b>8</b><small>Districts</small></div></div>
+    </section>
+
+    <!-- Add new club form -->
+    <section id="add-club" class="box">
+      <h3>➕ Add New Club</h3>
+      <p class="muted">Fill in club details to register a new club.</p>
+      <form class="form-grid">
+        <div>
+          <label for="club-name">Club Name</label>
+          <input id="club-name" type="text" placeholder="e.g. Rajshahi Sports Club">
+        </div>
+        <div>
+          <label for="club-district">District</label>
+          <select id="club-district">
+            <option>Select District</option>
+            <option>Dhaka</option>
+            <option>Rajshahi</option>
+            <option>Chattogram</option>
+            <option>Sylhet</option>
+            <option>Khulna</option>
+            <option>Barishal</option>
+            <option>Rangpur</option>
+            <option>Mymensingh</option>
+          </select>
+        </div>
+        <div>
+          <label for="club-manager">Manager Name</label>
+          <input id="club-manager" type="text" placeholder="Manager full name">
+        </div>
+        <div>
+          <label for="club-contact">Contact Number</label>
+          <input id="club-contact" type="tel" placeholder="01XXXXXXXXX">
+        </div>
+        <div class="full">
+          <label for="club-address">Club Address</label>
+          <input id="club-address" type="text" placeholder="Full club address">
+        </div>
+        <div class="full">
+          <button type="submit" class="btn btn-green">Register Club</button>
+          <button type="reset" class="btn btn-outline">Clear</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Clubs table -->
+    <section id="clubs" class="box">
+      <div class="box-head">
+        <div>
+          <h3>🏟️ Registered Clubs</h3>
+          <p class="muted">All clubs in the system.</p>
+        </div>
+        <select class="mini-select">
+          <option>All Districts</option>
+          <option>Dhaka</option>
+          <option>Rajshahi</option>
+          <option>Chattogram</option>
+          <option>Sylhet</option>
+        </select>
+      </div>
+
+      <table class="table">
+        <tr>
+          <th>Club ID</th>
+          <th>Club Name</th>
+          <th>District</th>
+          <th>Manager</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+        <tr>
+          <td>DSC-001</td>
+          <td>Rajshahi Sports Club</td>
+          <td>Rajshahi</td>
+          <td>Ahmed Rahman</td>
+          <td><span class="badge green">Active</span></td>
+          <td><a href="#">View</a> | <a href="#">Edit</a> | <a href="#" class="danger">Delete</a></td>
+        </tr>
+        <tr>
+          <td>DSC-002</td>
+          <td>Dhaka United Club</td>
+          <td>Dhaka</td>
+          <td>Tanvir Hasan</td>
+          <td><span class="badge green">Active</span></td>
+          <td><a href="#">View</a> | <a href="#">Edit</a> | <a href="#" class="danger">Delete</a></td>
+        </tr>
+        <tr>
+          <td>DSC-003</td>
+          <td>Chattogram Warriors</td>
+          <td>Chattogram</td>
+          <td>Rakib Hossain</td>
+          <td><span class="badge yellow">Pending</span></td>
+          <td><a href="#">View</a> | <a href="#">Edit</a> | <a href="#" class="danger">Delete</a></td>
+        </tr>
+        <tr>
+          <td>DSC-004</td>
+          <td>Sylhet Sports Academy</td>
+          <td>Sylhet</td>
+          <td>Fahim Ahmed</td>
+          <td><span class="badge green">Active</span></td>
+          <td><a href="#">View</a> | <a href="#">Edit</a> | <a href="#" class="danger">Delete</a></td>
+        </tr>
+      </table>
+    </section>
+
+    <footer class="foot">© 2026 District Sports — Admin Panel</footer>
+  </main>
+
+</body>
+</html>

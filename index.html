@@ -4,301 +4,265 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>District Sports — Sports Excellence Across Bangladesh</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <!-- ==================== MENU BAR (HEADER) ==================== -->
-  <header>
-    <div class="logo">
-      <h1>🏆 District Sports</h1>
-      <p>Sports Excellence Across Bangladesh</p>
-    </div>
-
-    <nav>
-      <ul>
-        <li><a href="#">Home</a></li>
-        <li><a href="login-system.html#clubs">Clubs</a></li>
-        <li><a href="login-system.html#players">Players</a></li>
-        <li><a href="login-system.html#tournaments">Tournaments</a></li>
-        <li><a href="login-system.html#rankings">Rankings</a></li>
-        <li><a href="login-system.html#news">News</a></li>
-        <li><a href="#">About</a></li>
-      </ul>
-    </nav>
-
-    <div class="header-buttons">
-      <a href="login-system.html#login">Login</a>
-      <a href="login-system.html">Get Started</a>
+  <!-- ========== HEADER ========== -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <div class="logo">
+        <span class="logo-icon">🏆</span>
+        <div>
+          <h1>District Sports</h1>
+          <p>Sports Excellence Across Bangladesh</p>
+        </div>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#" class="active">Home</a></li>
+          <li><a href="login-system.html#clubs">Clubs</a></li>
+          <li><a href="login-system.html#players">Players</a></li>
+          <li><a href="login-system.html#tournaments">Tournaments</a></li>
+          <li><a href="login-system.html#rankings">Rankings</a></li>
+          <li><a href="login-system.html#news">News</a></li>
+          <li><a href="#">About</a></li>
+        </ul>
+      </nav>
+      <div class="nav-buttons">
+        <a href="login.html" class="btn btn-outline">Login</a>
+        <a href="login.html" class="btn btn-green">Get Started</a>
+      </div>
     </div>
   </header>
 
-
-  <!-- ==================== HERO (MAIN BANNER) ==================== -->
-  <section class="hero">
-    <h2>Empowering Sports Excellence Across <span>Bangladesh</span></h2>
-    <p>A unified digital platform connecting sports clubs, players, tournaments, and communities across every district.</p>
-
-    <div class="hero-buttons">
-      <a href="#">Explore Clubs →</a>
-      <a href="#">Get Started</a>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats">
-      <div class="stat-item">
-        <h3>64+</h3>
-        <p>Districts</p>
-      </div>
-      <div class="stat-item">
-        <h3>500+</h3>
-        <p>Clubs</p>
-      </div>
-      <div class="stat-item">
-        <h3>10K+</h3>
-        <p>Players</p>
-      </div>
-      <div class="stat-item">
-        <h3>100+</h3>
-        <p>Tournaments</p>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ==================== FEATURE CARDS ==================== -->
-  <section class="features">
-    <p class="small-title">OUR PLATFORM</p>
-    <h2>One Platform. Every District.</h2>
-    <p>Bringing Bangladesh's sports clubs, athletes, tournaments and rankings together in one centralized digital ecosystem.</p>
-
-    <div class="cards">
-      <div class="card">
-        <img src="images/clubs.png" alt="District Clubs">
-        <h3>District Clubs</h3>
-        <p>Discover and manage registered sports clubs across all districts.</p>
-        <a href="#">→</a>
-      </div>
-
-      <div class="card">
-        <img src="images/players.png" alt="Player Profiles">
-        <h3>Player Profiles</h3>
-        <p>Digital player cards and performance history.</p>
-        <a href="#">→</a>
-      </div>
-
-      <div class="card">
-        <img src="images/trophy.png" alt="Tournaments">
-        <h3>Tournaments</h3>
-        <p>Manage competitions, fixtures and results.</p>
-        <a href="#">→</a>
-      </div>
-
-      <div class="card">
-        <img src="images/rankings.png" alt="Rankings">
-        <h3>Rankings</h3>
-        <p>Real-time points tables and player rankings.</p>
-        <a href="#">→</a>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ==================== EXPLORE DISTRICTS ==================== -->
-  <section class="districts">
-    <p class="small-title">EXPLORE</p>
-    <h2>Explore Sports Across Bangladesh</h2>
-    <p>Select a district to view clubs, players, tournaments and activities.</p>
-
-    <select>
-      <option>Select a District</option>
-      <option>Dhaka</option>
-      <option>Chattogram</option>
-      <option>Sylhet</option>
-      <option>Rajshahi</option>
-      <option>Khulna</option>
-      <option>Barishal</option>
-      <option>Rangpur</option>
-      <option>Mymensingh</option>
-    </select>
-
-    <div class="district-card">
-      <img src="images/dhaka.jpg" alt="Dhaka District">
-      <div>
-        <h3>Dhaka District</h3>
-        <p>42 Clubs</p>
-        <p>1,240 Players</p>
-        <p>18 Active Tournaments</p>
-        <a href="#">View District Details →</a>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ==================== EXPLORE SPORTS ==================== -->
-  <section class="sports">
-    <p class="small-title">SPORTS</p>
-    <h2>Explore Sports</h2>
-    <p>Football and Cricket. One community.</p>
-
-    <div class="sports-list">
-      <div class="sport-item">
-        <img src="images/football.jpg" alt="Football">
-        <p>Football</p>
-      </div>
-      <div class="sport-item">
-        <img src="images/cricket.jpg" alt="Cricket">
-        <p>Cricket</p>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ==================== TOURNAMENTS + RANKINGS ==================== -->
-  <section class="tournaments-rankings">
-
-    <div class="tournaments">
-      <p class="small-title">UPCOMING TOURNAMENTS</p>
-      <h2>Compete. Perform. Rise.</h2>
-      <p>Be part of exciting district tournaments across Bangladesh.</p>
-
-      <div class="tournament-card">
-        <img src="images/tournament.jpg" alt="Tournament">
-        <div>
-          <h3>Dhaka District Football Championship 2026</h3>
-          <p>📅 15 October 2026</p>
-          <p>📍 Dhaka</p>
-          <p>👥 24 Clubs</p>
-          <a href="#">View Tournament →</a>
+  <main>
+    <!-- ========== HERO ========== -->
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-text">
+          <h2>Empowering Sports Excellence Across <span>Bangladesh</span></h2>
+          <p>A unified digital platform connecting sports clubs, players, tournaments, and communities across every district.</p>
+          <div class="hero-buttons">
+            <a href="#" class="btn btn-green">Explore Clubs →</a>
+            <a href="login.html" class="btn btn-outline">Get Started</a>
+          </div>
+          <div class="stats">
+            <div class="stat"><span>🏟️</span><div><b>64+</b><small>Districts</small></div></div>
+            <div class="stat"><span>⚽</span><div><b>500+</b><small>Clubs</small></div></div>
+            <div class="stat"><span>👥</span><div><b>10K+</b><small>Players</small></div></div>
+            <div class="stat"><span>🏆</span><div><b>100+</b><small>Tournaments</small></div></div>
+          </div>
+        </div>
+        <div class="hero-map">
+          <h3>🗺️ Bangladesh Districts</h3>
+          <ul>
+            <li>Rangpur</li>
+            <li>Rajshahi</li>
+            <li>Mymensingh</li>
+            <li>Sylhet</li>
+            <li class="highlight">🔴 Dhaka</li>
+            <li>Khulna</li>
+            <li>Barishal</li>
+            <li>Chattogram</li>
+          </ul>
+          <p class="quote">"One Nation, Many Champions"</p>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="rankings">
-      <p class="small-title">LIVE RANKINGS</p>
-      <h2>Real-Time Rankings</h2>
-      <p>Latest points table from district tournaments.</p>
-
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Club</th>
-            <th>Played</th>
-            <th>Points</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>Dhaka United</td>
-            <td>12</td>
-            <td>31</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Uttara Sports Club</td>
-            <td>12</td>
-            <td>28</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>Mirpur Athletic</td>
-            <td>12</td>
-            <td>25</td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td>Gulshan Tigers</td>
-            <td>12</td>
-            <td>22</td>
-          </tr>
-          <tr>
-            <td>5</td>
-            <td>Mohammadpur SC</td>
-            <td>12</td>
-            <td>20</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-  </section>
-
-
-  <!-- ==================== PLAYER SPOTLIGHT + NEWS ==================== -->
-  <section class="players-news">
-
-    <div class="players">
-      <p class="small-title">PLAYER SPOTLIGHT</p>
-      <h2>Discover the Next Generation of Champions</h2>
-      <p>Talented athletes from every district.</p>
-
-      <div class="player-list">
-        <div class="player-item">
-          <img src="images/rahim.jpg" alt="Rahim Ahmed">
-          <h3>Rahim Ahmed</h3>
-          <p>Football | Dhaka</p>
-          <a href="#">View Profile →</a>
+    <!-- ========== PLATFORM FEATURES ========== -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="small-title">OUR PLATFORM</p>
+            <h2>One Platform. Every District.</h2>
+            <p class="muted">Everything in one place — clubs, players, tournaments, rankings.</p>
+          </div>
+          <a href="#" class="btn btn-outline small">View All Features →</a>
         </div>
-        <div class="player-item">
-          <img src="images/nusrat.jpg" alt="Nusrat Jahan">
-          <h3>Nusrat Jahan</h3>
-          <p>Cricket | Chattogram</p>
-        </div>
-        <div class="player-item">
-          <img src="images/tanek.jpg" alt="Tanek Hasan">
-          <h3>Tanek Hasan</h3>
-          <p>Cricket | Rajshahi</p>
-        </div>
-        <div class="player-item">
-          <img src="images/sadia.jpg" alt="Sadia Akter">
-          <h3>Sadia Akter</h3>
-          <p>Football | Sylhet</p>
+        <div class="grid-4">
+          <div class="card green"><div class="icon">🏟️</div><div><h3>District Clubs</h3><p>Registered sports clubs across all districts.</p></div></div>
+          <div class="card blue"><div class="icon">👤</div><div><h3>Player Profiles</h3><p>Digital player cards and history.</p></div></div>
+          <div class="card yellow"><div class="icon">🏆</div><div><h3>Tournaments</h3><p>Fixtures, competitions and results.</p></div></div>
+          <div class="card purple"><div class="icon">📊</div><div><h3>Rankings</h3><p>Live points tables and rankings.</p></div></div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="news">
-      <p class="small-title">NEWS &amp; ANNOUNCEMENTS</p>
-      <h2>Latest From The Sports Community</h2>
-      <p>Updates, events and stories from across districts.</p>
-
-      <div class="news-list">
-        <div class="news-item">
-          <img src="images/news1.jpg" alt="News 1">
-          <h3>District Championship begins across Bangladesh</h3>
-          <p>Oct 10, 2026</p>
+    <!-- ========== DISTRICTS ========== -->
+    <section class="section alt">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="small-title">EXPLORE</p>
+            <h2>Explore Sports Across Bangladesh</h2>
+            <p class="muted">Select a district to view its clubs, players and tournaments.</p>
+          </div>
         </div>
-        <div class="news-item">
-          <img src="images/news2.jpg" alt="News 2">
-          <h3>New clubs registered in 5 districts</h3>
-          <p>Sep 28, 2026</p>
-        </div>
-        <div class="news-item">
-          <img src="images/news3.jpg" alt="News 3">
-          <h3>Rising players of the month — September</h3>
-          <p>Sep 21, 2026</p>
+        <div class="grid-2">
+          <div>
+            <label class="label" for="district">Choose District</label>
+            <select id="district" class="select-box">
+              <option>📍 Select a District</option>
+              <option>Dhaka</option>
+              <option>Chattogram</option>
+              <option>Sylhet</option>
+              <option>Rajshahi</option>
+              <option>Khulna</option>
+              <option>Barishal</option>
+              <option>Rangpur</option>
+              <option>Mymensingh</option>
+            </select>
+            <ul class="check-list">
+              <li>✅ Browse clubs by district</li>
+              <li>✅ Find players by district</li>
+              <li>✅ View district tournaments</li>
+            </ul>
+          </div>
+          <div class="district-card">
+            <div class="district-img">🕌</div>
+            <div>
+              <h3>Dhaka District</h3>
+              <p>🏟️ <b>42</b> Clubs</p>
+              <p>👥 <b>1,240</b> Players</p>
+              <p>🏆 <b>18</b> Active Tournaments</p>
+              <a href="#" class="btn btn-outline small">View District Details →</a>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-  </section>
+    <!-- ========== SPORTS ========== -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="small-title">SPORTS</p>
+            <h2>Explore Sports</h2>
+            <p class="muted">Multiple sports. One community.</p>
+          </div>
+        </div>
+        <div class="grid-4">
+          <div class="sport">⚽<p>Football</p></div>
+          <div class="sport">🏏<p>Cricket</p></div>
+          <div class="sport">🏸<p>Badminton</p></div>
+          <div class="sport">🏐<p>Volleyball</p></div>
+          <div class="sport">🏀<p>Basketball</p></div>
+          <div class="sport">🏓<p>Table Tennis</p></div>
+          <div class="sport">👟<p>Athletics</p></div>
+          <div class="sport">🥋<p>Martial Arts</p></div>
+        </div>
+      </div>
+    </section>
 
+    <!-- ========== TOURNAMENTS (own section) ========== -->
+    <section class="section alt">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="small-title">UPCOMING TOURNAMENTS</p>
+            <h2>Compete. Perform. Rise.</h2>
+            <p class="muted">Join exciting district tournaments across Bangladesh.</p>
+          </div>
+          <a href="#" class="btn btn-outline small">View All Tournaments →</a>
+        </div>
+        <div class="grid-3">
+          <div class="box"><div class="tournament-img">⚽</div><div><h3>Dhaka Football Championship 2026</h3><p>📅 15 Oct 2026 • 📍 Dhaka • 👥 24 Clubs</p><a href="#" class="btn btn-green small">View Tournament →</a></div></div>
+          <div class="box"><div class="tournament-img">🏏</div><div><h3>Inter-District Cricket Cup</h3><p>📅 28 Oct 2026 • 📍 Chattogram • 👥 16 Clubs</p><a href="#" class="btn btn-outline small">View Details →</a></div></div>
+          <div class="box"><div class="tournament-img">🏸</div><div><h3>National Badminton Open</h3><p>📅 12 Nov 2026 • 📍 Sylhet • 👥 32 Players</p><a href="#" class="btn btn-outline small">View Details →</a></div></div>
+        </div>
+      </div>
+    </section>
 
-  <!-- ==================== FINAL CALL TO ACTION ==================== -->
-  <section class="cta">
-    <h2>Be Part of Bangladesh's Sporting Future</h2>
-    <p>Whether you're a player, club manager, administrator, or sports enthusiast — connect, compete and grow with your local sports community.</p>
-    <div class="cta-buttons">
-      <a href="#">Join the Platform →</a>
-      <a href="#">Explore Clubs</a>
-    </div>
-  </section>
+    <!-- ========== RANKINGS (own section) ========== -->
+    <section class="section">
+      <div class="container narrow">
+        <div class="section-head center">
+          <div>
+            <p class="small-title">LIVE RANKINGS</p>
+            <h2>Real-Time Rankings</h2>
+            <p class="muted">Latest points table from district tournaments.</p>
+          </div>
+        </div>
+        <table class="table">
+          <tr><th>#</th><th>Club</th><th>Played</th><th>Points</th></tr>
+          <tr><td>1</td><td>🏅 Dhaka United</td><td>12</td><td><b>31</b></td></tr>
+          <tr><td>2</td><td>🥈 Uttara Sports Club</td><td>12</td><td><b>28</b></td></tr>
+          <tr><td>3</td><td>🥉 Mirpur Athletic</td><td>12</td><td><b>25</b></td></tr>
+          <tr><td>4</td><td>Gulshan Tigers</td><td>12</td><td><b>22</b></td></tr>
+          <tr><td>5</td><td>Mohammadpur SC</td><td>12</td><td><b>20</b></td></tr>
+        </table>
+        <div class="center-btn"><a href="#" class="btn btn-outline small">View Full Rankings →</a></div>
+      </div>
+    </section>
 
+    <!-- ========== PLAYERS (own section) ========== -->
+    <section class="section alt">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="small-title">PLAYER SPOTLIGHT</p>
+            <h2>Discover the Next Champions</h2>
+            <p class="muted">Talented athletes from every district.</p>
+          </div>
+          <a href="#" class="btn btn-outline small">View All Players →</a>
+        </div>
+        <div class="grid-4">
+          <div class="player"><div class="avatar">🧍</div><h3>Rahim Ahmed</h3><p>Football | Dhaka</p><p class="stat-line">24 Matches • 18 Goals</p></div>
+          <div class="player"><div class="avatar">🏃‍♀️</div><h3>Nusrat Jahan</h3><p>Athletics | Chattogram</p><p class="stat-line">15 Races • 6 Gold</p></div>
+          <div class="player"><div class="avatar">🏏</div><h3>Tarek Hasan</h3><p>Cricket | Rajshahi</p><p class="stat-line">20 Matches • 850 Runs</p></div>
+          <div class="player"><div class="avatar">⚽</div><h3>Sadia Akter</h3><p>Football | Sylhet</p><p class="stat-line">18 Matches • 12 Goals</p></div>
+        </div>
+      </div>
+    </section>
 
-  <!-- ==================== FOOTER ==================== -->
+    <!-- ========== NEWS (own section) ========== -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <p class="small-title">NEWS & ANNOUNCEMENTS</p>
+            <h2>Latest From The Community</h2>
+            <p class="muted">Updates, events and stories from across districts.</p>
+          </div>
+          <a href="#" class="btn btn-outline small">View All News →</a>
+        </div>
+        <div class="grid-3">
+          <div class="news-card"><div class="news-img">🏆</div><span class="tag">Tournament • Oct 10</span><h3>District Championship begins across Bangladesh</h3></div>
+          <div class="news-card"><div class="news-img">🏟️</div><span class="tag">Clubs • Sep 28</span><h3>New clubs registered in 5 districts</h3></div>
+          <div class="news-card"><div class="news-img">⭐</div><span class="tag">Players • Sep 21</span><h3>Rising players of the month — September</h3></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== JOIN ========== -->
+    <section class="cta">
+      <div class="container narrow">
+        <h2>Be Part of Bangladesh's Sporting Future</h2>
+        <p>Players, managers, admins, fans — connect, compete and grow with your district.</p>
+        <div class="cta-buttons">
+          <a href="#" class="btn btn-green">Join the Platform →</a>
+          <a href="#" class="btn btn-outline">Explore Clubs</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========== FOOTER ========== -->
   <footer>
-    <p>© 2026 District Sports. All rights reserved.</p>
+    <div class="container footer-inner">
+      <div class="logo">
+        <span class="logo-icon">🏆</span>
+        <div><h1>District Sports</h1><p>Sports Excellence Across Bangladesh</p></div>
+      </div>
+      <nav>
+        <a href="#">About</a> • <a href="#">Contact</a> • <a href="#">Privacy</a> • <a href="#">Terms</a>
+      </nav>
+      <p>© 2026 District Sports. All rights reserved.</p>
+    </div>
   </footer>
 
 </body>

@@ -1,0 +1,152 @@
+/* =====================================================
+   DISTRICT SPORTS - Organized Simple Stylesheet
+   Order:
+   1. Colors & Layout width
+   2. Reset & Base
+   3. Reusable: container, buttons, section-head
+   4. Navbar
+   5. Hero
+   6. Cards / Grids / Boxes
+   7. Table / Players / News
+   8. CTA & Footer
+   9. Mobile
+   ===================================================== */
+
+/* ---------- 1. COLORS ---------- */
+:root {
+  --bg: #0b1310;
+  --bg2: #111a15;
+  --card: #15211b;
+  --border: #24352c;
+  --green: #7bf09b;
+  --green-dark: #143324;
+  --text: #fff;
+  --muted: #9fb3a7;
+  --width: 1100px; /* same width for all sections = organized */
+}
+
+/* ---------- 2. BASE ---------- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: Arial, sans-serif; line-height: 1.6; }
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+h2 { font-size: 26px; margin: 4px 0 6px; }
+.muted { color: var(--muted); font-size: 14px; }
+.small-title { color: var(--green); font-size: 12px; letter-spacing: 1px; font-weight: bold; }
+
+/* ---------- 3. REUSABLE LAYOUT ---------- */
+.container { max-width: var(--width); margin: auto; padding: 0 24px; }
+.container.narrow { max-width: 700px; } /* rankings + CTA centered */
+
+.section { padding: 48px 0; border-top: 1px solid #16211b; }
+.section.alt { background: var(--bg2); } /* alternate bg = organized look */
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.section-head.center, .center-btn { text-align: center; justify-content: center; }
+.center-btn { margin-top: 18px; }
+
+/* Grids: 2, 3, 4 columns */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+/* Buttons */
+.btn { display: inline-block; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: bold; border: 1px solid var(--border); }
+.btn-green { background: var(--green); color: #06270f; border: none; }
+.btn-outline { border: 1px solid #3a4f44; color: #fff; }
+.btn.small { padding: 6px 14px; font-size: 13px; }
+
+/* ---------- 4. NAVBAR ---------- */
+.navbar { background: var(--bg2); border-bottom: 1px solid var(--border); position: sticky; top: 0; }
+.nav-inner { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; padding-bottom: 12px; }
+.logo { display: flex; gap: 10px; align-items: center; }
+.logo-icon { font-size: 28px; }
+.logo h1 { font-size: 18px; }
+.logo p { font-size: 11px; color: var(--muted); }
+.navbar nav ul { display: flex; gap: 18px; font-size: 14px; }
+.navbar nav a { color: var(--muted); padding-bottom: 4px; }
+.navbar nav a.active, .navbar nav a:hover { color: #fff; border-bottom: 2px solid var(--green); }
+.nav-buttons { display: flex; gap: 10px; }
+
+/* ---------- 5. HERO ---------- */
+.hero { padding: 56px 0; }
+.hero-inner { display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: center; }
+.hero-text h2 { font-size: 42px; line-height: 1.2; }
+.hero-text h2 span { color: var(--green); }
+.hero-text > p { color: var(--muted); margin: 12px 0 20px; max-width: 480px; }
+.hero-buttons { display: flex; gap: 12px; margin-bottom: 24px; }
+.stats { display: flex; gap: 24px; }
+.stat { display: flex; gap: 8px; align-items: center; }
+.stat b { display: block; font-size: 16px; }
+.stat small { color: var(--muted); display: block; }
+
+.hero-map { background: var(--green-dark); border: 1px solid var(--border); border-radius: 14px; padding: 22px; }
+.hero-map ul { margin: 12px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 14px; }
+.hero-map .highlight { color: var(--green); font-weight: bold; }
+.hero-map .quote { font-style: italic; color: var(--green); }
+
+/* ---------- 6. CARDS & BOXES ---------- */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; display: flex; gap: 12px; align-items: flex-start; }
+.card .icon { font-size: 28px; }
+.card h3 { font-size: 15px; margin-bottom: 4px; }
+.card p { font-size: 13px; color: var(--muted); }
+.card.green { background: #12281a; }
+.card.blue { background: #131e2e; }
+.card.yellow { background: #2a2212; }
+.card.purple { background: #231833; }
+
+.label { font-size: 14px; font-weight: bold; display: block; margin-bottom: 8px; }
+.select-box { width: 100%; padding: 12px; border-radius: 10px; background: var(--card); color: #fff; border: 1px solid var(--border); }
+.check-list { margin-top: 14px; color: var(--muted); font-size: 14px; display: grid; gap: 6px; }
+
+.district-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: flex; gap: 18px; align-items: center; }
+.district-img { font-size: 56px; background: var(--green-dark); padding: 20px; border-radius: 10px; }
+
+.sport { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 22px 10px; text-align: center; font-size: 32px; }
+.sport p { font-size: 13px; margin-top: 8px; }
+
+.box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.box h3 { font-size: 15px; margin: 10px 0 6px; }
+.box p { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.tournament-img { font-size: 40px; background: var(--green-dark); border-radius: 10px; padding: 18px; text-align: center; }
+
+/* ---------- 7. TABLE / PLAYERS / NEWS ---------- */
+.table { width: 100%; margin-top: 16px; border-collapse: collapse; font-size: 14px; background: var(--card); border-radius: 12px; overflow: hidden; }
+.table th, .table td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; }
+.table th { color: var(--muted); font-size: 12px; }
+
+.player { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; text-align: center; }
+.avatar { font-size: 48px; background: var(--green-dark); border-radius: 10px; padding: 12px; }
+.player h3 { font-size: 15px; margin-top: 10px; }
+.player p { font-size: 13px; color: var(--muted); }
+.stat-line { margin-top: 6px; color: var(--green) !important; font-size: 12px !important; }
+
+.news-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.news-img { font-size: 36px; background: var(--green-dark); border-radius: 10px; padding: 16px; text-align: center; margin-bottom: 12px; }
+.tag { font-size: 11px; color: var(--green); background: #0f2417; padding: 4px 10px; border-radius: 12px; }
+.news-card h3 { font-size: 14px; margin-top: 10px; }
+
+/* ---------- 8. CTA & FOOTER ---------- */
+.cta { text-align: center; padding: 60px 0; background: #0f2017; border-top: 1px solid var(--border); }
+.cta p { color: var(--muted); margin: 10px 0 22px; }
+.cta-buttons { display: flex; gap: 12px; justify-content: center; }
+
+footer { border-top: 1px solid var(--border); padding: 24px 0; }
+.footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 13px; color: var(--muted); }
+.footer-inner nav a { color: var(--muted); margin: 0 4px; }
+
+/* ---------- 9. MOBILE ---------- */
+@media (max-width: 800px) {
+  .navbar nav { display: none; }
+  .hero-inner, .grid-2 { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .section-head { flex-direction: column; align-items: flex-start; }
+  .footer-inner { flex-direction: column; text-align: center; }
+}
