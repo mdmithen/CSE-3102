@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Dashboard — District Sports</title>
+  <link rel="stylesheet" href="css/player-dashboard.css">
+</head>
+<body class="pd-body">
+
+  <!-- Mobile overlay (behind the off-canvas sidebar) -->
+  <div class="pd-overlay" id="pdOverlay" hidden></div>
+
+  <!-- ========== SIDEBAR NAVIGATION ========== -->
+  <aside class="sidebar pd-sidebar" id="pdSidebar" aria-label="Player dashboard navigation">
+
+    <div class="logo">
+      <span>🏆</span>
+      <div>
+        <h1>District Sports</h1>
+        <p>Player Dashboard</p>
+      </div>
+    </div>
+
+    <p class="menu-title">MENU</p>
+    <nav class="pd-nav">
+      <ul>
+        <li><a href="#dashboard"          data-view="dashboard"  class="active">📊 <span>Dashboard</span></a></li>
+        <li><a href="#profile"            data-view="profile">🧑‍💽 <span>My Profile</span></a></li>
+        <li><a href="#club"               data-view="club">🏟️ <span>My Club</span></a></li>
+        <li><a href="#members"            data-view="members">👥 <span>Club Members</span></a></li>
+        <li><a href="#performance"        data-view="performance">⚽ <span>My Performance</span></a></li>
+        <li><a href="#rankings"           data-view="rankings">🏅 <span>My Rankings</span></a></li>
+        <li><a href="#notices"            data-view="notices">📢 <span>Notices</span><em class="pd-count" id="noticeCount">0</em></a></li>
+        <li><a href="#matches"            data-view="matches">📅 <span>Matches &amp; Tournaments</span></a></li>
+        <li><a href="#settings"           data-view="settings">⚙️ <span>Settings</span></a></li>
+      </ul>
+    </nav>
+
+    <div class="pd-side-foot">
+      <a href="index.html" class="pd-nav-link">🏠 <span>Back to Home</span></a>
+      <a href="#" class="pd-nav-link pd-logout" id="logoutBtn">🚪 <span>Logout</span></a>
+    </div>
+
+    <!-- Player identity card -->
+    <div class="pd-me-card">
+      <img id="sideAvatar" src="images/players.png" alt="Player avatar (demo)" onerror="this.style.display='none';">
+      <b id="sideName">Rahim Ahmed</b>
+      <small id="sideMeta">PLY-001 · Rajshahi</small>
+    </div>
+  </aside>
+
+  <!-- ========== MAIN ========== -->
+  <main class="main pd-main">
+
+    <!-- Top bar -->
+    <header class="pd-topbar">
+      <button class="pd-burger" id="pdBurger" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+      <div class="pd-topbar-title">
+        <h2 id="viewTitle">Dashboard</h2>
+        <p id="viewSubtitle">Overview of your season at a glance.</p>
+      </div>
+      <div class="pd-top-actions">
+        <span class="pd-demo-badge">DEMO DATA</span>
+        <span class="badge green" id="topStatus">Active</span>
+      </div>
+    </header>
+
+    <!-- ============== VIEW: DASHBOARD ============== -->
+    <section class="pd-view is-active" id="view-dashboard">
+
+      <!-- Welcome -->
+      <div class="box pd-welcome">
+        <div class="pd-welcome-main">
+          <img class="pd-avatar-lg" id="avatar" src="images/players.png" alt="Player avatar (demo)"
+               onerror="this.style.display='none';">
+          <div class="pd-welcome-text">
+            <p class="pd-hello">Welcome back,</p>
+            <h3 id="welcomeName">Rahim Ahmed</h3>
+            <p class="muted" id="welcomeLine">PLY-001 · Rajshahi Sports Club</p>
+            <div class="pd-chips" id="welcomeChips"></div>
+          </div>
+        </div>
+        <div class="pd-welcome-badges">
+          <span class="badge green" id="welcomeStatus">Active</span>
+          <small class="muted">Member since <span id="welcomeSince">2023</span></small>
+        </div>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="pd-stats" id="statCards"></div>
+
+      <div class="pd-2col">
+        <!-- Upcoming match -->
+        <div class="box">
+          <div class="box-head">
+            <div>
+              <h3>📅 Next Match</h3>
+              <p class="muted">Your upcoming fixture (demo)</p>
+            </div>
+          </div>
+          <div id="nextMatch"></div>
+        </div>
+
+        <!-- Recent results -->
+        <div class="box">
+          <div class="box-head">
+            <div>
+              <h3>📊 Recent Results</h3>
+              <p class="muted">Last 5 matches (demo)</p>
+            </div>
+          </div>
+          <div id="recentResults"></div>
+        </div>
+      </div>
+
+      <div class="pd-2col">
+        <!-- Ranking snapshot -->
+        <div class="box">
+          <div class="box-head">
+            <div>
+              <h3>🏅 Ranking Snapshot</h3>
+              <p class="muted">District Football Championship (demo)</p>
+            </div>
+          </div>
+          <div id="rankSnapshot"></div>
+        </div>
+
+        <!-- Notices snapshot -->
+        <div class="box">
+          <div class="box-head">
+            <div>
+              <h3>📢 Latest Notices</h3>
+              <p class="muted">From your club &amp; district (demo)</p>
+            </div>
+            <a href="#notices" class="btn btn-outline small pd-jump" data-view="notices">View all</a>
+          </div>
+          <div id="noticeSnapshot"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== VIEW: MY PROFILE ============== -->
+    <section class="pd-view" id="view-profile">
+      <div class="pd-2col">
+        <div class="box">
+          <div class="box-head">
+            <div>
+              <h3>🧑‍💽 Personal Information</h3>
+              <p class="muted">Registered player data (demo)</p>
+            </div>
+            <span class="badge green">Verified</span>
+          </div>
+          <dl class="pd-details" id="profileDetails"></dl>
+        </div>
+
+        <div class="box">
+          <div class="box-head">
+            <div>
+              <h3>🎽 Player Card</h3>
+              <p class="muted">Digital player card (demo)</p>
+            </div>
+          </div>
+          <div class="pd-card-face">
+            <div class="pd-card-top">
+              <img src="images/players.png" alt="Player photo (demo)" loading="lazy"
+                   onerror="this.style.display='none';">
+              <div>
+                <h4 id="cardName">Rahim Ahmed</h4>
+                <small id="cardId">PLY-001</small>
+              </div>
+            </div>
+            <div class="pd-card-body" id="cardBody"></div>
+          </div>
+          <p class="muted pd-note">Digital ID cards are a planned feature. This is a static demo card.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== VIEW: MY CLUB ============== -->
+    <section class="pd-view" id="view-club">
+      <div class="box pd-club-head">
+        <img class="pd-club-img" src="images/clubs.png" alt="Club (demo)" loading="lazy"
+             onerror="this.style.display='none';">
+        <div>
+          <h3 id="clubName">Rajshahi Sports Club</h3>
+          <p class="muted" id="clubMeta">DSC-001 · Established 2011</p>
+          <div class="pd-chips" id="clubChips"></div>
+        </div>
+        <div class="pd-club-stats" id="clubStats"></div>
+      </div>
+
+      <div class="pd-2col">
+        <div class="box">
+          <h3>👔 Club Management</h3>
+          <dl class="pd-details" id="clubManagement"></dl>
+        </div>
+        <div class="box">
+          <h3>📞 Club Information</h3>
+          <dl class="pd-details" id="clubContact"></dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== VIEW: CLUB MEMBERS ============== -->
+    <section class="pd-view" id="view-members">
+      <div class="box">
+        <div class="box-head">
+          <div>
+            <h3>👥 Club Roster</h3>
+            <p class="muted">Players registered at <span class="pd-inline-club">Rajshahi Sports Club</span> (demo)</p>
+          </div>
+          <input type="search" class="mini-select pd-roster-search" id="rosterSearch"
+                 placeholder="🔍 Search members..." aria-label="Search club members">
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Player ID</th>
+              <th scope="col">Name</th>
+              <th scope="col">Sport</th>
+              <th scope="col">Position</th>
+              <th scope="col">District</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody id="rosterBody"></tbody>
+        </table>
+        <p class="muted pd-note" id="rosterEmpty" hidden>No members match your search.</p>
+      </div>
+    </section>
+
+    <!-- ============== VIEW: MY PERFORMANCE ============== -->
+    <section class="pd-view" id="view-performance">
+      <div class="box">
+        <div class="box-head">
+          <div>
+            <h3>⚽ Season Summary</h3>
+            <p class="muted">District Football Championship 2026 (demo)</p>
+          </div>
+          <span class="badge green">Midfielder</span>
+        </div>
+        <div class="pd-perf-grid" id="perfGrid"></div>
+      </div>
+
+      <div class="pd-2col">
+        <div class="box">
+          <h3>📈 Performance by Competition</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Competition</th>
+                <th scope="col">P</th>
+                <th scope="col">G</th>
+                <th scope="col">A</th>
+                <th scope="col">Points</th>
+              </tr>
+            </thead>
+            <tbody id="perfTable"></tbody>
+          </table>
+        </div>
+
+        <div class="box">
+          <h3>🏅 Achievements</h3>
+          <ul class="pd-awards" id="awardsList"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== VIEW: MY RANKINGS ============== -->
+    <section class="pd-view" id="view-rankings">
+      <div class="pd-stats" id="rankStats"></div>
+
+      <div class="pd-2col">
+        <div class="box">
+          <div class="box-head">
+            <div>
+              <h3>🏅 Club Standings</h3>
+              <p class="muted">Top scorers — District Championship (demo)</p>
+            </div>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Rank</th>
+                <th scope="col">Player</th>
+                <th scope="col">Played</th>
+                <th scope="col">Goals</th>
+                <th scope="col">Points</th>
+              </tr>
+            </thead>
+            <tbody id="rankTable"></tbody>
+          </table>
+        </div>
+
+        <div class="box">
+          <div class="box-head">
+            <div>
+              <h3>🗺️ District Points Table</h3>
+              <p class="muted">All districts (demo)</p>
+            </div>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Rank</th>
+                <th scope="col">District</th>
+                <th scope="col">Points</th>
+                <th scope="col">Clubs</th>
+              </tr>
+            </thead>
+            <tbody id="districtTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== VIEW: NOTICES ============== -->
+    <section class="pd-view" id="view-notices">
+      <div class="box">
+        <div class="box-head">
+          <div>
+            <h3>📢 Notices &amp; Announcements</h3>
+            <p class="muted">From your club manager and district administration (demo)</p>
+          </div>
+          <button class="btn btn-outline small" id="readAllBtn">Mark all read</button>
+        </div>
+        <ul class="pd-notices" id="noticeList"></ul>
+      </div>
+    </section>
+
+    <!-- ============== VIEW: MATCHES & TOURNAMENTS ============== -->
+    <section class="pd-view" id="view-matches">
+      <div class="pd-2col">
+        <div class="box">
+          <h3>📅 My Fixtures</h3>
+          <p class="muted pd-note">Scheduled matches for your club (demo)</p>
+          <div class="pd-matches" id="fixtureList"></div>
+        </div>
+
+        <div class="box">
+          <h3>🏆 Tournaments</h3>
+          <p class="muted pd-note">Tournaments your club can join (demo)</p>
+          <div class="pd-tournaments" id="tournamentList"></div>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3>📜 Match History</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Tournament</th>
+              <th scope="col">Opponent</th>
+              <th scope="col">Result</th>
+              <th scope="col">Score</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============== VIEW: SETTINGS ============== -->
+    <section class="pd-view" id="view-settings">
+      <div class="pd-2col">
+        <div class="box">
+          <div class="box-head">
+            <div>
+              <h3>✏️ Edit Profile</h3>
+              <p class="muted">Changes are demo-only and reset on refresh.</p>
+            </div>
+          </div>
+          <form class="form-grid" id="profileForm" novalidate>
+            <div>
+              <label for="setName">Full Name</label>
+              <input id="setName" type="text" required>
+            </div>
+            <div>
+              <label for="setPhone">Contact Number</label>
+              <input id="setPhone" type="tel">
+            </div>
+            <div>
+              <label for="setEmail">Email</label>
+              <input id="setEmail" type="email" required>
+            </div>
+            <div>
+              <label for="setJersey">Jersey Number</label>
+              <input id="setJersey" type="text">
+            </div>
+            <div class="full">
+              <label for="setBio">Short Bio</label>
+              <textarea id="setBio" rows="3" placeholder="Tell your club about yourself..."></textarea>
+            </div>
+            <div class="full pd-form-actions">
+              <button type="submit" class="btn btn-green">Save Changes</button>
+              <button type="reset" class="btn btn-outline">Reset</button>
+            </div>
+            <p class="muted pd-full" id="profileFormMsg" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="box">
+          <div class="box-head">
+            <div>
+              <h3>🔐 Security</h3>
+              <p class="muted">Demo only — nothing is stored.</p>
+            </div>
+          </div>
+          <form id="passForm" novalidate>
+            <div>
+              <label for="curPass">Current Password</label>
+              <input id="curPass" type="password" placeholder="••••••" required>
+            </div>
+            <div>
+              <label for="newPass">New Password</label>
+              <input id="newPass" type="password" placeholder="At least 6 characters" required>
+            </div>
+            <div>
+              <label for="conPass">Confirm New Password</label>
+              <input id="conPass" type="password" placeholder="Repeat new password" required>
+            </div>
+            <div class="pd-form-actions">
+              <button type="submit" class="btn btn-green">Update Password</button>
+            </div>
+            <p class="muted" id="passFormMsg" role="status" aria-live="polite"></p>
+          </form>
+
+          <h3 class="pd-subhead">🔔 Notifications</h3>
+          <ul class="pd-toggles">
+            <li>
+              <label><input type="checkbox" checked> Match reminders (1 day before)</label>
+            </li>
+            <li>
+              <label><input type="checkbox" checked> Club announcements</label>
+            </li>
+            <li>
+              <label><input type="checkbox"> Ranking &amp; points updates</label>
+            </li>
+            <li>
+              <label><input type="checkbox"> SMS alerts (may cost money)</label>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="box pd-danger-zone">
+        <div>
+          <h3>🚪 Logout</h3>
+          <p class="muted">Ends this demo session and returns you to the login page.</p>
+        </div>
+        <button class="btn btn-outline pd-danger" id="logoutBtn2">Logout</button>
+      </div>
+    </section>
+
+    <footer class="foot">
+      © 2026 District Sports — Player Dashboard · Part 1 demo build · All data below is sample data,
+      no database or Supabase connection yet.
+    </footer>
+  </main>
+
+  <!-- Toast -->
+  <div class="pd-toast" id="pdToast" role="status" aria-live="polite" hidden></div>
+
+  <script src="js/player-dashboard.js"></script>
+</body>
+</html>

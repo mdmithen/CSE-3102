@@ -4,6 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>District Sports Management System</title>
+    <style>
+        /* Scoped styles for the Player Login block only.
+           No global reset, so the rest of this page is unchanged. */
+        .player-login-error {
+            color: #c0392b;
+            font-size: 0.9rem;
+            margin: 0 0 10px;
+        }
+        .player-login-error:empty { display: none; }
+        .player-login-hint {
+            font-size: 0.8rem;
+            color: #666;
+            background: #f2f2f2;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+        @keyframes playerShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .player-login-error.is-shake { animation: playerShake 0.3s ease; }
+    </style>
 </head>
 
 <body>
@@ -76,14 +99,15 @@
             <!-- Player Login -->
             <article>
                 <h3>Player Login</h3>
-                <form>
+                <form id="playerLoginForm">
+                    <p id="playerLoginError" class="player-login-error" role="alert" aria-live="polite"></p>
                     <p>
                         <label for="player-id-email">Player ID / Email</label>
-                        <input type="text" id="player-id-email" name="player_id_email" placeholder="PLY-001 or player@example.com">
+                        <input type="text" id="player-id-email" name="player_id_email" placeholder="PLY-001 or player@example.com" required>
                     </p>
                     <p>
                         <label for="player-password">Password</label>
-                        <input type="password" id="player-password" name="player_password">
+                        <input type="password" id="player-password" name="player_password" required>
                     </p>
                     <p>
                         <button type="submit">Login as Player</button>
@@ -92,6 +116,7 @@
                         <a href="#">Forgot Password?</a>
                     </p>
                     <p>Don't have an account? Contact your Club Admin.</p>
+                    <p class="player-login-hint"><strong>Demo login:</strong> player@gmail.com / 123456</p>
                 </form>
             </article>
         </section>
@@ -802,5 +827,60 @@
         <p>&copy; 2026 District Sports. All Rights Reserved.</p>
     </footer>
 
+    <!-- Player Login JavaScript -->
+    <script>
+    // ==========================================
+    // PLAYER LOGIN - Demo credentials check
+    // Demo: player@gmail.com / 123456
+    // NOTE: Client-side only. Supabase Auth comes in a later part.
+    // ==========================================
+
+    const PLAYER_EMAIL = "player@gmail.com";
+    const PLAYER_PASS = "123456";
+
+    const playerForm = document.getElementById("playerLoginForm");
+    const playerEmailInput = document.getElementById("player-id-email");
+    const playerPassInput = document.getElementById("player-password");
+    const playerErrorBox = document.getElementById("playerLoginError");
+
+    if (playerForm) {
+        playerForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const email = playerEmailInput.value.trim();
+            const pass = playerPassInput.value;
+
+            if (email === PLAYER_EMAIL && pass === PLAYER_PASS) {
+                playerErrorBox.textContent = "";
+                playerErrorBox.classList.remove("is-shake");
+
+                // Save demo session so the dashboard can verify the login.
+                sessionStorage.setItem("ds_player_session", JSON.stringify({
+                    loginId: email,
+                    playerId: "PLY-001",
+                    name: "Rahim Ahmed",
+                    role: "player",
+                    loggedInAt: new Date().toISOString()
+                }));
+
+                // Redirect to Player Dashboard
+                window.location.href = "player-dashboard.html";
+            } else {
+                // Clear any old success session, then show the error
+                sessionStorage.removeItem("ds_player_session");
+                playerErrorBox.textContent =
+                    "❌ Wrong email or password! Use the demo login: player@gmail.com / 123456";
+
+                // Small shake animation so the error is noticeable
+                playerErrorBox.classList.remove("is-shake");
+                void playerErrorBox.offsetWidth; // force restart of animation
+                playerErrorBox.classList.add("is-shake");
+
+                playerPassInput.value = "";
+                playerPassInput.focus();
+            }
+        });
+    }
+    </script>
 </body>
 </html>
