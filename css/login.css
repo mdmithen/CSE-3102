@@ -69,8 +69,74 @@ input {
 /* Error text */
 .error { color: var(--red); font-size: 14px; text-align: center; margin-bottom: 12px; min-height: 20px; }
 
+/* Nudge the error box so a wrong password is obvious */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-6px); }
+  75%      { transform: translateX(6px); }
+}
+.error.is-shake { animation: shake 0.3s ease; }
+
+/* ---------- Password field with Show / Hide ---------- */
+.pw-wrap { position: relative; }
+.pw-wrap input {
+  padding-right: 68px;      /* room for the button */
+  margin-bottom: 14px;
+}
+.pw-toggle {
+  position: absolute;
+  right: 6px;
+  top: 2px;
+  background: var(--card);
+  color: var(--green);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 6px 10px;
+  cursor: pointer;
+  min-width: 52px;
+}
+.pw-toggle:hover { border-color: var(--green); }
+
+/* ---------- Demo account shortcuts ---------- */
+.demo-accounts {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.demo-title {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.demo-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: #0f1a14;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+.demo-row:hover { border-color: var(--green); }
+.demo-row.is-selected { border-color: var(--green); background: var(--green-dark); }
+.demo-row b { display: block; font-size: 13px; }
+.demo-row span { color: var(--muted); font-size: 11px; }
+
 .links { text-align: center; margin-top: 16px; font-size: 13px; }
 .links a { color: var(--green); }
 .links span { color: var(--muted); margin: 0 6px; }
 
 .hint { text-align: center; margin-top: 14px; font-size: 12px; color: var(--muted); background: #0f1a14; padding: 8px; border-radius: 8px; }
+
+/* ---------- Small screens ---------- */
+@media (max-width: 480px) {
+  .login-box { width: 100%; padding: 24px 20px; }
+}

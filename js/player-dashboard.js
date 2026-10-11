@@ -151,27 +151,14 @@ const VIEW_META = {
 
 /* ==========================================
    1. SESSION GUARD
-   The dashboard only opens after a player
-   login from login-system.html. Without a
-   session we send the visitor back.
+   Uses the shared AUTH module, so the player
+   dashboard is opened by the single login
+   page and blocked if nobody is signed in.
    ========================================== */
-(function guardSession() {
-  const raw = sessionStorage.getItem("ds_player_session");
-  if (!raw) {
-    window.location.replace("login-system.html#login");
-    return;
-  }
-  try {
-    const s = JSON.parse(raw);
-    if (s.role !== "player") {
-      window.location.replace("login-system.html#login");
-      return;
-    }
-  } catch (err) {
-    sessionStorage.removeItem("ds_player_session");
-    window.location.replace("login-system.html#login");
-  }
-})();
+function playerSession() {
+  if (!window.AUTH) return null;
+  return AUTH.currentUser();
+}
 
 /* ---------- helpers ---------- */
 const $  = (sel, root) => (root || document).querySelector(sel);
@@ -202,9 +189,11 @@ function toast(message) {
    ========================================== */
 function renderIdentity() {
   const p = DEMO_PLAYER;
+  // Name shown in the sidebar comes from the demo session when available
+  const user = playerSession();
 
   // Sidebar
-  fill($("#sideName"), p.name);
+  fill($("#sideName"), (user && user.name) || p.name);
   fill($("#sideMeta"), p.playerId + " · " + p.district);
 
   // Top bar
@@ -729,8 +718,8 @@ function bindNavigation() {
    ========================================== */
 function doLogout() {
   if (!window.confirm("Log out of the Player Dashboard?")) return;
-  sessionStorage.removeItem("ds_player_session");
-  window.location.href = "login-system.html#login";
+  // Clears the demo session and returns to the shared login page
+  AUTH.logout();
 }
 
 function bindLogout() {
@@ -768,7 +757,7 @@ function bindNotices() {
 /* ==========================================
    17. INIT
    ========================================== */
-(function init() {
+function boot() {
   renderIdentity();
   renderStatCards();
   renderNextMatch();
@@ -795,4 +784,11 @@ function bindNotices() {
   window.addEventListener("resize", () => {
     if (window.innerWidth > 1024) closeDrawer();
   });
-})();
+}
+
+/* Build the page only for a signed-in player.
+   Otherwise AUTH.requireRole sends the visitor
+   to the shared login page. */
+if (window.AUTH && AUTH.requireRole(AUTH.ROLES.PLAYER)) {
+  boot();
+}

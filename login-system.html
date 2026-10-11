@@ -4,29 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>District Sports Management System</title>
-    <style>
-        /* Scoped styles for the Player Login block only.
-           No global reset, so the rest of this page is unchanged. */
-        .player-login-error {
-            color: #c0392b;
-            font-size: 0.9rem;
-            margin: 0 0 10px;
-        }
-        .player-login-error:empty { display: none; }
-        .player-login-hint {
-            font-size: 0.8rem;
-            color: #666;
-            background: #f2f2f2;
-            padding: 6px 10px;
-            border-radius: 6px;
-        }
-        @keyframes playerShake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-6px); }
-            75% { transform: translateX(6px); }
-        }
-        .player-login-error.is-shake { animation: playerShake 0.3s ease; }
-    </style>
 </head>
 
 <body>
@@ -43,81 +20,31 @@
                 <li><a href="#tournaments">Tournaments</a></li>
                 <li><a href="#rankings">Rankings</a></li>
                 <li><a href="#news">News</a></li>
-                <li><a href="#login">Login</a></li>
+                <li><a href="login.html">Login</a></li>
             </ul>
         </nav>
     </header>
 
     <main>
 
-        <!-- LOGIN PORTAL -->
+        <!-- LOGIN POINTER: the website has ONE shared login page -->
         <section id="login">
-            <h2>District Sports Login Portal</h2>
-
-            <!-- Super Admin Login -->
+            <h2>Login</h2>
             <article>
-                <h3>Super Admin Login</h3>
-                <form>
-                    <p>
-                        <label for="super-admin-email">Admin Email</label>
-                        <input type="email" id="super-admin-email" name="super_admin_email" placeholder="admin@districtsports.com">
-                    </p>
-                    <p>
-                        <label for="super-admin-password">Password</label>
-                        <input type="password" id="super-admin-password" name="super_admin_password">
-                    </p>
-                    <p>
-                        <button type="submit">Login as Super Admin</button>
-                    </p>
-                    <p>
-                        <a href="#">Forgot Password?</a>
-                    </p>
-                </form>
-            </article>
-
-            <!-- Club Admin Login -->
-            <article>
-                <h3>Club Admin Login</h3>
-                <form>
-                    <p>
-                        <label for="club-admin-email">Club Admin Email</label>
-                        <input type="email" id="club-admin-email" name="club_admin_email" placeholder="clubadmin@districtsports.com">
-                    </p>
-                    <p>
-                        <label for="club-admin-password">Password</label>
-                        <input type="password" id="club-admin-password" name="club_admin_password">
-                    </p>
-                    <p>
-                        <button type="submit">Login as Club Admin</button>
-                    </p>
-                    <p>
-                        <a href="#">Forgot Password?</a>
-                    </p>
-                </form>
-            </article>
-
-            <!-- Player Login -->
-            <article>
-                <h3>Player Login</h3>
-                <form id="playerLoginForm">
-                    <p id="playerLoginError" class="player-login-error" role="alert" aria-live="polite"></p>
-                    <p>
-                        <label for="player-id-email">Player ID / Email</label>
-                        <input type="text" id="player-id-email" name="player_id_email" placeholder="PLY-001 or player@example.com" required>
-                    </p>
-                    <p>
-                        <label for="player-password">Password</label>
-                        <input type="password" id="player-password" name="player_password" required>
-                    </p>
-                    <p>
-                        <button type="submit">Login as Player</button>
-                    </p>
-                    <p>
-                        <a href="#">Forgot Password?</a>
-                    </p>
-                    <p>Don't have an account? Contact your Club Admin.</p>
-                    <p class="player-login-hint"><strong>Demo login:</strong> player@gmail.com / 123456</p>
-                </form>
+                <p>
+                    District Sports uses a single sign-in page for every role.
+                    Choose an account type when you sign in and you will be taken
+                    straight to the right dashboard.
+                </p>
+                <ul>
+                    <li>👨‍💼 Super Admin — manage clubs, districts and users</li>
+                    <li>🏟️ Club Admin / Club Manager — manage your club and its players</li>
+                    <li>🧑‍🎽 Player — view your profile, performance and rankings</li>
+                </ul>
+                <p>
+                    <a href="login.html"><strong>→ Go to the Login Page</strong></a>
+                </p>
+                <p><small>Don't have an account? Contact your Club Admin.</small></p>
             </article>
         </section>
 
@@ -249,6 +176,12 @@
         <section id="clubs">
             <h2>Club Admin (Club Manager)</h2>
             <p>Manage players registered under a specific sports club.</p>
+
+            <!-- Shown only when a Club Admin is signed in -->
+            <div id="clubAdminBar" hidden>
+                <p>Signed in as Club Admin: <b id="clubAdminWho"></b></p>
+                <p><a href="#" id="clubAdminLogout">Logout</a> · <a href="index.html">Back to Home</a></p>
+            </div>
 
             <!-- Register New Player -->
             <article>
@@ -827,60 +760,31 @@
         <p>&copy; 2026 District Sports. All Rights Reserved.</p>
     </footer>
 
-    <!-- Player Login JavaScript -->
+    <!-- Club Admin session banner: only shown to a signed-in Club Admin -->
+    <script src="js/auth.js"></script>
     <script>
-    // ==========================================
-    // PLAYER LOGIN - Demo credentials check
-    // Demo: player@gmail.com / 123456
-    // NOTE: Client-side only. Supabase Auth comes in a later part.
-    // ==========================================
+    (function () {
+        if (!window.AUTH) return;
 
-    const PLAYER_EMAIL = "player@gmail.com";
-    const PLAYER_PASS = "123456";
+        var bar = document.getElementById("clubAdminBar");
+        var who = document.getElementById("clubAdminWho");
+        var out = document.getElementById("clubAdminLogout");
+        if (!bar) return;
 
-    const playerForm = document.getElementById("playerLoginForm");
-    const playerEmailInput = document.getElementById("player-id-email");
-    const playerPassInput = document.getElementById("player-password");
-    const playerErrorBox = document.getElementById("playerLoginError");
+        var user = AUTH.currentUser();
+        if (user && user.role === AUTH.ROLES.CLUB_ADMIN) {
+            if (who) who.textContent = user.name + " (" + user.email + ")";
+            bar.hidden = false;
+        }
 
-    if (playerForm) {
-        playerForm.addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            const email = playerEmailInput.value.trim();
-            const pass = playerPassInput.value;
-
-            if (email === PLAYER_EMAIL && pass === PLAYER_PASS) {
-                playerErrorBox.textContent = "";
-                playerErrorBox.classList.remove("is-shake");
-
-                // Save demo session so the dashboard can verify the login.
-                sessionStorage.setItem("ds_player_session", JSON.stringify({
-                    loginId: email,
-                    playerId: "PLY-001",
-                    name: "Rahim Ahmed",
-                    role: "player",
-                    loggedInAt: new Date().toISOString()
-                }));
-
-                // Redirect to Player Dashboard
-                window.location.href = "player-dashboard.html";
-            } else {
-                // Clear any old success session, then show the error
-                sessionStorage.removeItem("ds_player_session");
-                playerErrorBox.textContent =
-                    "❌ Wrong email or password! Use the demo login: player@gmail.com / 123456";
-
-                // Small shake animation so the error is noticeable
-                playerErrorBox.classList.remove("is-shake");
-                void playerErrorBox.offsetWidth; // force restart of animation
-                playerErrorBox.classList.add("is-shake");
-
-                playerPassInput.value = "";
-                playerPassInput.focus();
-            }
-        });
-    }
+        if (out) {
+            out.addEventListener("click", function (e) {
+                e.preventDefault();
+                if (!window.confirm("Log out of the Club Admin dashboard?")) return;
+                AUTH.logout();
+            });
+        }
+    })();
     </script>
 </body>
 </html>

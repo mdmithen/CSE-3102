@@ -1,36 +1,94 @@
 // ==========================================
-// LOGIN - Very simple check (for class project)
-// Admin: admin@gmail.com / 123456
+// LOGIN - Shared login page for every role.
+// Works together with js/auth.js, which holds
+// the demo accounts and the role redirects.
+//
+// Demo accounts (all passwords: 123456)
+//   admin@gmail.com               -> Super Admin -> admin.html
+//   clubadmin@districtsports.com  -> Club Admin  -> login-system.html#clubs
+//   player@gmail.com              -> Player      -> player-dashboard.html
 // ==========================================
 
-// 1. Correct admin email + password (fixed)
-const ADMIN_EMAIL = "admin@gmail.com";
-const ADMIN_PASS = "123456";
+(function () {
 
-// 2. Get form + inputs + error box from HTML
-const form = document.getElementById("loginForm");
-const emailInput = document.getElementById("email");
-const passInput = document.getElementById("password");
-const errorBox = document.getElementById("error");
+  // 1. Grab the elements we need
+  var form = document.getElementById("loginForm");
+  var emailInput = document.getElementById("email");
+  var passInput = document.getElementById("password");
+  var errorBox = document.getElementById("error");
+  var toggleBtn = document.getElementById("togglePassword");
+  var demoRows = document.querySelectorAll(".demo-row");
 
-// 3. When user clicks "Login"
-form.addEventListener("submit", function (e) {
-  e.preventDefault(); // stop page reload
-
-  const email = emailInput.value.trim();
-  const pass = passInput.value;
-
-  // 4. Check login
-  // For now: only admin login. Later we will add player login here.
-  // Example for later:
-  // if (player login) { window.location.href = "player.html"; }
-
-  if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
-    errorBox.textContent = "";
-    // Go to admin panel
-    window.location.href = "admin.html";
-  } else {
-    // Show error
-    errorBox.textContent = "❌ Wrong email or password!";
+  // 2. Show / hide password
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", function () {
+      var isHidden = passInput.type === "password";
+      passInput.type = isHidden ? "text" : "password";
+      toggleBtn.textContent = isHidden ? "Hide" : "Show";
+      toggleBtn.setAttribute("aria-label", isHidden ? "Hide password" : "Show password");
+      toggleBtn.setAttribute("aria-pressed", String(isHidden));
+      passInput.focus();
+    });
   }
-});
+
+  // 3. Demo shortcut buttons fill the form
+  Array.prototype.forEach.call(demoRows, function (row) {
+    row.addEventListener("click", function () {
+      var account = null;
+      Array.prototype.forEach.call(demoRows, function (r) {
+        r.classList.remove("is-selected");
+      });
+      row.classList.add("is-selected");
+
+      // Pull the matching demo account so the password always matches
+      for (var i = 0; i < AUTH.DEMO_ACCOUNTS.length; i++) {
+        if (AUTH.DEMO_ACCOUNTS[i].email === row.dataset.email) {
+          account = AUTH.DEMO_ACCOUNTS[i];
+          break;
+        }
+      }
+
+      if (account) {
+        emailInput.value = account.email;
+        passInput.value = account.password;
+      }
+      errorBox.textContent = "";
+      passInput.focus();
+    });
+  });
+
+  // 4. Login
+  form.addEventListener("submit", function (e) {
+    e.preventDefault(); // stop the page reloading
+
+    var email = emailInput.value.trim();
+    var pass = passInput.value;
+
+    // Small guard so an empty form gives a friendly message
+    if (!email || !pass) {
+      errorBox.textContent = "❌ Please enter both your email address and password.";
+      return;
+    }
+
+    // 5. Ask AUTH to check the demo accounts
+    var result = AUTH.login(email, pass);
+
+    if (result.ok) {
+      errorBox.textContent = "";
+      // Role decides where the user lands:
+      // Super Admin -> admin.html
+      // Club Admin  -> login-system.html#clubs
+      // Player      -> player-dashboard.html
+      window.location.href = result.redirect;
+    } else {
+      errorBox.textContent = result.message;
+      errorBox.classList.remove("is-shake");
+      void errorBox.offsetWidth; // restart the shake animation
+      errorBox.classList.add("is-shake");
+
+      passInput.value = "";
+      passInput.focus();
+    }
+  });
+
+})();
