@@ -186,7 +186,8 @@
             <!-- Register New Player -->
             <article>
                 <h3>Register New Player</h3>
-                <form>
+                <p id="clubMsg" role="status"></p>
+                <form id="playerForm">
                     <p>
                         <label for="player-name">Player Name</label>
                         <input type="text" id="player-name" name="player_name" placeholder="Player full name">
@@ -268,62 +269,32 @@
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="roster-body">
                         <tr>
-                            <td>PLY-001</td>
-                            <td>Rahim Ahmed</td>
-                            <td>Football</td>
-                            <td>Midfielder</td>
-                            <td>Rajshahi</td>
-                            <td>01800000001</td>
-                            <td>Active</td>
-                            <td>
-                                <a href="#">View</a>
-                                <a href="#">Edit</a>
-                                <a href="#">Remove</a>
-                            </td>
+                            <td colspan="8">Loading roster…</td>
                         </tr>
+                    </tbody>
+                </table>
+            </article>
+
+            <!-- Join requests from players -->
+            <article>
+                <h3>Join Requests</h3>
+                <p class="muted">Players who asked to join this club. Approve adds them to the roster automatically.</p>
+                <table>
+                    <thead>
                         <tr>
-                            <td>PLY-002</td>
-                            <td>Sakib Hasan</td>
-                            <td>Cricket</td>
-                            <td>Batsman</td>
-                            <td>Dhaka</td>
-                            <td>01800000002</td>
-                            <td>Active</td>
-                            <td>
-                                <a href="#">View</a>
-                                <a href="#">Edit</a>
-                                <a href="#">Remove</a>
-                            </td>
+                            <th scope="col">Player Email</th>
+                            <th scope="col">Full Name</th>
+                            <th scope="col">Note</th>
+                            <th scope="col">Requested</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
                         </tr>
+                    </thead>
+                    <tbody id="join-requests-body">
                         <tr>
-                            <td>PLY-003</td>
-                            <td>Nayeem Islam</td>
-                            <td>Football</td>
-                            <td>Goalkeeper</td>
-                            <td>Chattogram</td>
-                            <td>01800000003</td>
-                            <td>Active</td>
-                            <td>
-                                <a href="#">View</a>
-                                <a href="#">Edit</a>
-                                <a href="#">Remove</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>PLY-004</td>
-                            <td>Arif Hossain</td>
-                            <td>Badminton</td>
-                            <td>Singles</td>
-                            <td>Sylhet</td>
-                            <td>01800000004</td>
-                            <td>Pending</td>
-                            <td>
-                                <a href="#">View</a>
-                                <a href="#">Edit</a>
-                                <a href="#">Remove</a>
-                            </td>
+                            <td colspan="6">Loading requests…</td>
                         </tr>
                     </tbody>
                 </table>
@@ -761,7 +732,10 @@
     </footer>
 
     <!-- Club Admin session banner: only shown to a signed-in Club Admin -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/club-admin.js"></script>
     <script>
     (function () {
         if (!window.AUTH) return;

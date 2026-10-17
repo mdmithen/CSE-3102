@@ -179,6 +179,30 @@
 
     <!-- ============== VIEW: MY CLUB ============== -->
     <section class="pd-view" id="view-club">
+
+      <!-- Ask to join a club (real Supabase data) -->
+      <div class="box">
+        <div class="box-head">
+          <div>
+            <h3>🏟️ Join a Club</h3>
+            <p class="muted" id="joinStatus">Pick a club and send a request — the club manager approves it.</p>
+          </div>
+        </div>
+        <form class="form-grid" id="joinClubForm" novalidate>
+          <div>
+            <label for="joinClub">Club</label>
+            <select id="joinClub"><option value="">Loading clubs…</option></select>
+          </div>
+          <div>
+            <label for="joinNote">Message (optional)</label>
+            <input id="joinNote" type="text" placeholder="e.g. I play as a midfielder">
+          </div>
+          <div class="full">
+            <button type="submit" class="btn btn-green">Send Join Request</button>
+          </div>
+        </form>
+      </div>
+
       <div class="box pd-club-head">
         <img class="pd-club-img" id="clubLogo" src="images/clubs.png" alt="Club logo (demo)" loading="lazy"
              onerror="this.style.display='none';">
@@ -589,7 +613,10 @@
   <!-- Toast -->
   <div class="pd-toast" id="pdToast" role="status" aria-live="polite" hidden></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/player-dashboard.js"></script>
+  <script src="js/player-join.js"></script>
 </body>
 </html>

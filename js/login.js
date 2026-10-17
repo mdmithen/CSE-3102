@@ -1,10 +1,11 @@
 // ==========================================
 // LOGIN - Shared login page for every role.
-// Works together with js/auth.js, which holds
-// the demo accounts and the role redirects.
+// Works together with js/auth.js, which asks
+// Supabase Auth to verify the password and
+// then decides where each role is redirected.
 //
 // Demo accounts (all passwords: 123456)
-//   admin@gmail.com               -> Super Admin -> admin.html
+//   admin@districtsports.com     -> Super Admin -> admin.html
 //   clubadmin@districtsports.com  -> Club Admin  -> login-system.html#clubs
 //   player@gmail.com              -> Player      -> player-dashboard.html
 // ==========================================
@@ -57,7 +58,7 @@
     });
   });
 
-  // 4. Login
+  // 4. Login (Supabase answers asynchronously -> Promise)
   form.addEventListener("submit", function (e) {
     e.preventDefault(); // stop the page reloading
 
@@ -70,25 +71,32 @@
       return;
     }
 
-    // 5. Ask AUTH to check the demo accounts
-    var result = AUTH.login(email, pass);
+    // Stop double submits while Supabase is working
+    var submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+    errorBox.textContent = "⏳ Signing in…";
 
-    if (result.ok) {
-      errorBox.textContent = "";
-      // Role decides where the user lands:
-      // Super Admin -> admin.html
-      // Club Admin  -> login-system.html#clubs
-      // Player      -> player-dashboard.html
-      window.location.href = result.redirect;
-    } else {
-      errorBox.textContent = result.message;
-      errorBox.classList.remove("is-shake");
-      void errorBox.offsetWidth; // restart the shake animation
-      errorBox.classList.add("is-shake");
+    // 5. Ask AUTH to check the account with Supabase
+    AUTH.login(email, pass).then(function (result) {
+      if (submitBtn) submitBtn.disabled = false;
 
-      passInput.value = "";
-      passInput.focus();
-    }
+      if (result.ok) {
+        // Role decides where the user lands:
+        // Super Admin -> admin.html
+        // Club Admin  -> login-system.html#clubs
+        // Player      -> player-dashboard.html
+        errorBox.textContent = "";
+        window.location.href = result.redirect;
+      } else {
+        errorBox.textContent = result.message;
+        errorBox.classList.remove("is-shake");
+        void errorBox.offsetWidth; // restart the shake animation
+        errorBox.classList.add("is-shake");
+
+        passInput.value = "";
+        passInput.focus();
+      }
+    });
   });
 
 })();

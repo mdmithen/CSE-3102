@@ -76,8 +76,9 @@
           </select>
         </div>
         <div>
-          <label for="club-manager">Manager Name</label>
-          <input id="club-manager" type="text" placeholder="Manager full name">
+          <label for="club-manager-email">Manager Email</label>
+          <input id="club-manager-email" type="email" placeholder="manager@gmail.com">
+          <small class="muted">Must already exist in Authentication → Users. That person becomes the Club Admin of this club.</small>
         </div>
         <div>
           <label for="club-contact">Contact Number</label>
@@ -92,6 +93,7 @@
           <button type="reset" class="btn btn-outline">Clear</button>
         </div>
       </form>
+      <p id="adminMsg" class="muted" role="status"></p>
     </section>
 
     <!-- Clubs table -->
@@ -114,49 +116,43 @@
         <tr>
           <th>Club ID</th>
           <th>Club Name</th>
-          <th>District</th>
           <th>Manager</th>
           <th>Status</th>
           <th>Action</th>
         </tr>
+        <tbody id="clubs-body">
+          <tr><td colspan="5" class="muted">Loading clubs…</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- All users (super admin) -->
+    <section id="users" class="box">
+      <div class="box-head">
+        <div>
+          <h3>👥 All Users</h3>
+          <p class="muted">Everyone who has a Supabase Auth account, with their role.</p>
+        </div>
+      </div>
+
+      <table class="table">
         <tr>
-          <td>DSC-001</td>
-          <td>Rajshahi Sports Club</td>
-          <td>Rajshahi</td>
-          <td>Ahmed Rahman</td>
-          <td><span class="badge green">Active</span></td>
-          <td><a href="#">View</a> | <a href="#">Edit</a> | <a href="#" class="danger">Delete</a></td>
+          <th>Email</th>
+          <th>Full Name</th>
+          <th>Role</th>
+          <th>Joined</th>
         </tr>
-        <tr>
-          <td>DSC-002</td>
-          <td>Dhaka United Club</td>
-          <td>Dhaka</td>
-          <td>Tanvir Hasan</td>
-          <td><span class="badge green">Active</span></td>
-          <td><a href="#">View</a> | <a href="#">Edit</a> | <a href="#" class="danger">Delete</a></td>
-        </tr>
-        <tr>
-          <td>DSC-003</td>
-          <td>Chattogram Warriors</td>
-          <td>Chattogram</td>
-          <td>Rakib Hossain</td>
-          <td><span class="badge yellow">Pending</span></td>
-          <td><a href="#">View</a> | <a href="#">Edit</a> | <a href="#" class="danger">Delete</a></td>
-        </tr>
-        <tr>
-          <td>DSC-004</td>
-          <td>Sylhet Sports Academy</td>
-          <td>Sylhet</td>
-          <td>Fahim Ahmed</td>
-          <td><span class="badge green">Active</span></td>
-          <td><a href="#">View</a> | <a href="#">Edit</a> | <a href="#" class="danger">Delete</a></td>
-        </tr>
+        <tbody id="users-body">
+          <tr><td colspan="4" class="muted">Loading users…</td></tr>
+        </tbody>
       </table>
     </section>
 
     <footer class="foot">© 2026 District Sports — Admin Panel</footer>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/admin.js"></script>
 </body>
