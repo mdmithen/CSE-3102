@@ -1,8 +1,13 @@
 /* ==========================================
    PLAYER DASHBOARD - JavaScript
-   Part 1 demo build. No database, no Supabase.
-   All content comes from the DEMO_* objects
-   below, so the whole page stays consistent.
+   UI demo build (frontend only).
+
+   Everything on this page is driven by the DEMO_*
+   objects below, so the tiles, charts, tables and
+   badges always agree with each other. The only
+   feature that talks to the database is the
+   "Join a Club" panel (js/player-join.js), which is
+   a separate file and is not touched here.
    ========================================== */
 
 /* ---------- DEMO DATA (no backend yet) ---------- */
@@ -111,6 +116,38 @@ function sportStatLabels(sport) {
   return SPORT_STATS[sport] || SPORT_STATS.Football;
 }
 
+/* Club top-scorer list, DERIVED from DEMO_MEMBERS.
+   Keeping one source means the ranking page can never disagree
+   with the roster shown a few clicks away.
+   Player points = goals x 3 + assists. */
+function computeClubStandings() {
+  const rows = DEMO_MEMBERS
+    .filter(m => m.stats && m.stats.apps !== undefined)
+    .map(m => {
+      const goals = m.stats.goals || 0;
+      const assists = m.stats.assists || 0;
+      return {
+        id: m.id,
+        name: m.name,
+        position: m.position,
+        played: m.stats.apps,
+        goals,
+        assists,
+        rating: m.stats.rating || 0,
+        points: goals * 3 + assists,
+        me: !!m.me
+      };
+    })
+    .sort((a, b) =>
+      b.points - a.points || b.goals - a.goals || a.played - b.played);
+
+  rows.forEach((r, i) => { r.rank = i + 1; });
+  return rows;
+}
+
+const DEMO_STANDINGS = computeClubStandings();
+const MY_STANDING = DEMO_STANDINGS.find(r => r.me) || DEMO_STANDINGS[0] || null;
+
 /* ==========================================
    DERIVED PERFORMANCE
    Every total below is calculated from
@@ -148,8 +185,13 @@ function computePerformance() {
     minutes: sum("minutes"),
     rating: Math.round((sum("rating") / played) * 10) / 10,
     winRate: Math.round((count("win") / played) * 100),
-    points: competitions.reduce((t, c) => t + c.pts, 0),
-    rank: 3,                       // position in the club top-scorers list
+    /* Points earned in competitions (W x 3 + D per competition).
+       This is a TEAM-style total and is deliberately kept apart
+       from playerPoints below, which is the top-scorer formula. */
+    competitionPoints: competitions.reduce((t, c) => t + c.pts, 0),
+    /* From the derived club standings, so rank 3 is never hardcoded */
+    rank: MY_STANDING ? MY_STANDING.rank : 1,
+    playerPoints: MY_STANDING ? MY_STANDING.points : 0,
     competitions,
     awards: [
       { title: "District Champion 2025",   meta: "Rajshahi Sports Club · Football" },
@@ -167,14 +209,6 @@ function grow(result) {
 /* Live object used across the page */
 const DEMO_PERFORMANCE = computePerformance();
 
-const DEMO_RANKINGS = [
-  { rank: 1, name: "Imran Kabir",  played: 12, goals: 9, points: 28 },
-  { rank: 2, name: "Sadia Akter",  played: 11, goals: 8, points: 25 },
-  { rank: 3, name: "Rahim Ahmed",  played: 12, goals: 7, points: 24, me: true },
-  { rank: 4, name: "Tanvir Hasan", played: 11, goals: 5, points: 20 },
-  { rank: 5, name: "Rafiqul Hasan", played: 10, goals: 4, points: 18 }
-];
-
 const DEMO_DISTRICTS = [
   { rank: 1, district: "Rajshahi",   points: 265, clubs: 12 },
   { rank: 2, district: "Dhaka",      points: 260, clubs: 18 },
@@ -182,36 +216,65 @@ const DEMO_DISTRICTS = [
   { rank: 4, district: "Sylhet",     points: 230, clubs: 10 }
 ];
 
+/* National top-scorer list (sample data).
+   The signed-in player is placed by rank so his numbers
+   match DEMO_PERFORMANCE exactly - see myNationalRow(). */
+const DEMO_NATIONAL = [
+  { rank: 1,  name: "Javed Hasan",      club: "Dhaka United",        played: 14, goals: 11 },
+  { rank: 2,  name: "Arif Hossain",     club: "Chattogram Warriors", played: 13, goals: 10 },
+  { rank: 3,  name: "Rakib Hossain",    club: "Sylhet Sports Academy", played: 13, goals: 9 },
+  { rank: 4,  name: "Nayeem Islam",     club: "Chattogram Warriors", played: 12, goals: 8 },
+  { rank: 5,  name: "Sadia Akter",      club: "Sylhet Sports Academy", played: 11, goals: 8 }
+];
+
+/* My national row is derived, not hand-typed, so the goals and
+   matches can never drift away from DEMO_PERFORMANCE. */
+function myNationalRow() {
+  const nextRank = (DEMO_NATIONAL[DEMO_NATIONAL.length - 1].rank || 0) + 1;
+  return {
+    rank: nextRank,
+    name: DEMO_PLAYER.name,
+    club: DEMO_CLUB.name,
+    played: DEMO_PERFORMANCE.played,
+    goals: DEMO_PERFORMANCE.goals,
+    me: true
+  };
+}
+
+/* Upcoming fixtures. `iso` is what the countdown math reads;
+   `date` is the label shown on screen. */
 const DEMO_FIXTURES = [
-  { date: "15 Oct 2026", time: "15:30", tournament: "District Football Championship 2026",
+  { iso: "2026-10-24", date: "24 Oct 2026", time: "15:30", tournament: "District Football Championship 2026",
     opponent: "Uttara Sports Club", venue: "Rajshahi Stadium", img: "images/football.jpg" },
-  { date: "22 Oct 2026", time: "17:00", tournament: "Rajshahi Divisional League",
+  { iso: "2026-10-31", date: "31 Oct 2026", time: "17:00", tournament: "Rajshahi Divisional League",
     opponent: "Mohammadpur SC", venue: "Divisional Ground", img: "images/football.jpg" }
 ];
 
 const DEMO_TOURNAMENTS = [
-  { icon: "⚽", name: "District Football Championship 2026", meta: "15 Oct 2026 · Rajshahi · 24 clubs", status: "Registered" },
-  { icon: "🏏", name: "Inter-District Cricket Tournament",   meta: "28 Oct 2026 · Dhaka · 16 clubs",    status: "Open" },
-  { icon: "🏸", name: "National Badminton Championship",    meta: "12 Nov 2026 · Chattogram · 32 players", status: "Open" }
+  { icon: "⚽", name: "District Football Championship 2026", meta: "15 Oct 2026 · Rajshahi · 24 clubs", status: "Registered", statusKey: "registered" },
+  { icon: "🏏", name: "Inter-District Cricket Tournament",   meta: "28 Oct 2026 · Dhaka · 16 clubs",    status: "Open", statusKey: "open" },
+  { icon: "⚽", name: "National Youth Cup (Qualifiers)",      meta: "05 Nov 2026 · Dhaka · 32 clubs",    status: "Closing Soon", statusKey: "closing" }
 ];
 
 const DEMO_NOTICES = [
   { icon: "📅", title: "Training session moved to 4:00 PM",
     body: "Due to the district tournament, Friday training now starts at 4:00 PM on the main field.",
-    meta: "Club Manager · 10 Oct 2026", unread: true },
+    meta: "Club Manager · 10 Oct 2026", priority: "high", unread: true },
   { icon: "🏆", title: "District Championship squad announced",
     body: "You have been selected in the starting XI. Jersey collection is open at the club office from 2 PM.",
-    meta: "Rajshahi Sports Club · 09 Oct 2026", unread: true },
+    meta: "Rajshahi Sports Club · 09 Oct 2026", priority: "high", unread: true },
   { icon: "📋", title: "Player ID card renewal",
     body: "Please submit your national ID at the club office before 20 October to keep your digital player card active.",
-    meta: "District Council · 05 Oct 2026", unread: true },
+    meta: "District Council · 05 Oct 2026", priority: "medium", unread: true },
   { icon: "⭐", title: "September player of the month",
     body: "Congratulations on being shortlisted for the district player of the month award.",
-    meta: "District Council · 30 Sep 2026", unread: false },
+    meta: "District Council · 30 Sep 2026", priority: "normal", unread: false },
   { icon: "⚽", title: "Friendly match against Bogura XI",
     body: "A practice friendly is scheduled. Full squad attendance is expected.",
-    meta: "Club Manager · 26 Sep 2026", unread: false }
+    meta: "Club Manager · 26 Sep 2026", priority: "normal", unread: false }
 ];
+
+const PRIORITY_LABEL = { high: "High", medium: "Medium", normal: "Normal" };
 
 /* ---------- VIEW METADATA ---------- */
 const VIEW_META = {
@@ -292,11 +355,46 @@ function toast(message) {
   box._timer = setTimeout(() => { box.hidden = true; }, 2600);
 }
 
+/* ---------- shared helpers for the UI ----------
+
+/* One empty-state markup for every list on the page, so
+   "nothing to show" always looks and reads the same. */
+function emptyState(icon, title, hint) {
+  return '<div class="pd-empty-inline">' +
+    "<span>" + icon + "</span>" +
+    "<b>" + esc(title) + "</b>" +
+    (hint ? '<small class="muted">' + esc(hint) + "</small>" : "") +
+  "</div>";
+}
+
+/* Swap a list for its empty state without deleting the host element. */
+function toggleEmptyState(listEl, emptyEl, isEmpty) {
+  if (listEl) listEl.hidden = isEmpty;
+  if (emptyEl) emptyEl.hidden = !isEmpty;
+}
+
+/* Days between today and an ISO date. Returns "Today",
+   "Tomorrow", "in N days" or "N days ago". */
+function countdownLabel(iso) {
+  const today = new Date();
+  const target = new Date(iso + "T00:00:00");
+  if (isNaN(target.getTime())) return "";
+
+  const days = Math.round(
+    (target - new Date(today.getFullYear(), today.getMonth(), today.getDate())) / 86400000
+  );
+
+  if (days === 0) return { text: "📍 Today", cls: "is-today" };
+  if (days === 1) return { text: "⏱ Tomorrow", cls: "" };
+  if (days > 1)   return { text: "⏱ In " + days + " days", cls: "" };
+  return { text: "⏱ " + Math.abs(days) + " days ago", cls: "is-past" };
+}
+
 /* ==========================================
    2. STATIC HEADER + WELCOME CONTENT
    ========================================== */
 function renderIdentity() {
-  const p = DEMO_PLAYER;
+  const p = player();
   // Name shown in the sidebar comes from the demo session when available
   const user = playerSession();
 
@@ -361,15 +459,26 @@ function renderStatCards() {
 const RESULT_LABEL = { win: "Win", loss: "Loss", draw: "Draw", upcoming: "Upcoming" };
 
 function renderNextMatch() {
+  const host = $("#nextMatch");
+  if (!host) return;
+
   const f = DEMO_FIXTURES[0];
-  $("#nextMatch").innerHTML = (
+  if (!f) {
+    host.innerHTML = emptyState("📅", "No fixture scheduled", "Your club has no upcoming match right now.");
+    return;
+  }
+
+  const cd = countdownLabel(f.iso);
+
+  host.innerHTML = (
     '<div class="pd-match">' +
       '<img src="' + f.img + '" alt="" loading="lazy" onerror="this.style.display=\'none\';">' +
-      "<div>" +
+      '<div class="pd-match-body">' +
         "<h4>" + esc(DEMO_PLAYER.club) + " vs " + esc(f.opponent) + "</h4>" +
         "<small>" + esc(f.tournament) + "</small>" +
         '<small>📅 ' + esc(f.date) + " · 🕒 " + esc(f.time) + "</small>" +
         "<small>📍 " + esc(f.venue) + "</small>" +
+        '<span class="pd-countdown ' + cd.cls + '">' + esc(cd.text) + "</span>" +
       "</div>" +
       '<div class="pd-match-vs">' +
         '<span class="pd-match-result pd-result-upcoming">Upcoming</span>' +
@@ -380,9 +489,17 @@ function renderNextMatch() {
 
 function renderRecentResults() {
   // Five most recent matches, newest first, from the one match dataset
+  const host = $("#recentResults");
+  if (!host) return;
+
   const recent = DEMO_MATCHES.slice().sort(byDateDesc).slice(0, 5);
 
-  $("#recentResults").innerHTML = recent.map(r => (
+  if (!recent.length) {
+    host.innerHTML = emptyState("📊", "No results yet", "Matches you play will appear here.");
+    return;
+  }
+
+  host.innerHTML = recent.map(r => (
     '<div class="pd-match">' +
       "<div>" +
         "<h4>vs " + esc(r.opponent) + "</h4>" +
@@ -400,41 +517,65 @@ function renderRecentResults() {
    5. DASHBOARD — RANK + NOTICE SNAPSHOT
    ========================================== */
 function renderRankSnapshot() {
-  const rows = DEMO_RANKINGS.slice(0, 5).map(r => (
-    "<tr" + (r.me ? ' class="is-me"' : "") + ">" +
-      "<td>" + r.rank + "</td>" +
-      "<td>" + esc(r.name) + "</td>" +
-      "<td>" + r.played + "</td>" +
-      "<td>" + r.goals + "</td>" +
-      "<td>" + r.points + "</td>" +
-    "</tr>"
-  )).join("");
+  const host = $("#rankSnapshot");
+  if (!host) return;
 
-  $("#rankSnapshot").innerHTML =
+  const rows = DEMO_STANDINGS.slice(0, 5);
+
+  if (!rows.length) {
+    host.innerHTML = emptyState("🏅", "No standings yet", "The club table appears once the season starts.");
+    return;
+  }
+
+  host.innerHTML =
     '<table class="table"><thead><tr>' +
       "<th>Rank</th><th>Player</th><th>P</th><th>Goals</th><th>Points</th>" +
-    "</tr></thead><tbody>" + rows + "</tbody></table>";
+    "</tr></thead><tbody>" +
+    rows.map(r => (
+      "<tr" + (r.me ? ' class="is-me"' : "") + ">" +
+        "<td>" + r.rank + "</td>" +
+        "<td>" + esc(r.name) + "</td>" +
+        "<td>" + r.played + "</td>" +
+        "<td>" + r.goals + "</td>" +
+        "<td>" + r.points + "</td>" +
+      "</tr>"
+    )).join("") +
+    "</tbody></table>" +
+    '<p class="muted pd-note">Top scorers · points = goals × 3 + assists</p>';
 }
 
 function renderNoticeSnapshot() {
-  const items = DEMO_NOTICES.slice(0, 3).map(n => (
-    '<div class="pd-notice' + (n.unread ? " is-unread" : "") + '">' +
+  const host = $("#noticeSnapshot");
+  if (!host) return;
+
+  const items = DEMO_NOTICES.slice(0, 3);
+
+  if (!items.length) {
+    host.innerHTML = emptyState("📢", "No notices", "Club announcements will appear here.");
+    return;
+  }
+
+  host.innerHTML = items.map(n => (
+    '<div class="pd-notice is-' + n.priority + (n.unread ? " is-unread" : "") + '">' +
       '<span class="pd-notice-icon">' + n.icon + "</span>" +
       "<div>" +
-        "<h4>" + esc(n.title) + "</h4>" +
+        '<div class="pd-notice-head">' +
+          (n.unread ? '<i class="pd-unread-dot"></i>' : "") +
+          '<span class="pd-priority pd-priority-' + n.priority + '">' +
+            esc(PRIORITY_LABEL[n.priority]) + "</span>" +
+          "<h4>" + esc(n.title) + "</h4>" +
+        "</div>" +
         '<span class="pd-notice-meta">' + esc(n.meta) + "</span>" +
       "</div>" +
     "</div>"
   )).join("");
-
-  $("#noticeSnapshot").innerHTML = items;
 }
 
 /* ==========================================
    6. MY PROFILE
    ========================================== */
 function renderProfile() {
-  const p = DEMO_PLAYER;
+  const p = player();
 
   const rows = [
     ["Player Name", p.name],
@@ -459,16 +600,29 @@ function renderProfile() {
     "<dt>" + esc(k) + "</dt><dd>" + esc(v) + "</dd>"
   ).join("");
 
-  // Digital card
+  // Digital player card
   fill($("#cardName"), p.name);
   fill($("#cardId"), p.playerId);
+  fill($("#cardJersey"), p.jersey);
+  fill($("#cardStatus"), p.status);
+
+  const cardAvatar = $("#cardAvatar");
+  if (cardAvatar) {
+    cardAvatar.textContent = initials(p.name);
+    cardAvatar.style.setProperty("--h", avatarHue(p.playerId));
+  }
+
+  // The four headline facts on the front of the card
+  fill($("#cardClub"), p.club);
+  fill($("#cardSport"), p.sport);
+  fill($("#cardPosition"), p.position);
+  fill($("#cardJerseyNo"), p.jersey);
+
   $("#cardBody").innerHTML = [
-    ["Club", p.club],
     ["District", p.district],
-    ["Sport", p.sport],
-    ["Position", p.position],
-    ["Jersey", p.jersey],
-    ["Status", p.status]
+    ["Age", p.age + " yrs"],
+    ["Preferred Foot", p.foot],
+    ["Member Since", p.joined]
   ].map(([k, v]) => "<div><small>" + esc(k) + "</small><b>" + esc(v) + "</b></div>").join("");
 }
 
@@ -528,11 +682,71 @@ function renderClub() {
   ).join("");
 
   renderClubMemberStrip();
+  renderClubKpi();
+}
+
+/* Club snapshot: counts derived from the same roster list,
+   so the member count can never drift from the cards below. */
+function renderClubKpi() {
+  const c = DEMO_CLUB;
+  const active = DEMO_MEMBERS.filter(m => m.status === "Active").length;
+  const avgAge = DEMO_MEMBERS.length
+    ? Math.round(DEMO_MEMBERS.reduce((t, m) => t + (m.age || 0), 0) / DEMO_MEMBERS.length)
+    : 0;
+  const perf = DEMO_PERFORMANCE;
+
+  const kpis = [
+    { icon: "👥", value: DEMO_MEMBERS.length, label: "Registered members" },
+    { icon: "✅", value: active,              label: "Active players" },
+    { icon: "🎂", value: avgAge + " yrs",     label: "Average age" },
+    { icon: "📈", value: perf.winRate + "%",  label: "Season win rate" },
+    { icon: "🥇", value: "#" + perf.rank,     label: "My club rank" },
+    { icon: "🗺️", value: c.districtRank,      label: "Club district rank" }
+  ];
+
+  const host = $("#clubKpi");
+  if (host) {
+    host.innerHTML = kpis.map(k =>
+      '<div class="pd-kpi">' +
+        "<span>" + k.icon + "</span>" +
+        "<b>" + esc(k.value) + "</b>" +
+        "<small>" + esc(k.label) + "</small>" +
+      "</div>"
+    ).join("");
+  }
+
+  // Club form = the same last five matches the dashboard shows
+  const formHost = $("#clubForm");
+  if (!formHost) return;
+
+  const recent = DEMO_MATCHES.slice().sort(byDateDesc).slice(0, 5);
+  if (!recent.length) {
+    formHost.innerHTML = emptyState("📈", "No form yet", "Results appear after the first match.");
+    return;
+  }
+  formHost.innerHTML = recent.map(m => formChip(m)).join("");
+}
+
+/* One "W / opponent" chip, reused by both form strips */
+function formChip(m) {
+  return '<span class="pd-form-chip pd-form-' + m.result + '" title="' +
+    esc(m.opponent) + " · " + esc(formatDate(m.date)) + '">' +
+    RESULT_LABEL[m.result] +
+    '<small>' + esc(m.opponent.split(" ")[0]) + "</small>" +
+  "</span>";
 }
 
 /* Small avatar preview on the club page */
 function renderClubMemberStrip() {
-  $("#clubMemberStrip").innerHTML = DEMO_MEMBERS.map(m => (
+  const host = $("#clubMemberStrip");
+  if (!host) return;
+
+  if (!DEMO_MEMBERS.length) {
+    host.innerHTML = emptyState("👥", "No members yet", "Players appear here once they join the club.");
+    return;
+  }
+
+  host.innerHTML = DEMO_MEMBERS.map(m => (
     '<button type="button" class="pd-strip-member" data-member="' + esc(m.id) + '">' +
       '<span class="pd-avatar" style="--h:' + avatarHue(m.id) + '">' + esc(initials(m.name)) + "</span>" +
       "<b>" + esc(m.name) + "</b>" +
@@ -677,8 +891,106 @@ function renderPerformance() {
   )).join("");
 
   renderChart();
+  renderRatingChart();
+  renderFormBar();
   renderFormStrip();
   renderHistory();
+}
+
+/* ---------- Win / draw / loss bar + win rate ---------- */
+function renderFormBar() {
+  const perf = DEMO_PERFORMANCE;
+  const total = perf.played || 1;
+
+  const segs = [
+    { key: "win",  label: "Wins",   n: perf.wins },
+    { key: "draw", label: "Draws",  n: perf.draws },
+    { key: "loss", label: "Losses", n: perf.losses }
+  ];
+
+  const bar = $("#perfFormBar");
+  if (bar) {
+    bar.innerHTML = segs.map(s =>
+      '<i class="seg-' + s.key + '" style="width:' + ((s.n / total) * 100).toFixed(2) + '%" ' +
+         'title="' + s.label + ": " + s.n + '"></i>'
+    ).join("");
+  }
+
+  const legend = $("#perfFormLegend");
+  if (legend) {
+    legend.innerHTML = segs.map(s =>
+      '<span><i class="lg-' + s.key + '"></i>' + s.label +
+      " <b>" + s.n + "</b> (" + Math.round((s.n / total) * 100) + "%)</span>"
+    ).join("");
+  }
+
+  fill($("#perfWinRate"), perf.winRate + "% win rate");
+  fill($("#perfBalanceMeta"),
+    perf.wins + "W · " + perf.draws + "D · " + perf.losses + "L from " + perf.played + " matches");
+}
+
+/* ---------- Rating trend chart (same matches, second metric) ---------- */
+function renderRatingChart() {
+  const box = $("#ratingChart");
+  if (!box) return;
+
+  const games = DEMO_MATCHES.slice().sort((a, b) => (a.date < b.date ? -1 : 1));
+  if (!games.length) {
+    box.innerHTML = emptyState("📈", "No chart data", "Ratings appear once matches are played.");
+    return;
+  }
+
+  const ratings = games.map(m => m.rating);
+  fill($("#ratingAvg"), String(DEMO_PERFORMANCE.rating));
+
+  const W = 760, H = 220, padL = 34, padR = 16, padT = 14, padB = 30;
+  const innerW = W - padL - padR, innerH = H - padT - padB;
+
+  /* The scale is centred on 6.0 so a good and a poor match
+     are visibly different, rather than hugging the top. */
+  const low = Math.max(0, Math.min(...ratings) - 1);
+  const high = Math.min(10, Math.max(...ratings) + 1);
+  const span = Math.max(1, high - low);
+
+  const x = i => padL + (games.length === 1 ? innerW / 2 : (i / (games.length - 1)) * innerW);
+  const y = v => padT + innerH - ((v - low) / span) * innerH;
+
+  let grid = "";
+  for (let v = Math.ceil(low); v <= high; v++) {
+    grid += '<line x1="' + padL + '" y1="' + y(v) + '" x2="' + (W - padR) + '" y2="' + y(v) +
+            '" class="pd-grid-line" />' +
+            '<text x="' + (padL - 8) + '" y="' + (y(v) + 4) +
+            '" class="pd-axis-text" text-anchor="end">' + v + "</text>";
+  }
+
+  let xLabels = "";
+  games.forEach((m, i) => {
+    if (i % 2 !== 0 && i !== games.length - 1) return;
+    xLabels += '<text x="' + x(i) + '" y="' + (H - 10) +
+               '" class="pd-axis-text" text-anchor="middle">' +
+               esc(m.date.slice(5)) + "</text>";
+  });
+
+  /* Season average, drawn as a dashed reference line */
+  const avgY = y(DEMO_PERFORMANCE.rating);
+  const avgLine = '<line x1="' + padL + '" y1="' + avgY + '" x2="' + (W - padR) + '" y2="' + avgY +
+                  '" class="pd-avg-line" />';
+
+  const path = ratings.map((v, i) => (i ? "L" : "M") + x(i) + " " + y(v)).join(" ");
+  const dots = ratings.map((v, i) =>
+    '<circle cx="' + x(i) + '" cy="' + y(v) + '" r="4" class="pd-dot pd-dot-rating">' +
+      "<title>" + esc(games[i].opponent) + ": " + v + " / 10</title>" +
+    "</circle>"
+  ).join("");
+
+  box.innerHTML =
+    '<svg viewBox="0 0 ' + W + " " + H + '" class="pd-chart-svg" ' +
+         'preserveAspectRatio="xMidYMid meet" role="img" ' +
+         'aria-label="Match rating over ' + games.length + ' matches">' +
+      grid + xLabels + avgLine +
+      '<path d="' + path + '" class="pd-line pd-line-rating" fill="none" />' +
+      dots +
+    "</svg>";
 }
 
 /* ---------- Progress chart (hand-built SVG, no libraries) ---------- */
@@ -741,14 +1053,15 @@ function renderChart() {
 
 /* ---------- Last 5 results strip ---------- */
 function renderFormStrip() {
+  const host = $("#perfForm");
+  if (!host) return;
+
   const recent = DEMO_MATCHES.slice().sort(byDateDesc).slice(0, 5);
-  $("#perfForm").innerHTML = recent.map(m => (
-    '<span class="pd-form-chip pd-form-' + m.result + '" title="' +
-      esc(m.opponent) + " · " + esc(formatDate(m.date)) + '">' +
-      RESULT_LABEL[m.result] +
-      '<small>' + esc(m.opponent.split(" ")[0]) + "</small>" +
-    "</span>"
-  )).join("");
+  if (!recent.length) {
+    host.innerHTML = emptyState("📈", "No recent form", "Your last five results appear here.");
+    return;
+  }
+  host.innerHTML = recent.map(m => formChip(m)).join("");
 }
 
 /* ---------- Match history: filters + table ---------- */
@@ -838,63 +1151,180 @@ function clearHistoryFilters() {
 
 /* ==========================================
    10. MY RANKINGS
+   Club / District / National, switched by tabs.
+   Club rows are derived from the roster (DEMO_STANDINGS),
+   the national row is derived from DEMO_PERFORMANCE.
    ========================================== */
+let activeRankTab = "club";
+
+const RANK_VIEWS = {
+  club: {
+    title: "🏅 Club Standings",
+    meta: "Top scorers at " + DEMO_CLUB.name + " — derived from the club roster",
+    note: "Points = goals × 3 + assists. The same numbers appear on the Club Members page.",
+    columns: ["Rank", "Player", "Played", "Goals", "Assists", "Points"]
+  },
+  district: {
+    title: "🗺️ District Points Table",
+    meta: "All districts (demo data)",
+    note: "District totals are sample data for the class project.",
+    columns: ["Rank", "District", "Points", "Clubs", "Players", ""]
+  },
+  national: {
+    title: "🇧🇩 National Top Scorers",
+    meta: "Bangladesh national league (demo data)",
+    note: "Your row is calculated from the same season statistics used elsewhere on this page.",
+    columns: ["Rank", "Player", "Club", "Played", "Goals", ""]
+  }
+};
+
 function renderRankings() {
   const perf = DEMO_PERFORMANCE;
 
   const cards = [
-    { icon: "🏆", value: "#" + perf.rank,  label: "Club Ranking",   foot: "Top scorers list" },
-    { icon: "📈", value: perf.points || 24, label: "Points",         foot: "This season" },
-    { icon: "⚽", value: perf.goals,        label: "Goals",          foot: "2nd best in club" },
-    { icon: "🎯", value: perf.rating,      label: "Avg. Rating",    foot: "Out of 10" },
-    { icon: "📊", value: "3rd",             label: "District Rank",  foot: DEMO_PLAYER.district + " (demo)" }
+    { icon: "🏆", value: "#" + perf.rank,       label: "Club Ranking",  foot: "Top scorers list" },
+    { icon: "📈", value: perf.playerPoints,     label: "Player Points", foot: "Goals × 3 + assists" },
+    { icon: "⚽", value: perf.goals,             label: "Goals",         foot: "Season total" },
+    { icon: "🎯", value: perf.rating,           label: "Avg. Rating",   foot: "Out of 10" },
+    { icon: "🗺️", value: districtRankLabel(),   label: "District Rank", foot: DEMO_PLAYER.district + " (demo)" }
   ];
-  $("#rankStats").innerHTML = cards.map(c => (
-    '<div class="pd-stat">' +
-      '<span class="pd-stat-icon">' + c.icon + "</span>" +
-      "<b>" + esc(c.value) + "</b>" +
-      "<small>" + esc(c.label) + "</small>" +
-      '<span class="pd-stat-foot">' + esc(c.foot) + "</span>" +
-    "</div>"
-  )).join("");
+  const stats = $("#rankStats");
+  if (stats) {
+    stats.innerHTML = cards.map(c => (
+      '<div class="pd-stat">' +
+        '<span class="pd-stat-icon">' + c.icon + "</span>" +
+        "<b>" + esc(c.value) + "</b>" +
+        "<small>" + esc(c.label) + "</small>" +
+        '<span class="pd-stat-foot">' + esc(c.foot) + "</span>" +
+      "</div>"
+    )).join("");
+  }
 
-  $("#rankTable").innerHTML = DEMO_RANKINGS.map(r => (
+  drawRankTab();
+}
+
+function districtRankLabel() {
+  const d = DEMO_DISTRICTS.find(x => x.district === DEMO_PLAYER.district);
+  return d ? "#" + d.rank : "—";
+}
+
+/* Renders the header row and the body for whichever tab is open */
+function drawRankTab() {
+  const view = RANK_VIEWS[activeRankTab] || RANK_VIEWS.club;
+
+  fill($("#rankTitle"), view.title);
+  fill($("#rankMeta"), view.meta);
+  fill($("#rankNote"), view.note);
+
+  const head = $("#rankHead");
+  const body = $("#rankTable");
+  if (!head || !body) return;
+
+  // Last column is a spacer, so it gets no label
+  head.innerHTML = "<tr>" + view.columns
+    .map((c, i) => '<th scope="col"' + (i === view.columns.length - 1 ? ' class="pd-col-empty"' : "") + ">" + esc(c) + "</th>")
+    .join("") + "</tr>";
+
+  let rows = [];   // { cells: [...], me: bool }
+
+  if (activeRankTab === "club") {
+    rows = DEMO_STANDINGS.map(r => ({
+      me: r.me,
+      cells: [r.rank, esc(r.name), r.played, r.goals, r.assists, r.points, ""]
+    }));
+  } else if (activeRankTab === "district") {
+    rows = DEMO_DISTRICTS.map(d => ({
+      me: d.district === DEMO_PLAYER.district,
+      cells: [d.rank, esc(d.district), d.points, d.clubs, d.points * 2, ""]
+    }));
+  } else {
+    rows = DEMO_NATIONAL.concat([myNationalRow()]).map(n => ({
+      me: !!n.me,
+      cells: [n.rank, esc(n.name), esc(n.club), n.played, n.goals, ""]
+    }));
+  }
+
+  body.innerHTML = rows.map(r =>
     "<tr" + (r.me ? ' class="is-me"' : "") + ">" +
-      "<td>" + r.rank + "</td>" +
-      "<td>" + esc(r.name) + "</td>" +
-      "<td>" + r.played + "</td>" +
-      "<td>" + r.goals + "</td>" +
-      "<td>" + r.points + "</td>" +
-    "</tr>"
-  )).join("");
+    r.cells.map(c => "<td>" + c + "</td>").join("") + "</tr>"
+  ).join("");
 
-  $("#districtTable").innerHTML = DEMO_DISTRICTS.map(d => (
-    "<tr" + (d.district === DEMO_PLAYER.district ? ' class="is-me"' : "") + ">" +
-      "<td>" + d.rank + "</td>" +
-      "<td>" + esc(d.district) + "</td>" +
-      "<td>" + d.points + "</td>" +
-      "<td>" + d.clubs + "</td>" +
-    "</tr>"
-  )).join("");
+  toggleEmptyState($(".pd-table-wrap", $("#view-rankings")) || $("#rankTable").closest(".pd-table-wrap"),
+                  $("#rankEmpty"), rows.length === 0);
+}
+
+/* Tab clicks */
+function bindRankTabs() {
+  const tabs = $("#rankTabs");
+  if (!tabs) return;
+
+  tabs.addEventListener("click", e => {
+    const btn = e.target.closest("[data-rank]");
+    if (!btn) return;
+
+    activeRankTab = btn.dataset.rank;
+
+    $$(".pd-tab", tabs).forEach(t => {
+      const on = t === btn;
+      t.classList.toggle("is-active", on);
+      t.setAttribute("aria-selected", String(on));
+    });
+
+    drawRankTab();
+  });
 }
 
 /* ==========================================
-   11. NOTICES (+ unread handling)
+   11. NOTICES (priority + unread handling)
    ========================================== */
+let noticeFilter = "";
+
+function visibleNotices() {
+  if (noticeFilter === "unread") return DEMO_NOTICES.filter(n => n.unread);
+  if (noticeFilter === "read")   return DEMO_NOTICES.filter(n => !n.unread);
+  if (noticeFilter === "high")   return DEMO_NOTICES.filter(n => n.priority === "high");
+  return DEMO_NOTICES;
+}
+
 function renderNotices() {
-  $("#noticeList").innerHTML = DEMO_NOTICES.map((n, i) => (
-    '<li class="pd-notice' + (n.unread ? " is-unread" : "") + '" data-index="' + i + '">' +
-      '<span class="pd-notice-icon">' + n.icon + "</span>" +
-      "<div>" +
-        "<h4>" + esc(n.title) + "</h4>" +
-        "<p>" + esc(n.body) + "</p>" +
-        '<span class="pd-notice-meta">' + esc(n.meta) + "</span>" +
-      "</div>" +
-      (n.unread
-        ? '<button type="button" class="pd-notice-action" data-read="' + i + '">Mark read</button>'
-        : "") +
-    "</li>"
-  )).join("");
+  const host = $("#noticeList");
+  if (!host) return;
+
+  const list = visibleNotices();
+
+  if (!list.length) {
+    host.hidden = true;
+    toggleEmptyState(host, $("#noticeEmpty"), true);
+    updateNoticeCount();
+    return;
+  }
+
+  toggleEmptyState(host, $("#noticeEmpty"), false);
+
+  host.innerHTML = list.map(n => {
+    const original = DEMO_NOTICES.indexOf(n);
+    return (
+      '<li class="pd-notice is-' + n.priority + (n.unread ? " is-unread" : "") + '" data-index="' + original + '">' +
+        '<span class="pd-notice-icon">' + n.icon + "</span>" +
+        "<div>" +
+          '<div class="pd-notice-head">' +
+            (n.unread ? '<i class="pd-unread-dot" title="Unread"></i>' : "") +
+            '<span class="pd-priority pd-priority-' + n.priority + '">' +
+              esc(PRIORITY_LABEL[n.priority]) + "</span>" +
+            "<h4>" + esc(n.title) + "</h4>" +
+          "</div>" +
+          "<p>" + esc(n.body) + "</p>" +
+          '<span class="pd-notice-meta">' + esc(n.meta) +
+            (n.unread ? " · Unread" : " · Read") + "</span>" +
+        "</div>" +
+        '<div class="pd-notice-actions">' +
+          (n.unread
+            ? '<button type="button" class="pd-notice-action" data-read="' + original + '">Mark read</button>'
+            : '<button type="button" class="pd-notice-action" data-unread="' + original + '">Mark unread</button>') +
+        "</div>" +
+      "</li>"
+    );
+  }).join("");
 
   updateNoticeCount();
 }
@@ -912,27 +1342,57 @@ function updateNoticeCount() {
    12. MATCHES & TOURNAMENTS
    ========================================== */
 function renderMatches() {
-  $("#fixtureList").innerHTML = DEMO_FIXTURES.map(f => (
-    '<div class="pd-match">' +
-      '<img src="' + f.img + '" alt="" loading="lazy" onerror="this.style.display=\'none\';">' +
-      "<div>" +
-        "<h4>vs " + esc(f.opponent) + "</h4>" +
-        "<small>" + esc(f.tournament) + "</small>" +
-        "<small>📅 " + esc(f.date) + " · 🕒 " + esc(f.time) + "</small>" +
-        "<small>📍 " + esc(f.venue) + "</small>" +
-      "</div>" +
-      '<div class="pd-match-vs"><span class="pd-match-result pd-result-upcoming">Upcoming</span></div>' +
-    "</div>"
-  )).join("");
+  const fixtures = DEMO_FIXTURES;
+  const fixtureHost = $("#fixtureList");
 
-  $("#tournamentList").innerHTML = DEMO_TOURNAMENTS.map(t => (
-    '<div class="pd-tournament">' +
-      '<span class="pd-tournament-icon">' + t.icon + "</span>" +
-      "<div><h4>" + esc(t.name) + "</h4><small>" + esc(t.meta) + "</small></div>" +
-      '<div class="pd-match-vs"><span class="pd-match-result pd-result-upcoming">' +
-        esc(t.status) + "</span></div>" +
-    "</div>"
-  )).join("");
+  if (fixtureHost) {
+    if (!fixtures.length) {
+      fixtureHost.innerHTML = "";
+      toggleEmptyState(fixtureHost, $("#fixtureEmpty"), true);
+    } else {
+      toggleEmptyState(fixtureHost, $("#fixtureEmpty"), false);
+      fixtureHost.innerHTML = fixtures.map(f => {
+        const cd = countdownLabel(f.iso);
+        return (
+          '<div class="pd-match">' +
+            '<img src="' + f.img + '" alt="" loading="lazy" onerror="this.style.display=\'none\';">' +
+            '<div class="pd-match-body">' +
+              "<h4>vs " + esc(f.opponent) + "</h4>" +
+              "<small>" + esc(f.tournament) + "</small>" +
+              '<small>📅 ' + esc(f.date) + " · 🕒 " + esc(f.time) + "</small>" +
+              "<small>📍 " + esc(f.venue) + "</small>" +
+              '<span class="pd-countdown ' + cd.cls + '">' + esc(cd.text) + "</span>" +
+            "</div>" +
+            '<div class="pd-match-vs">' +
+              '<span class="pd-match-result pd-result-upcoming">Upcoming</span>' +
+            "</div>" +
+          "</div>"
+        );
+      }).join("");
+    }
+  }
+
+  const tourneyHost = $("#tournamentList");
+  if (tourneyHost) {
+    if (!DEMO_TOURNAMENTS.length) {
+      tourneyHost.innerHTML = "";
+      toggleEmptyState(tourneyHost, $("#tournamentEmpty"), true);
+    } else {
+      toggleEmptyState(tourneyHost, $("#tournamentEmpty"), false);
+      tourneyHost.innerHTML = DEMO_TOURNAMENTS.map(t => (
+        '<div class="pd-tournament">' +
+          '<span class="pd-tournament-icon">' + t.icon + "</span>" +
+          '<div class="pd-match-body">' +
+            "<h4>" + esc(t.name) + "</h4><small>" + esc(t.meta) + "</small>" +
+          "</div>" +
+          '<div class="pd-match-vs">' +
+            '<span class="pd-tournament-status pd-status-' + esc(t.statusKey) + '">' +
+              esc(t.status) + "</span>" +
+          "</div>" +
+        "</div>"
+      )).join("");
+    }
+  }
 }
 
 /* ==========================================
@@ -1072,17 +1532,85 @@ function bindModals() {
 
 /* ==========================================
    13. SETTINGS
+   Frontend only. Edits live in this browser's
+   localStorage and never touch the database.
    ========================================== */
+const SETTINGS_KEY = "ds_player_demo_settings";
+
+/* Values the player has changed in the demo Settings form */
+let localEdits = readSettings();
+
+function readSettings() {
+  try {
+    return JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}") || {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveSettings() {
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(localEdits));
+  } catch (e) { /* private mode - the demo still works in memory */ }
+}
+
+function clearSettings() {
+  try { localStorage.removeItem(SETTINGS_KEY); } catch (e) {}
+  localEdits = {};
+  toast("Saved demo data cleared");
+  fillSettingsForm();
+  renderIdentity();
+  renderProfile();
+}
+
+/* DEMO_PLAYER with the player's own edits layered on top */
+function player() {
+  return Object.assign({}, DEMO_PLAYER, localEdits);
+}
+
 function fillSettingsForm() {
-  const p = DEMO_PLAYER;
+  const p = player();
+
   $("#setName").value = p.name;
   $("#setPhone").value = p.phone;
   $("#setEmail").value = p.email;
   $("#setJersey").value = p.jersey;
+  $("#setPosition").value = p.position;
+  $("#setDistrict").value = p.district;
   $("#setBio").value = p.bio || "";
+
+  updateAvatarPreview(p);
+}
+
+/* The avatar preview follows whatever name is typed */
+function updateAvatarPreview(p) {
+  const box = $("#setAvatar");
+  if (box) {
+    box.textContent = initials(p.name);
+    box.style.setProperty("--h", avatarHue(p.name));
+  }
+  fill($("#setAvatarName"), p.name);
+  fill($("#setAvatarMeta"), p.playerId + " · " + p.sport);
+}
+
+/* Restore the notification checkboxes from the saved demo settings */
+function loadPrefs() {
+  const saved = readSettings().prefs || {};
+  $$("[data-pref]").forEach(input => {
+    const key = input.dataset.pref;
+    input.checked = saved[key] === undefined ? input.defaultChecked : !!saved[key];
+  });
 }
 
 function bindSettings() {
+  // Live avatar preview as the name is typed
+  const nameInput = $("#setName");
+  if (nameInput) {
+    nameInput.addEventListener("input", () => {
+      updateAvatarPreview(player());
+    });
+  }
+
   $("#profileForm").addEventListener("submit", e => {
     e.preventDefault();
     const name  = $("#setName").value.trim();
@@ -1100,10 +1628,25 @@ function bindSettings() {
       return;
     }
 
-    // Demo only: nothing is sent anywhere.
-    msg.textContent = "✅ Saved locally for this demo. A database is not connected yet, so changes reset on refresh.";
+    // Frontend only: keep the change in this browser
+    localEdits = Object.assign({}, localEdits, {
+      name,
+      email,
+      phone: $("#setPhone").value.trim(),
+      jersey: $("#setJersey").value.trim(),
+      position: $("#setPosition").value.trim(),
+      district: $("#setDistrict").value || DEMO_PLAYER.district,
+      bio: $("#setBio").value.trim()
+    });
+    saveSettings();
+
+    msg.textContent = "✅ Saved in this browser only. Nothing was sent to a server, so this demo change resets when local storage is cleared.";
     msg.className = "muted pd-full pd-form-msg-ok";
-    toast("Profile saved (demo only)");
+    toast("Profile saved (browser only)");
+
+    // Reflect the new details across the dashboard
+    renderIdentity();
+    renderProfile();
   });
 
   $("#profileForm").addEventListener("reset", () => {
@@ -1111,6 +1654,22 @@ function bindSettings() {
     msg.textContent = "";
     setTimeout(fillSettingsForm, 0);
   });
+
+  const clearBtn = $("#clearStorage");
+  if (clearBtn) clearBtn.addEventListener("click", clearSettings);
+
+  // Notification preferences
+  $$("[data-pref]").forEach(input => {
+    input.addEventListener("change", () => {
+      const prefs = readSettings().prefs || {};
+      prefs[input.dataset.pref] = input.checked;
+      localEdits = Object.assign({}, localEdits, { prefs });
+      saveSettings();
+      toast(input.checked ? "Preference saved" : "Preference turned off");
+    });
+  });
+
+  loadPrefs();
 
   $("#passForm").addEventListener("submit", e => {
     e.preventDefault();
@@ -1120,7 +1679,7 @@ function bindSettings() {
     const msg = $("#passFormMsg");
 
     if (cur !== "123456") {
-      msg.textContent = "❌ Current password is wrong. (Demo password is 123456)";
+      msg.textContent = "❌ Demo check failed. Type 123456 to preview this screen.";
       msg.className = "muted pd-form-msg-err";
       return;
     }
@@ -1135,10 +1694,10 @@ function bindSettings() {
       return;
     }
 
-    msg.textContent = "✅ Password updated (demo only — not stored anywhere).";
+    msg.textContent = "✅ This is a visual mock only — your real password was not changed.";
     msg.className = "muted pd-form-msg-ok";
     e.target.reset();
-    toast("Password updated (demo only)");
+    toast("Preview only — password unchanged");
   });
 }
 
@@ -1195,6 +1754,13 @@ function bindNavigation() {
   });
 
   $("#pdOverlay").addEventListener("click", closeDrawer);
+
+  // Escape closes the mobile drawer, like the detail popup
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    const sidebar = $("#pdSidebar");
+    if (sidebar && sidebar.classList.contains("is-open")) closeDrawer();
+  });
 
   // Open the right view when arriving with a #hash
   const initial = (window.location.hash || "#dashboard").slice(1);
@@ -1263,23 +1829,58 @@ function bindHistoryFilters() {
 }
 
 function bindNotices() {
-  // Mark one notice as read
-  $("#noticeList").addEventListener("click", e => {
-    const btn = e.target.closest("[data-read]");
-    if (!btn) return;
-    const i = Number(btn.dataset.read);
-    DEMO_NOTICES[i].unread = false;
-    renderNotices();
-    toast("Notice marked as read");
-  });
+  const list = $("#noticeList");
+
+  // Mark one notice as read / unread again
+  if (list) {
+    list.addEventListener("click", e => {
+      const read = e.target.closest("[data-read]");
+      if (read) {
+        DEMO_NOTICES[Number(read.dataset.read)].unread = false;
+        renderNotices();
+        renderNoticeSnapshot();
+        toast("Notice marked as read");
+        return;
+      }
+
+      const unread = e.target.closest("[data-unread]");
+      if (unread) {
+        DEMO_NOTICES[Number(unread.dataset.unread)].unread = true;
+        renderNotices();
+        renderNoticeSnapshot();
+        toast("Notice marked as unread");
+      }
+    });
+  }
 
   // Mark all read
-  $("#readAllBtn").addEventListener("click", () => {
-    DEMO_NOTICES.forEach(n => { n.unread = false; });
-    renderNotices();
-    renderNoticeSnapshot();
-    toast("All notices marked as read");
-  });
+  const all = $("#readAllBtn");
+  if (all) {
+    all.addEventListener("click", () => {
+      DEMO_NOTICES.forEach(n => { n.unread = false; });
+      renderNotices();
+      renderNoticeSnapshot();
+      toast("All notices marked as read");
+    });
+  }
+
+  // Priority / read filters
+  const filter = $("#noticeFilter");
+  if (filter) {
+    filter.addEventListener("change", e => {
+      noticeFilter = e.target.value;
+      renderNotices();
+    });
+  }
+
+  const clear = $("#noticeEmptyClear");
+  if (clear) {
+    clear.addEventListener("click", () => {
+      noticeFilter = "";
+      if (filter) filter.value = "";
+      renderNotices();
+    });
+  }
 }
 
 /* ==========================================
@@ -1308,6 +1909,7 @@ function boot() {
   bindSettings();
   bindNavigation();
   bindLogout();
+  bindRankTabs();
   bindMemberFilters();
   bindHistoryFilters();
   bindModals();

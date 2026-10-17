@@ -41,6 +41,11 @@
   background: transparent;
 }
 
+/* Smaller button variant, used by the in-page "View all" jump links.
+   style.css defines .btn.small for the public pages; admin.css does not,
+   so the dashboard needs its own copy. */
+.btn.small { padding: 6px 14px; font-size: 13px; }
+
 /* Demo badge */
 .pd-demo-badge {
   background: var(--amber);
@@ -759,8 +764,371 @@ textarea {
   #view-performance .table td:nth-child(4) { max-width: 130px; }
 }
 
-/* Small phones */
+/* ============================================================
+   PART 3: UI UPGRADE
+   11. Card polish          12. Player ID card
+   13. KPI row              14. Form bar / meters
+   15. Tabs                 16. Notice priority + tools
+   17. Match / tournament cards
+   18. Settings avatar      19. Table wrapper + hover
+   20. Empty states         21. Responsive (part 3)
+   ============================================================ */
+
+/* ---------- 11. CARD POLISH ---------- */
+.pd-stat,
+.pd-perf,
+.pd-kpi,
+.pd-member-card,
+.pd-match,
+.pd-tournament,
+.pd-notice {
+  transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pd-stat:hover,
+.pd-perf:hover,
+.pd-kpi:hover {
+  border-color: var(--green);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+}
+
+/* A short colour bar on top of each stat card gives the row some rhythm */
+.pd-stat { position: relative; overflow: hidden; }
+.pd-stat::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--green), transparent);
+}
+.pd-stat b { font-variant-numeric: tabular-nums; }
+
+/* ---------- 12. PLAYER ID CARD ---------- */
+.pd-card-face {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 100% 0%, #1b4732 0%, transparent 60%),
+    linear-gradient(135deg, #143324, #0b1310);
+  border: 1px solid #2a4a38;
+  padding: 20px;
+}
+
+/* Big jersey number watermark in the corner */
+.pd-card-jersey {
+  position: absolute;
+  top: -14px;
+  right: 6px;
+  font-size: 92px;
+  font-weight: bold;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+  user-select: none;
+}
+
+.pd-card-stamp {
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 12px;
+  background: var(--green-dark);
+  color: var(--green);
+  border: 1px solid var(--green);
+  white-space: nowrap;
+}
+
+/* The four headline facts: club, sport, position, jersey */
+.pd-card-facts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.pd-card-facts div {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  padding: 8px 10px;
+  min-width: 0;
+}
+.pd-card-facts small {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.pd-card-facts b {
+  display: block;
+  font-size: 14px;
+  color: #fff;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Secondary rows keep their own divider so the card reads in two tiers */
+.pd-card-body { margin-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+
+/* ---------- 13. KPI ROW ---------- */
+.pd-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+.pd-kpi {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+.pd-kpi span { font-size: 18px; }
+.pd-kpi b {
+  display: block;
+  font-size: 22px;
+  color: var(--green);
+  margin: 4px 0 2px;
+  font-variant-numeric: tabular-nums;
+}
+.pd-kpi small { color: var(--muted); font-size: 11px; }
+
+/* ---------- 14. FORM BAR / METERS ---------- */
+.pd-form-bar {
+  display: flex;
+  height: 16px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg);
+  margin-top: 14px;
+  border: 1px solid var(--border);
+}
+.pd-form-bar i { display: block; height: 100%; }
+.pd-form-bar .seg-win  { background: var(--green); }
+.pd-form-bar .seg-draw { background: var(--amber); }
+.pd-form-bar .seg-loss { background: var(--red); }
+
+.pd-form-bar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.pd-form-bar-legend span { display: flex; align-items: center; gap: 6px; }
+.pd-form-bar-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.lg-win { background: var(--green); }
+.lg-draw { background: var(--amber); }
+.lg-loss { background: var(--red); }
+
+.pd-key-rating { background: var(--amber); }
+
+/* ---------- 15. TABS ---------- */
+.pd-tabs {
+  display: inline-flex;
+  gap: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 4px;
+  flex-wrap: wrap;
+}
+.pd-tab {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 7px 16px;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.pd-tab:hover { color: #fff; background: var(--card); }
+.pd-tab.is-active { background: var(--green); color: #06270f; }
+.pd-tab:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+/* ---------- 16. NOTICE PRIORITY + TOOLS ---------- */
+.pd-notice-tools {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.pd-notice-tools .mini-select { font-family: Arial, sans-serif; }
+.pd-notice-tools .btn { width: auto; }
+
+.pd-notice { position: relative; }
+.pd-notice-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.pd-notice-head h4 { margin: 0; }
+
+.pd-priority {
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+.pd-priority-high   { background: #3a1d1d; color: var(--red); border: 1px solid #6b2f2f; }
+.pd-priority-medium { background: #2a2212; color: var(--amber); border: 1px solid #5a4a1e; }
+.pd-priority-normal { background: var(--green-dark); color: var(--green); border: 1px solid #244d34; }
+
+.pd-unread-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+}
+
+/* Priority drives the left edge colour as well as the badge */
+.pd-notice.is-high   { border-left: 3px solid var(--red); }
+.pd-notice.is-medium { border-left: 3px solid var(--amber); }
+.pd-notice.is-normal { border-left: 3px solid var(--border); }
+.pd-notice.is-unread { background: #12281a; }
+
+/* ---------- 17. MATCH / TOURNAMENT CARDS ---------- */
+.pd-match-body { min-width: 0; flex: 1; }
+.pd-match h4, .pd-tournament h4 { overflow-wrap: anywhere; }
+
+.pd-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--green);
+  background: var(--green-dark);
+  border: 1px solid #244d34;
+  padding: 3px 9px;
+  border-radius: 10px;
+  margin-top: 6px;
+  white-space: nowrap;
+}
+.pd-countdown.is-today { color: var(--amber); background: #2a2212; border-color: #5a4a1e; }
+.pd-countdown.is-past { color: var(--muted); background: var(--card); border-color: var(--border); }
+
+.pd-tournament-status {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px 11px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+.pd-status-open       { background: var(--green-dark); color: var(--green); border: 1px solid #244d34; }
+.pd-status-registered { background: #132038; color: #6fb7ff; border: 1px solid #24405f; }
+.pd-status-closing    { background: #2a2212; color: var(--amber); border: 1px solid #5a4a1e; }
+.pd-status-closed     { background: var(--card); color: var(--muted); border: 1px solid var(--border); }
+
+/* ---------- 18. SETTINGS AVATAR ---------- */
+.pd-settings-avatar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+.pd-settings-avatar b { display: block; font-size: 16px; }
+.pd-settings-avatar small { font-size: 12px; }
+
+/* ---------- 19. TABLE WRAPPER + ROW HOVER ---------- */
+.pd-table-wrap { overflow-x: auto; }
+.table tbody tr { transition: background 0.12s ease; }
+.table tbody tr:hover { background: #12281a; }
+/* The "me" highlight must win over the hover colour */
+.table tbody tr.is-me, .table tbody tr.is-me:hover { background: var(--green-dark); }
+.table tbody tr.is-me td:first-child { box-shadow: inset 3px 0 0 var(--green); }
+
+/* ---------- 20. EMPTY STATES ---------- */
+.pd-empty {
+  display: block;
+}
+.pd-empty[hidden] { display: none; }
+
+/* Inline empty state, used inside cards that keep their own list host */
+.pd-empty-inline {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  text-align: center;
+  padding: 26px 14px;
+  background: var(--bg2);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+.pd-empty-inline span { font-size: 26px; }
+.pd-empty-inline b { font-size: 14px; }
+.pd-empty-inline small { font-size: 12px; }
+
+/* Notice action button sits in its own column so long text wraps cleanly */
+.pd-notice-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+.pd-notice-actions .pd-notice-action { margin-left: 0; }
+
+/* Rating chart accents */
+.pd-line-rating { stroke: var(--amber); }
+.pd-dot-rating { fill: var(--amber); }
+.pd-avg-line {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  opacity: 0.7;
+}
+
+/* Spacer column in the rankings table keeps the header/rows aligned */
+.pd-col-empty { width: 10px; }
+
+/* ---------- 21. RESPONSIVE (PART 3) ---------- */
+@media (max-width: 1024px) {
+  .pd-card-facts { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 800px) {
+  .pd-tabs { width: 100%; justify-content: space-between; }
+  .pd-tab { flex: 1; text-align: center; padding: 7px 10px; }
+  .pd-notice-tools { width: 100%; justify-content: space-between; }
+  .pd-notice-actions { margin-left: 0; width: 100%; }
+  .pd-notice-tools .mini-select { flex: 1; }
+  .pd-kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .pd-match { align-items: flex-start; }
+  .pd-card-jersey { font-size: 68px; }
+}
+
 @media (max-width: 480px) {
+  .pd-card-facts { grid-template-columns: 1fr; }
+  .pd-kpi-row { grid-template-columns: 1fr; }
+  .pd-settings-avatar { flex-direction: column; text-align: center; }
+  .pd-form-bar { height: 14px; }
+
+  /* Original small-phone rules (kept) */
   .pd-stats { grid-template-columns: 1fr 1fr; }
   .pd-perf-grid { grid-template-columns: 1fr 1fr; }
   .pd-avatar-lg { width: 64px; height: 64px; }
