@@ -1,7 +1,12 @@
 // ==========================================
 // CLUB ADMIN (Club Manager) - login-system.html
-// Uses js/auth.js for the role guard and
+// Uses js/auth.js for the role check and
 // js/supabase-config.js for the Supabase client.
+//
+// login-system.html is PUBLIC, so this script must never
+// redirect. AUTH.hasRole() only decides whether the Club
+// Manager panel (#clubAdminPanel) is shown; everything
+// below is skipped for anyone who is not a Club Admin.
 //
 // What a club manager can do
 // -------------------------
@@ -22,8 +27,32 @@
 
   if (!window.AUTH) return;
 
-  // Only a signed-in Club Admin may use this page section
-  if (!AUTH.requireRole(AUTH.ROLES.CLUB_ADMIN)) return;
+  /* ---------- role gate ----------
+     login-system.html is a PUBLIC page, so the old
+     AUTH.requireRole guard was wrong here: it sent every
+     visitor - including people who never logged in - to
+     login.html, which locked the public Clubs / Players /
+     Tournaments / Rankings / News sections.
+
+     AUTH.hasRole() asks the same question without ever
+     redirecting. When the answer is "no", the Club Manager
+     tools stay hidden and NOTHING below runs, so the
+     protected operations are exactly as protected as they
+     were before.
+
+     Data protection is not weakened by this: Row Level
+     Security in Supabase still decides what a manager can
+     read and write, and my_club_id() still pins every query
+     to the manager's own club. */
+
+  var isClubAdmin = AUTH.hasRole(AUTH.ROLES.CLUB_ADMIN);
+  var panelEl = document.getElementById("clubAdminPanel");
+  var gateEl = document.getElementById("clubAdminGate");
+
+  if (panelEl) panelEl.hidden = !isClubAdmin;
+  if (gateEl) gateEl.hidden = isClubAdmin;
+
+  if (!isClubAdmin) return;
 
   var user = AUTH.currentUser();
   var msgEl = document.getElementById("clubMsg");

@@ -4,32 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>District Sports Management System</title>
+    <link rel="stylesheet" href="css/public.css">
 </head>
 
-<body>
+<body class="pub-body">
+
+    <a class="pub-skip" href="#main">Skip to content</a>
 
     <!-- ==================== HEADER ==================== -->
-    <header>
-        <h1>District Sports</h1>
+    <header class="navbar">
+        <div class="container nav-inner">
+            <div class="logo">
+                <span class="logo-icon">🏆</span>
+                <div>
+                    <h1>District Sports</h1>
+                    <p>Sports Excellence Across Bangladesh</p>
+                </div>
+            </div>
 
-        <nav>
-            <ul>
-                <li><a href="#dashboard">Dashboard</a></li>
-                <li><a href="#clubs">Clubs</a></li>
-                <li><a href="#players">Players</a></li>
-                <li><a href="#tournaments">Tournaments</a></li>
-                <li><a href="#rankings">Rankings</a></li>
-                <li><a href="#news">News</a></li>
-                <li><a href="login.html">Login</a></li>
-            </ul>
-        </nav>
+            <nav class="pub-nav" aria-label="Public sections">
+                <ul>
+                    <li><a href="#clubs">Clubs</a></li>
+                    <li><a href="#players">Players</a></li>
+                    <li><a href="#tournaments">Tournaments</a></li>
+                    <li><a href="#rankings">Rankings</a></li>
+                    <li><a href="#news">News</a></li>
+                    <li><a href="login.html">🔐 Login</a></li>
+                </ul>
+            </nav>
+        </div>
     </header>
 
-    <main>
+    <main id="main" class="container">
 
         <!-- LOGIN POINTER: the website has ONE shared login page -->
-        <section id="login">
-            <h2>Login</h2>
+        <section id="login" class="section">
+            <p class="pub-kicker">Get Started</p>
+            <h2>🔐 Login</h2>
             <article>
                 <p>
                     District Sports uses a single sign-in page for every role.
@@ -48,273 +59,320 @@
             </article>
         </section>
 
-
-        <!-- SUPER ADMIN DASHBOARD -->
-        <section id="dashboard">
-            <h2>Main System Admin (Super Admin)</h2>
-            <p>Manage registered sports clubs across different districts.</p>
-
-            <!-- Add New Club -->
-            <article>
-                <h3>Add New Club</h3>
-                <form>
-                    <p>
-                        <label for="club-name">Club Name</label>
-                        <input type="text" id="club-name" name="club_name" placeholder="Club name">
-                    </p>
-                    <p>
-                        <label for="club-district">District</label>
-                        <select id="club-district" name="club_district">
-                            <option value="">Select District</option>
-                            <option>Dhaka</option>
-                            <option>Rajshahi</option>
-                            <option>Chattogram</option>
-                            <option>Sylhet</option>
-                            <option>Khulna</option>
-                            <option>Barishal</option>
-                            <option>Rangpur</option>
-                            <option>Mymensingh</option>
-                        </select>
-                    </p>
-                    <p>
-                        <label for="club-address">Club Address</label>
-                        <textarea id="club-address" name="club_address" rows="3" placeholder="Full club address"></textarea>
-                    </p>
-                    <p>
-                        <label for="club-contact">Contact Number</label>
-                        <input type="tel" id="club-contact" name="club_contact" placeholder="01XXXXXXXXX">
-                    </p>
-                    <p>
-                        <label for="club-email">Email</label>
-                        <input type="email" id="club-email" name="club_email" placeholder="club@example.com">
-                    </p>
-                    <p>
-                        <label for="club-manager-name">Club Manager Name</label>
-                        <input type="text" id="club-manager-name" name="club_manager_name" placeholder="Manager full name">
-                    </p>
-                    <p>
-                        <button type="submit">Register Club</button>
-                    </p>
-                </form>
-            </article>
-
-            <!-- Registered Clubs -->
-            <article>
-                <h3>Registered Clubs</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">Club ID</th>
-                            <th scope="col">Club Name</th>
-                            <th scope="col">District</th>
-                            <th scope="col">Manager</th>
-                            <th scope="col">Contact</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>DSC-001</td>
-                            <td>Rajshahi Sports Club</td>
-                            <td>Rajshahi</td>
-                            <td>Ahmed Rahman</td>
-                            <td>01700000001</td>
-                            <td>Active</td>
-                            <td>
-                                <a href="#">View</a>
-                                <a href="#">Edit</a>
-                                <a href="#">Delete</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>DSC-002</td>
-                            <td>Dhaka United Club</td>
-                            <td>Dhaka</td>
-                            <td>Tanvir Hasan</td>
-                            <td>01700000002</td>
-                            <td>Active</td>
-                            <td>
-                                <a href="#">View</a>
-                                <a href="#">Edit</a>
-                                <a href="#">Delete</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>DSC-003</td>
-                            <td>Chattogram Warriors</td>
-                            <td>Chattogram</td>
-                            <td>Rakib Hossain</td>
-                            <td>01700000003</td>
-                            <td>Pending</td>
-                            <td>
-                                <a href="#">View</a>
-                                <a href="#">Edit</a>
-                                <a href="#">Delete</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>DSC-004</td>
-                            <td>Sylhet Sports Academy</td>
-                            <td>Sylhet</td>
-                            <td>Fahim Ahmed</td>
-                            <td>01700000004</td>
-                            <td>Active</td>
-                            <td>
-                                <a href="#">View</a>
-                                <a href="#">Edit</a>
-                                <a href="#">Delete</a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </article>
-        </section>
-
-
-        <!-- CLUB ADMIN DASHBOARD -->
-        <section id="clubs">
-            <h2>Club Admin (Club Manager)</h2>
-            <p>Manage players registered under a specific sports club.</p>
-
-            <!-- Shown only when a Club Admin is signed in -->
-            <div id="clubAdminBar" hidden>
-                <p>Signed in as Club Admin: <b id="clubAdminWho"></b></p>
-                <p><a href="#" id="clubAdminLogout">Logout</a> · <a href="index.html">Back to Home</a></p>
-            </div>
-
-            <!-- Register New Player -->
-            <article>
-                <h3>Register New Player</h3>
-                <p id="clubMsg" role="status"></p>
-                <form id="playerForm">
-                    <p>
-                        <label for="player-name">Player Name</label>
-                        <input type="text" id="player-name" name="player_name" placeholder="Player full name">
-                    </p>
-                    <p>
-                        <label for="player-id">Player ID</label>
-                        <input type="text" id="player-id" name="player_id" placeholder="PLY-005">
-                    </p>
-                    <p>
-                        <label for="player-dob">Date of Birth</label>
-                        <input type="date" id="player-dob" name="player_dob">
-                    </p>
-                    <p>
-                        <label for="player-gender">Gender</label>
-                        <select id="player-gender" name="player_gender">
-                            <option value="">Select Gender</option>
-                            <option>Male</option>
-                            <option>Female</option>
-                            <option>Other</option>
-                        </select>
-                    </p>
-                    <p>
-                        <label for="player-district">District</label>
-                        <select id="player-district" name="player_district">
-                            <option value="">Select District</option>
-                            <option>Dhaka</option>
-                            <option>Rajshahi</option>
-                            <option>Chattogram</option>
-                            <option>Sylhet</option>
-                            <option>Khulna</option>
-                            <option>Barishal</option>
-                            <option>Rangpur</option>
-                            <option>Mymensingh</option>
-                        </select>
-                    </p>
-                    <p>
-                        <label for="player-sport">Sport</label>
-                        <select id="player-sport" name="player_sport">
-                            <option value="">Select Sport</option>
-                            <option>Football</option>
-                            <option>Cricket</option>
-                            <option>Badminton</option>
-                            <option>Athletics</option>
-                            <option>Basketball</option>
-                            <option>Volleyball</option>
-                        </select>
-                    </p>
-                    <p>
-                        <label for="player-position">Position</label>
-                        <input type="text" id="player-position" name="player_position" placeholder="e.g. Midfielder">
-                    </p>
-                    <p>
-                        <label for="player-contact">Contact Number</label>
-                        <input type="tel" id="player-contact" name="player_contact" placeholder="01XXXXXXXXX">
-                    </p>
-                    <p>
-                        <label for="player-email">Email</label>
-                        <input type="email" id="player-email" name="player_email" placeholder="player@example.com">
-                    </p>
-                    <p>
-                        <button type="submit">Register Player</button>
-                    </p>
-                </form>
-            </article>
-
-            <!-- Club Player Roster -->
-            <article>
-                <h3>Club Player Roster</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">Player ID</th>
-                            <th scope="col">Player Name</th>
-                            <th scope="col">Sport</th>
-                            <th scope="col">Position</th>
-                            <th scope="col">District</th>
-                            <th scope="col">Contact</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="roster-body">
-                        <tr>
-                            <td colspan="8">Loading roster…</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </article>
-
-            <!-- Join requests from players -->
-            <article>
-                <h3>Join Requests</h3>
-                <p class="muted">Players who asked to join this club. Approve adds them to the roster automatically.</p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th scope="col">Player Email</th>
-                            <th scope="col">Full Name</th>
-                            <th scope="col">Note</th>
-                            <th scope="col">Requested</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="join-requests-body">
-                        <tr>
-                            <td colspan="6">Loading requests…</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </article>
-        </section>
-
-
-        <!-- PLAYER DASHBOARD -->
-        <section id="players">
-            <h2>Player Dashboard</h2>
-            <p>
-                Players can view their personal information, club information,
-                sports information, tournament participation, performance,
-                and achievements.
+        <!-- PUBLIC CLUBS DIRECTORY -->
+        <section id="clubs" class="section alt">
+            <p class="pub-kicker">Clubs</p>
+            <h2>🏟️ Sports Clubs</h2>
+            <p class="pub-lead">
+                Registered sports clubs by district. Everyone can browse this list
+                without an account.
             </p>
 
-            <!-- My Profile -->
             <article>
-                <h3>My Profile</h3>
-                <dl>
+                <h3>Registered Clubs</h3>
+                <p class="muted">All clubs in the system (sample data).</p>
+                <div class="pub-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Club ID</th>
+                                <th scope="col">Club Name</th>
+                                <th scope="col">District</th>
+                                <th scope="col">Manager</th>
+                                <th scope="col">Contact</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>DSC-001</td>
+                                <td>Rajshahi Sports Club</td>
+                                <td>Rajshahi</td>
+                                <td>Ahmed Rahman</td>
+                                <td>01700000001</td>
+                                <td><span class="pub-badge">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>DSC-002</td>
+                                <td>Dhaka United Club</td>
+                                <td>Dhaka</td>
+                                <td>Tanvir Hasan</td>
+                                <td>01700000002</td>
+                                <td><span class="pub-badge">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>DSC-003</td>
+                                <td>Chattogram Warriors</td>
+                                <td>Chattogram</td>
+                                <td>Rakib Hossain</td>
+                                <td>01700000003</td>
+                                <td><span class="pub-badge yellow">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>DSC-004</td>
+                                <td>Sylhet Sports Academy</td>
+                                <td>Sylhet</td>
+                                <td>Fahim Ahmed</td>
+                                <td>01700000004</td>
+                                <td><span class="pub-badge">Active</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <!-- ============================================
+                 CLUB MANAGER TOOLS - SIGNED-IN CLUB ADMIN ONLY
+                 js/club-admin.js keeps #clubAdminPanel hidden
+                 unless AUTH.hasRole("club_admin"), and skips
+                 every query and insert below that line for
+                 everybody else. Do not move the protected
+                 markup out of this wrapper.
+                 ============================================ -->
+            <section id="clubAdminPanel" hidden>
+                <h3>🏟️ Club Manager Tools</h3>
+                <p class="muted">
+                    Signed-in Club Admins only: manage the players of the club
+                    you manage and review join requests.
+                </p>
+
+                <!-- Shown only when a Club Admin is signed in -->
+                <div id="clubAdminBar" hidden>
+                    <p>Signed in as Club Admin: <b id="clubAdminWho"></b></p>
+                    <p><a href="#" id="clubAdminLogout">Logout</a> <a href="index.html">Back to Home</a></p>
+                </div>
+
+                <!-- Register New Player -->
+                <article>
+                    <h3>Register New Player</h3>
+                    <p id="clubMsg" role="status"></p>
+                    <form id="playerForm">
+                        <p>
+                            <label for="player-name">Player Name</label>
+                            <input type="text" id="player-name" name="player_name" placeholder="Player full name">
+                        </p>
+                        <p>
+                            <label for="player-id">Player ID</label>
+                            <input type="text" id="player-id" name="player_id" placeholder="PLY-005">
+                        </p>
+                        <p>
+                            <label for="player-dob">Date of Birth</label>
+                            <input type="date" id="player-dob" name="player_dob">
+                        </p>
+                        <p>
+                            <label for="player-gender">Gender</label>
+                            <select id="player-gender" name="player_gender">
+                                <option value="">Select Gender</option>
+                                <option>Male</option>
+                                <option>Female</option>
+                                <option>Other</option>
+                            </select>
+                        </p>
+                        <p>
+                            <label for="player-district">District</label>
+                            <select id="player-district" name="player_district">
+                                <option value="">Select District</option>
+                                <option>Dhaka</option>
+                                <option>Rajshahi</option>
+                                <option>Chattogram</option>
+                                <option>Sylhet</option>
+                                <option>Khulna</option>
+                                <option>Barishal</option>
+                                <option>Rangpur</option>
+                                <option>Mymensingh</option>
+                            </select>
+                        </p>
+                        <p>
+                            <label for="player-sport">Sport</label>
+                            <select id="player-sport" name="player_sport">
+                                <option value="">Select Sport</option>
+                                <option>Football</option>
+                                <option>Cricket</option>
+                                <option>Badminton</option>
+                                <option>Athletics</option>
+                                <option>Basketball</option>
+                                <option>Volleyball</option>
+                            </select>
+                        </p>
+                        <p>
+                            <label for="player-position">Position</label>
+                            <input type="text" id="player-position" name="player_position" placeholder="e.g. Midfielder">
+                        </p>
+                        <p>
+                            <label for="player-contact">Contact Number</label>
+                            <input type="tel" id="player-contact" name="player_contact" placeholder="01XXXXXXXXX">
+                        </p>
+                        <p>
+                            <label for="player-email">Email</label>
+                            <input type="email" id="player-email" name="player_email" placeholder="player@example.com">
+                        </p>
+                        <p>
+                            <button type="submit">Register Player</button>
+                        </p>
+                    </form>
+                </article>
+
+                <!-- Club Player Roster -->
+                <article>
+                    <h3>Club Player Roster</h3>
+                    <div class="pub-table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Player ID</th>
+                                    <th scope="col">Player Name</th>
+                                    <th scope="col">Sport</th>
+                                    <th scope="col">Position</th>
+                                    <th scope="col">District</th>
+                                    <th scope="col">Contact</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="roster-body">
+                                <tr>
+                                    <td colspan="8">Loading roster…</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <!-- Join requests from players -->
+                <article>
+                    <h3>Join Requests</h3>
+                    <p class="muted">Players who asked to join this club. Approve adds them to the roster automatically.</p>
+                    <div class="pub-table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Player Email</th>
+                                    <th scope="col">Full Name</th>
+                                    <th scope="col">Note</th>
+                                    <th scope="col">Requested</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="join-requests-body">
+                                <tr>
+                                    <td colspan="6">Loading requests…</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Public visitors get this instead of the manager tools -->
+            <div id="clubAdminGate" class="pub-gate">
+                <h3>🔐 Club Manager Tools are private</h3>
+                <p>
+                    Signing up players, viewing a live roster and approving join
+                    requests need a Club Admin account. Club Managers are assigned
+                    by the Super Admin in the Admin Panel.
+                </p>
+                <a href="login.html" class="btn btn-green">Login as Club Admin →</a>
+                <p><small>Players: <a href="login.html" style="color: var(--green);">log in to request a club</a>.</small></p>
+            </div>
+        </section>
+
+
+        <!-- PUBLIC PLAYERS DIRECTORY -->
+        <section id="players" class="section">
+            <p class="pub-kicker">Players</p>
+            <h2>🧑‍🎽 Players</h2>
+            <p class="pub-lead">
+                Players registered across the districts (sample data). A full
+                searchable player database is planned.
+            </p>
+
+            <article>
+                <h3>Player Directory</h3>
+                <p class="muted">Football and Cricket players across all districts.</p>
+                <div class="pub-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Player ID</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Sport</th>
+                                <th scope="col">Position</th>
+                                <th scope="col">District</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>PLY-001</td>
+                                <td>Rahim Ahmed</td>
+                                <td>Football</td>
+                                <td>Midfielder</td>
+                                <td>Rajshahi</td>
+                                <td><span class="pub-badge">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>PLY-002</td>
+                                <td>Sakib Hasan</td>
+                                <td>Cricket</td>
+                                <td>Batsman</td>
+                                <td>Dhaka</td>
+                                <td><span class="pub-badge">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>PLY-003</td>
+                                <td>Nayeem Islam</td>
+                                <td>Football</td>
+                                <td>Goalkeeper</td>
+                                <td>Chattogram</td>
+                                <td><span class="pub-badge">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>PLY-005</td>
+                                <td>Tanvir Hasan</td>
+                                <td>Football</td>
+                                <td>Defender</td>
+                                <td>Rajshahi</td>
+                                <td><span class="pub-badge">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>PLY-006</td>
+                                <td>Imran Kabir</td>
+                                <td>Football</td>
+                                <td>Striker</td>
+                                <td>Rajshahi</td>
+                                <td><span class="pub-badge">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>PLY-007</td>
+                                <td>Sadia Akter</td>
+                                <td>Football</td>
+                                <td>Winger</td>
+                                <td>Sylhet</td>
+                                <td><span class="pub-badge">Active</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pub-actions">
+                    <a href="login.html">→ Go to your own Player Dashboard</a>
+                </div>
+            </article>
+
+            <!-- Sample profile below: static example data, open to everyone -->
+            <div class="pub-stack">
+                <p class="pub-kicker">Example Profile</p>
+                <h3>Sample player profile (static demo data)</h3>
+                <p class="pub-lead">
+                    The blocks below show what a player profile looks like. The
+                    live, personal version of this screen is the
+                    <a href="login.html" style="color: var(--green);">Player Dashboard</a>,
+                    which needs a signed-in player account.
+                </p>
+
+                <article>
+                    <h3>My Profile</h3>
+                    <dl>
                     <dt>Player Name</dt>
                     <dd>Rahim Ahmed</dd>
 
@@ -413,19 +471,131 @@
             <!-- Achievements -->
             <article>
                 <h3>Achievements</h3>
-                <ul>
+                <ul class="pub-list">
                     <li>District Champion 2025</li>
                     <li>Best Midfielder 2025</li>
                     <li>Man of the Match x3</li>
                 </ul>
             </article>
+            </div><!-- /.pub-stack -->
+        </section>
+
+
+        <!-- SUPER ADMIN PANEL PREVIEW -->
+        <section id="dashboard" class="section alt">
+            <p class="pub-kicker">Administration</p>
+            <h2>👨‍💼 Super Admin Panel</h2>
+            <p class="pub-lead">
+                Club registration and user management are done by the Super Admin.
+                The screen below is a static layout sample — the live panel, which
+                talks to the database, is at <a href="admin.html" style="color: var(--green);">admin.html</a>
+                and needs a Super Admin account.
+            </p>
+
+            <!-- STATIC SAMPLE ONLY - the working version is admin.html + js/admin.js -->
+            <article>
+                <h3>Add New Club <small class="muted">(static sample)</small></h3>
+                <form>
+                    <p>
+                        <label for="club-name">Club Name</label>
+                        <input type="text" id="club-name" name="club_name" placeholder="Club name">
+                    </p>
+                    <p>
+                        <label for="club-district">District</label>
+                        <select id="club-district" name="club_district">
+                            <option value="">Select District</option>
+                            <option>Dhaka</option>
+                            <option>Rajshahi</option>
+                            <option>Chattogram</option>
+                            <option>Sylhet</option>
+                            <option>Khulna</option>
+                            <option>Barishal</option>
+                            <option>Rangpur</option>
+                            <option>Mymensingh</option>
+                        </select>
+                    </p>
+                    <p>
+                        <label for="club-address">Club Address</label>
+                        <textarea id="club-address" name="club_address" rows="3" placeholder="Full club address"></textarea>
+                    </p>
+                    <p>
+                        <label for="club-contact">Contact Number</label>
+                        <input type="tel" id="club-contact" name="club_contact" placeholder="01XXXXXXXXX">
+                    </p>
+                    <p>
+                        <label for="club-email">Email</label>
+                        <input type="email" id="club-email" name="club_email" placeholder="club@example.com">
+                    </p>
+                    <p>
+                        <label for="club-manager-name">Club Manager Name</label>
+                        <input type="text" id="club-manager-name" name="club_manager_name" placeholder="Manager full name">
+                    </p>
+                    <p>
+                        <a href="admin.html" class="btn btn-green">Open the live Admin Panel →</a>
+                    </p>
+                </form>
+            </article>
+
+            <!-- Registered clubs list (same data as the public Clubs section) -->
+            <article>
+                <h3>Registered Clubs <small class="muted">(static sample)</small></h3>
+                <div class="pub-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Club ID</th>
+                                <th scope="col">Club Name</th>
+                                <th scope="col">District</th>
+                                <th scope="col">Manager</th>
+                                <th scope="col">Contact</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>DSC-001</td>
+                                <td>Rajshahi Sports Club</td>
+                                <td>Rajshahi</td>
+                                <td>Ahmed Rahman</td>
+                                <td>01700000001</td>
+                                <td><span class="pub-badge">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>DSC-002</td>
+                                <td>Dhaka United Club</td>
+                                <td>Dhaka</td>
+                                <td>Tanvir Hasan</td>
+                                <td>01700000002</td>
+                                <td><span class="pub-badge">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>DSC-003</td>
+                                <td>Chattogram Warriors</td>
+                                <td>Chattogram</td>
+                                <td>Rakib Hossain</td>
+                                <td>01700000003</td>
+                                <td><span class="pub-badge yellow">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>DSC-004</td>
+                                <td>Sylhet Sports Academy</td>
+                                <td>Sylhet</td>
+                                <td>Fahim Ahmed</td>
+                                <td>01700000004</td>
+                                <td><span class="pub-badge">Active</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
         </section>
 
 
         <!-- PUBLIC & SCOUT PORTAL -->
-        <section id="scout">
-            <h2>Public &amp; Scout Portal</h2>
-            <p>Search players, clubs, tournament results, and district sports information.</p>
+        <section id="scout" class="section">
+            <p class="pub-kicker">Scouting</p>
+            <h2>🔎 Public &amp; Scout Portal</h2>
+            <p class="pub-lead">Search players, clubs, tournament results, and district sports information.</p>
 
             <!-- Search & Filter -->
             <article>
@@ -535,8 +705,10 @@
 
 
         <!-- TOURNAMENTS -->
-        <section id="tournaments">
-            <h2>Tournaments</h2>
+        <section id="tournaments" class="section alt">
+            <p class="pub-kicker">Competitions</p>
+            <h2>🏆 Tournaments</h2>
+            <p class="pub-lead">District and national level competitions across Football and Cricket.</p>
 
             <article>
                 <h3>District Football Championship 2026</h3>
@@ -556,10 +728,10 @@
                     <dt>Description</dt>
                     <dd>The annual district level football championship where clubs compete for the district title.</dd>
                 </dl>
-                <p>
+                <div class="pub-actions">
                     <a href="#">View Details</a>
                     <a href="#">Register</a>
-                </p>
+                </div>
             </article>
 
             <article>
@@ -580,10 +752,10 @@
                     <dt>Description</dt>
                     <dd>A multi district cricket tournament where clubs submit their player lists before the deadline.</dd>
                 </dl>
-                <p>
+                <div class="pub-actions">
                     <a href="#">View Details</a>
                     <a href="#">Register</a>
-                </p>
+                </div>
             </article>
 
             <article>
@@ -604,10 +776,10 @@
                     <dt>Description</dt>
                     <dd>A national level badminton championship featuring players from all districts.</dd>
                 </dl>
-                <p>
+                <div class="pub-actions">
                     <a href="#">View Details</a>
                     <a href="#">Register</a>
-                </p>
+                </div>
             </article>
 
             <article>
@@ -628,110 +800,144 @@
                     <dt>Description</dt>
                     <dd>A district level athletics championship covering track and field events.</dd>
                 </dl>
-                <p>
+                <div class="pub-actions">
                     <a href="#">View Details</a>
                     <a href="#">Register</a>
-                </p>
+                </div>
             </article>
         </section>
 
 
         <!-- RANKINGS -->
-        <section id="rankings">
-            <h2>District Sports Rankings</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">Rank</th>
-                        <th scope="col">District</th>
-                        <th scope="col">Total Points</th>
-                        <th scope="col">Clubs</th>
-                        <th scope="col">Players</th>
-                        <th scope="col">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Rajshahi</td>
-                        <td>265</td>
-                        <td>12</td>
-                        <td>145</td>
-                        <td>Leading</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Dhaka</td>
-                        <td>260</td>
-                        <td>18</td>
-                        <td>210</td>
-                        <td>Active</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Chattogram</td>
-                        <td>250</td>
-                        <td>14</td>
-                        <td>170</td>
-                        <td>Active</td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>Sylhet</td>
-                        <td>230</td>
-                        <td>10</td>
-                        <td>120</td>
-                        <td>Active</td>
-                    </tr>
-                </tbody>
-            </table>
+        <section id="rankings" class="section">
+            <p class="pub-kicker">Standings</p>
+            <h2>🏅 District Sports Rankings</h2>
+            <p class="pub-lead">District points table (sample data).</p>
+            <article>
+                <h3>All districts</h3>
+                <div class="pub-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Rank</th>
+                                <th scope="col">District</th>
+                                <th scope="col">Total Points</th>
+                                <th scope="col">Clubs</th>
+                                <th scope="col">Players</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Rajshahi</td>
+                                <td>265</td>
+                                <td>12</td>
+                                <td>145</td>
+                                <td><span class="pub-badge">Leading</span></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Dhaka</td>
+                                <td>260</td>
+                                <td>18</td>
+                                <td>210</td>
+                                <td><span class="pub-badge grey">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Chattogram</td>
+                                <td>250</td>
+                                <td>14</td>
+                                <td>170</td>
+                                <td><span class="pub-badge grey">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Sylhet</td>
+                                <td>230</td>
+                                <td>10</td>
+                                <td>120</td>
+                                <td><span class="pub-badge grey">Active</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
         </section>
 
 
         <!-- NEWS -->
-        <section id="news">
-            <h2>News &amp; Announcements</h2>
+        <section id="news" class="section alt">
+            <p class="pub-kicker">Updates</p>
+            <h2>📰 News &amp; Announcements</h2>
 
             <article>
+                <span class="pub-badge yellow">Tournament</span>
                 <h3>District Football Championship 2026</h3>
                 <p>Registration for the district football championship is now open.</p>
-                <p><a href="#">Read More</a></p>
+                <div class="pub-actions"><a href="#">Read More →</a></div>
             </article>
 
             <article>
+                <span class="pub-badge yellow">Tournament</span>
                 <h3>Inter-District Cricket Tournament</h3>
                 <p>Clubs can submit their player lists before the registration deadline.</p>
-                <p><a href="#">Read More</a></p>
+                <div class="pub-actions"><a href="#">Read More →</a></div>
             </article>
 
             <article>
+                <span class="pub-badge yellow">Clubs</span>
                 <h3>New Sports Clubs Added</h3>
                 <p>Several new clubs have recently joined the District Sports platform.</p>
-                <p><a href="#">Read More</a></p>
+                <div class="pub-actions"><a href="#">Read More →</a></div>
             </article>
+        </section>
+
+        <section class="section">
+            <div class="pub-gate">
+                <h3>🔐 Ready to join the platform?</h3>
+                <p>
+                    One sign-in page for every role — Super Admin, Club Admin and
+                    Player. You will be taken straight to your dashboard.
+                </p>
+                <a href="login.html" class="btn btn-green">Go to Login →</a>
+                <p><small><a href="index.html" style="color: var(--green);">← Back to Home</a></small></p>
+            </div>
         </section>
 
     </main>
 
 
     <!-- FOOTER -->
-    <footer>
-        <h2>District Sports</h2>
-        <p>Sports Excellence Across Bangladesh</p>
+    <footer class="pub-footer">
+        <div class="container pub-foot-grid">
+            <div class="logo">
+                <span class="logo-icon">🏆</span>
+                <div>
+                    <h2>District Sports</h2>
+                    <p>Sports Excellence Across Bangladesh</p>
+                </div>
+            </div>
 
-        <nav>
-            <ul>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Contact</a></li>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Terms &amp; Conditions</a></li>
-            </ul>
-        </nav>
+            <nav aria-label="Footer">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#clubs">Clubs</a></li>
+                    <li><a href="#tournaments">Tournaments</a></li>
+                    <li><a href="#rankings">Rankings</a></li>
+                    <li><a href="#news">News</a></li>
+                    <li><a href="login.html">Login</a></li>
+                </ul>
+            </nav>
 
-        <p>&copy; 2026 District Sports. All Rights Reserved.</p>
+            <p>&copy; 2026 District Sports. All Rights Reserved.</p>
+        </div>
     </footer>
 
-    <!-- Club Admin session banner: only shown to a signed-in Club Admin -->
+    <!-- Club Admin session banner: only shown to a signed-in Club Admin.
+     This page is public, so nothing here may redirect - it only reveals
+     the banner. The panel around it is handled by js/club-admin.js. -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
@@ -746,7 +952,7 @@
         if (!bar) return;
 
         var user = AUTH.currentUser();
-        if (user && user.role === AUTH.ROLES.CLUB_ADMIN) {
+        if (user && AUTH.hasRole(AUTH.ROLES.CLUB_ADMIN)) {
             if (who) who.textContent = user.name + " (" + user.email + ")";
             bar.hidden = false;
         }

@@ -194,6 +194,26 @@ var AUTH = (function () {
 
   function isLoggedIn() { return session() !== null; }
 
+  /* ---------- non-redirecting role checks ----------
+     Use these on pages that are PUBLIC but contain a
+     protected panel (see login-system.html). The visitor
+     stays exactly where they are; the panel is simply
+     hidden or shown. Nothing is fetched from Supabase.
+
+     requireRole() below stays the guard for pages that are
+     fully protected, so nothing here weakens it. */
+
+  /* The role of the signed-in user, or null when nobody is signed in */
+  function currentRole() {
+    var s = session();
+    return s ? s.role : null;
+  }
+
+  /* True only when that exact role is signed in. */
+  function hasRole(role) {
+    return currentRole() === role;
+  }
+
   /* ---------- friendly error messages ---------- */
   function friendlyError(err) {
     var msg = (err && err.message) ? String(err.message) : "";
@@ -353,6 +373,8 @@ var AUTH = (function () {
     logout: logout,
     redirectFor: redirectFor,
     requireRole: requireRole,
+    currentRole: currentRole,
+    hasRole: hasRole,
     isLoggedIn: isLoggedIn,
     syncWithServer: syncWithServer
   };
