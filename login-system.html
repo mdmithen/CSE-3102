@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>District Sports Management System</title>
-    <link rel="stylesheet" href="css/public.css">
+    <!-- v3 busts the browser cache so the Club Admin redesign always loads -->
+    <link rel="stylesheet" href="css/public.css?v=3">
+    <link rel="stylesheet" href="css/club-admin.css?v=3">
 </head>
 
 <body class="pub-body">
@@ -68,7 +70,349 @@
                 without an account.
             </p>
 
-            <article>
+<!-- ============================================================
+                 CLUB ADMIN DASHBOARD - SIGNED-IN CLUB ADMIN ONLY
+                 js/club-admin.js keeps #clubAdminPanel hidden unless
+                 AUTH.hasRole("club_admin") and skips every query and
+                 insert below that line for everybody else.
+                 Do not move the protected markup out of this wrapper.
+                 ============================================================ -->
+            <section id="clubAdminPanel" hidden>
+              <div class="cad-shell">
+
+                <!-- Backdrop behind the mobile sidebar drawer -->
+                <div class="cad-overlay" id="cadOverlay" hidden></div>
+
+                <!-- ============ DARK NAVY SIDEBAR ============ -->
+                <aside class="cad-sidebar" id="cadSidebar" aria-label="Club Admin navigation">
+                  <div class="cad-brand">
+                    <span class="cad-logo" aria-hidden="true">🏆</span>
+                    <div class="cad-brand-text">
+                      <b>DistrictSports</b>
+                      <small>SPORTS OS</small>
+                    </div>
+                  </div>
+
+                  <nav class="cad-side-nav">
+                    <ul>
+                      <li><a href="#clubs" class="is-active" data-cad-nav="overview"><span aria-hidden="true">▦</span> Club Portal</a></li>
+                      <li><a href="#players"><span aria-hidden="true">🧑</span> Player Portal</a></li>
+                      <li><a href="#club-roster" data-cad-nav="players"><span aria-hidden="true">👥</span> Players</a></li>
+                      <li><a href="#clubs-directory"><span aria-hidden="true">🏟</span> Clubs</a></li>
+                      <li><a href="#tournaments"><span aria-hidden="true">🏆</span> Tournaments</a></li>
+                      <li><a href="#matches" data-cad-tab="matches"><span aria-hidden="true">📅</span> Fixtures</a></li>
+                      <li><a href="#venues" data-cad-tab="venues"><span aria-hidden="true">📍</span> Venues</a></li>
+                      <li><a href="#equipment" data-cad-tab="equipment"><span aria-hidden="true">🎒</span> Equipment</a></li>
+                    </ul>
+
+                    <p class="cad-side-title">System</p>
+                    <ul>
+                      <li><a href="#join-requests" data-cad-nav="players"><span aria-hidden="true">✉</span> Join Requests</a></li>
+                      <li><a href="#news"><span aria-hidden="true">🗞</span> News &amp; Events</a></li>
+                      <li><a href="#reports" data-cad-tab="reports"><span aria-hidden="true">📊</span> Reports</a></li>
+                    </ul>
+                  </nav>
+
+                  <!-- Season notice card (static information, matches the reference) -->
+                  <div class="cad-season">
+                    <b>Season 2026</b>
+                    <p>Registration closes in 12 days</p>
+                    <a href="#tournaments" class="cad-season-btn">View Season Guide</a>
+                  </div>
+
+                  <div class="cad-side-foot">
+                    <p>Signed in as</p>
+                    <b id="cadSideWho">Club Admin</b>
+                    <a href="index.html" class="cad-home">⌂ Back to Home</a>
+                    <a href="#" id="cadSideLogout" class="cad-logout-link">Logout</a>
+                  </div>
+                </aside>
+
+                <!-- ============ MAIN COLUMN ============ -->
+                <div class="cad-main">
+
+                  <!-- ---- white top navigation bar ---- -->
+                  <header class="cad-topbar">
+                    <!-- Drawer toggle, only used on small screens -->
+                    <button type="button" class="cad-burger" id="cadBurger"
+                            aria-label="Open navigation menu" aria-expanded="false">☰</button>
+
+                    <div class="cad-search">
+                      <label class="cad-sr" for="cadSearch">Search players, clubs, tournaments</label>
+                      <input type="search" id="cadSearch" placeholder="🔍  Search players, clubs, tournaments" autocomplete="off">
+                      <span class="cad-kbd" aria-hidden="true">⌘K</span>
+                    </div>
+
+                    <div class="cad-top-actions">
+                      <label class="cad-role-picker">
+                        <span class="cad-sr">Signed-in role</span>
+                        <select id="cadRoleSelect" disabled>
+                          <option>🏟️ Club Manager</option>
+                        </select>
+                      </label>
+
+                      <a class="cad-icon-btn" href="#join-requests" aria-label="Pending join requests">
+                        🔔<em id="cadNotifCount" hidden>0</em>
+                      </a>
+
+                      <!-- The signed-in profile block below is filled by the page script -->
+                      <div class="cad-profile" id="clubAdminBar" hidden>
+                        <span class="cad-avatar" id="cadAvatar" aria-hidden="true">CA</span>
+                        <div class="cad-profile-text">
+                          <b id="clubAdminWho">Club Admin</b>
+                          <small>Club Manager</small>
+                        </div>
+                      </div>
+                      <a href="#" id="clubAdminLogout" class="cad-profile-chevron" aria-label="Sign out">Logout</a>
+                    </div>
+                  </header>
+
+                  <!-- ---- dark teal club banner ---- -->
+                  <section class="cad-banner" aria-label="Managed club">
+                    <div class="cad-banner-text">
+                      <p class="cad-banner-kicker"><span aria-hidden="true">🏠</span> CLUB MANAGER SPACE</p>
+                      <h2 id="cadClubName">Loading club…</h2>
+                      <p id="cadClubDesc">Fetching your club details from the database.</p>
+                    </div>
+
+                    <label class="cad-club-picker">
+                      <span>Managing Club</span>
+                      <select id="cadClubSelect" aria-label="Select the club you manage">
+                        <option value="">Loading…</option>
+                      </select>
+                    </label>
+                  </section>
+
+                  <!-- ---- six compact statistic cards ---- -->
+                  <div class="cad-stats" id="cadStats" aria-label="Club statistics"></div>
+
+                  <!-- ---- horizontal navigation tabs ---- -->
+                  <nav class="cad-tabs" id="cadTabs" role="tablist" aria-label="Club Admin sections">
+                    <button type="button" class="cad-tab is-active" role="tab" data-tab="club"    aria-selected="true"><span aria-hidden="true">🏟</span> My Club</button>
+                    <button type="button" class="cad-tab" role="tab" data-tab="players" aria-selected="false"><span aria-hidden="true">👥</span> Players</button>
+                    <button type="button" class="cad-tab" role="tab" data-tab="teams"   aria-selected="false"><span aria-hidden="true">🏷</span> Teams</button>
+                    <button type="button" class="cad-tab" role="tab" data-tab="matches" aria-selected="false"><span aria-hidden="true">📅</span> Matches</button>
+                    <button type="button" class="cad-tab" role="tab" data-tab="venues"  aria-selected="false"><span aria-hidden="true">📍</span> Venue Booking</button>
+                    <button type="button" class="cad-tab" role="tab" data-tab="equipment" aria-selected="false"><span aria-hidden="true">🎒</span> Equipment</button>
+                    <button type="button" class="cad-tab" role="tab" data-tab="cards"   aria-selected="false"><span aria-hidden="true">🪪</span> Player Cards</button>
+                    <button type="button" class="cad-tab" role="tab" data-tab="reports" aria-selected="false"><span aria-hidden="true">📊</span> Reports</button>
+                  </nav>
+
+                  <!-- ---- panel: My Club ---- -->
+                  <section class="cad-panel is-active" data-panel="club" role="tabpanel">
+                    <div class="cad-two-col">
+
+                      <!-- club profile card (left) -->
+                      <article class="cad-card cad-profile-card">
+                        <div class="cad-profile-head">
+                          <span class="cad-crest" id="cadCrest" aria-hidden="true">SS</span>
+                          <div>
+                            <h3 id="cadCardName">—</h3>
+                            <div class="cad-badges" id="cadCardBadges"></div>
+                            <p class="cad-card-sub" id="cadCardSub">—</p>
+                          </div>
+                        </div>
+
+                        <dl class="cad-facts" id="cadProfileFacts"></dl>
+                      </article>
+
+                      <!-- summary information (right) -->
+                      <article class="cad-card">
+                        <div class="cad-statlist" id="cadSummaryFacts"></div>
+                        <p class="cad-note" id="cadSummaryNote">
+                          Counts come straight from the club roster and join-request tables.
+                        </p>
+                      </article>
+                    </div>
+                  </section>
+
+                  <!-- ---- panel: Players (existing working features) ---- -->
+                  <section class="cad-panel" data-panel="players" role="tabpanel">
+
+                    <!-- Register New Player -->
+                    <article class="cad-card" id="register-player">
+                      <h3>Register New Player</h3>
+                      <p id="clubMsg" role="status"></p>
+                      <form id="playerForm" class="cad-form">
+                        <div>
+                          <label for="player-name">Player Name</label>
+                          <input type="text" id="player-name" name="player_name" placeholder="Player full name" required>
+                        </div>
+                        <div>
+                          <label for="player-id">Player ID</label>
+                          <input type="text" id="player-id" name="player_id" placeholder="PLY-005">
+                        </div>
+                        <div>
+                          <label for="player-dob">Date of Birth</label>
+                          <input type="date" id="player-dob" name="player_dob">
+                        </div>
+                        <div>
+                          <label for="player-gender">Gender</label>
+                          <select id="player-gender" name="player_gender">
+                            <option value="">Select Gender</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label for="player-district">District</label>
+                          <select id="player-district" name="player_district">
+                            <option value="">Select District</option>
+                            <option>Dhaka</option>
+                            <option>Rajshahi</option>
+                            <option>Chattogram</option>
+                            <option>Sylhet</option>
+                            <option>Khulna</option>
+                            <option>Barishal</option>
+                            <option>Rangpur</option>
+                            <option>Mymensingh</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label for="player-sport">Sport</label>
+                          <select id="player-sport" name="player_sport">
+                            <option value="">Select Sport</option>
+                            <option>Football</option>
+                            <option>Cricket</option>
+                            <option>Badminton</option>
+                            <option>Athletics</option>
+                            <option>Basketball</option>
+                            <option>Volleyball</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label for="player-position">Position</label>
+                          <input type="text" id="player-position" name="player_position" placeholder="e.g. Midfielder">
+                        </div>
+                        <div>
+                          <label for="player-contact">Contact Number</label>
+                          <input type="tel" id="player-contact" name="player_contact" placeholder="01XXXXXXXXX">
+                        </div>
+                        <div>
+                          <label for="player-email">Email</label>
+                          <input type="email" id="player-email" name="player_email" placeholder="player@example.com">
+                        </div>
+                        <div class="cad-form-actions">
+                          <button type="submit">Register Player</button>
+                          <button type="reset">Clear</button>
+                        </div>
+                      </form>
+                    </article>
+
+                    <!-- Club Player Roster -->
+                    <article class="cad-card" id="club-roster">
+                      <div class="cad-card-head">
+                        <h3>Club Player Roster</h3>
+                        <span class="cad-chip" id="cadRosterCount">0 players</span>
+                      </div>
+                      <div class="cad-table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th scope="col">Player ID</th>
+                              <th scope="col">Player Name</th>
+                              <th scope="col">Sport</th>
+                              <th scope="col">Position</th>
+                              <th scope="col">District</th>
+                              <th scope="col">Contact</th>
+                              <th scope="col">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody id="roster-body">
+                            <tr><td colspan="7">Loading roster…</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </article>
+
+                    <!-- Join requests from players -->
+                    <article class="cad-card" id="join-requests">
+                      <div class="cad-card-head">
+                        <h3>Join Requests</h3>
+                        <span class="cad-chip" id="cadRequestCount">0 pending</span>
+                      </div>
+                      <p class="cad-note">Approving a request also adds that player to the club roster.</p>
+                      <div class="cad-table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th scope="col">Player ID</th>
+                              <th scope="col">Full Name</th>
+                              <th scope="col">Note</th>
+                              <th scope="col">Requested</th>
+                              <th scope="col">Status</th>
+                              <th scope="col">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody id="join-requests-body">
+                            <tr><td colspan="6">Loading requests…</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </article>
+                  </section>
+
+                  <!-- ---- panels with no data source yet (honest empty states) ---- -->
+                  <section class="cad-panel" id="teams" data-panel="teams" role="tabpanel">
+                    <article class="cad-card cad-empty">
+                      <h3>👥 Teams</h3>
+                      <p>Team management is not built yet, and there is no <code>teams</code> data source in this build. Nothing is faked here — the module is simply pending.</p>
+                    </article>
+                  </section>
+
+                  <section class="cad-panel" id="matches" data-panel="matches" role="tabpanel">
+                    <article class="cad-card cad-empty">
+                      <h3>📅 Matches</h3>
+                      <p>Match scheduling and results are not built yet. No <code>matches</code> queries are wired to this page.</p>
+                    </article>
+                  </section>
+
+                  <section class="cad-panel" id="venues" data-panel="venues" role="tabpanel">
+                    <article class="cad-card cad-empty">
+                      <h3>📍 Venue Booking</h3>
+                      <p>Venue booking is planned. There is no venue table connected yet.</p>
+                    </article>
+                  </section>
+
+                  <section class="cad-panel" id="equipment" data-panel="equipment" role="tabpanel">
+                    <article class="cad-card cad-empty">
+                      <h3>🎒 Equipment</h3>
+                      <p>Equipment tracking is planned. There is no equipment table connected yet.</p>
+                    </article>
+                  </section>
+
+                  <section class="cad-panel" id="cards" data-panel="cards" role="tabpanel">
+                    <article class="cad-card cad-empty">
+                      <h3>🪪 Player Cards</h3>
+                      <p>Digital player card printing is planned for a future release.</p>
+                    </article>
+                  </section>
+
+                  <section class="cad-panel" id="reports" data-panel="reports" role="tabpanel">
+                    <article class="cad-card cad-empty">
+                      <h3>📊 Reports</h3>
+                      <p>Club reports will be generated from real roster and match data once those modules exist.</p>
+                    </article>
+                  </section>
+
+                </div><!-- /.cad-main -->
+              </div><!-- /.cad-shell -->
+            </section>
+
+            <!-- Public visitors get this instead of the manager tools -->
+            <div id="clubAdminGate" class="pub-gate">
+                <h3>🔐 Club Manager Tools are private</h3>
+                <p>
+                    Signing up players, viewing a live roster and approving join
+                    requests need a Club Admin account. Club Managers are assigned
+                    by the Super Admin in the Admin Panel.
+                </p>
+                <a href="login.html" class="btn btn-green">Login as Club Admin →</a>
+                <p><small>Players: <a href="login.html" style="color: var(--green);">log in to request a club</a>.</small></p>
+            </div>
+
+            <article id="clubs-directory">
                 <h3>Registered Clubs</h3>
                 <p class="muted">All clubs in the system (sample data).</p>
                 <div class="pub-table-wrap">
@@ -120,161 +464,6 @@
                     </table>
                 </div>
             </article>
-
-            <!-- ============================================
-                 CLUB MANAGER TOOLS - SIGNED-IN CLUB ADMIN ONLY
-                 js/club-admin.js keeps #clubAdminPanel hidden
-                 unless AUTH.hasRole("club_admin"), and skips
-                 every query and insert below that line for
-                 everybody else. Do not move the protected
-                 markup out of this wrapper.
-                 ============================================ -->
-            <section id="clubAdminPanel" hidden>
-                <h3>🏟️ Club Manager Tools</h3>
-                <p class="muted">
-                    Signed-in Club Admins only: manage the players of the club
-                    you manage and review join requests.
-                </p>
-
-                <!-- Shown only when a Club Admin is signed in -->
-                <div id="clubAdminBar" hidden>
-                    <p>Signed in as Club Admin: <b id="clubAdminWho"></b></p>
-                    <p><a href="#" id="clubAdminLogout">Logout</a> <a href="index.html">Back to Home</a></p>
-                </div>
-
-                <!-- Register New Player -->
-                <article>
-                    <h3>Register New Player</h3>
-                    <p id="clubMsg" role="status"></p>
-                    <form id="playerForm">
-                        <p>
-                            <label for="player-name">Player Name</label>
-                            <input type="text" id="player-name" name="player_name" placeholder="Player full name">
-                        </p>
-                        <p>
-                            <label for="player-id">Player ID</label>
-                            <input type="text" id="player-id" name="player_id" placeholder="PLY-005">
-                        </p>
-                        <p>
-                            <label for="player-dob">Date of Birth</label>
-                            <input type="date" id="player-dob" name="player_dob">
-                        </p>
-                        <p>
-                            <label for="player-gender">Gender</label>
-                            <select id="player-gender" name="player_gender">
-                                <option value="">Select Gender</option>
-                                <option>Male</option>
-                                <option>Female</option>
-                                <option>Other</option>
-                            </select>
-                        </p>
-                        <p>
-                            <label for="player-district">District</label>
-                            <select id="player-district" name="player_district">
-                                <option value="">Select District</option>
-                                <option>Dhaka</option>
-                                <option>Rajshahi</option>
-                                <option>Chattogram</option>
-                                <option>Sylhet</option>
-                                <option>Khulna</option>
-                                <option>Barishal</option>
-                                <option>Rangpur</option>
-                                <option>Mymensingh</option>
-                            </select>
-                        </p>
-                        <p>
-                            <label for="player-sport">Sport</label>
-                            <select id="player-sport" name="player_sport">
-                                <option value="">Select Sport</option>
-                                <option>Football</option>
-                                <option>Cricket</option>
-                                <option>Badminton</option>
-                                <option>Athletics</option>
-                                <option>Basketball</option>
-                                <option>Volleyball</option>
-                            </select>
-                        </p>
-                        <p>
-                            <label for="player-position">Position</label>
-                            <input type="text" id="player-position" name="player_position" placeholder="e.g. Midfielder">
-                        </p>
-                        <p>
-                            <label for="player-contact">Contact Number</label>
-                            <input type="tel" id="player-contact" name="player_contact" placeholder="01XXXXXXXXX">
-                        </p>
-                        <p>
-                            <label for="player-email">Email</label>
-                            <input type="email" id="player-email" name="player_email" placeholder="player@example.com">
-                        </p>
-                        <p>
-                            <button type="submit">Register Player</button>
-                        </p>
-                    </form>
-                </article>
-
-                <!-- Club Player Roster -->
-                <article>
-                    <h3>Club Player Roster</h3>
-                    <div class="pub-table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Player ID</th>
-                                    <th scope="col">Player Name</th>
-                                    <th scope="col">Sport</th>
-                                    <th scope="col">Position</th>
-                                    <th scope="col">District</th>
-                                    <th scope="col">Contact</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="roster-body">
-                                <tr>
-                                    <td colspan="8">Loading roster…</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </article>
-
-                <!-- Join requests from players -->
-                <article>
-                    <h3>Join Requests</h3>
-                    <p class="muted">Players who asked to join this club. Approve adds them to the roster automatically.</p>
-                    <div class="pub-table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Player Email</th>
-                                    <th scope="col">Full Name</th>
-                                    <th scope="col">Note</th>
-                                    <th scope="col">Requested</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="join-requests-body">
-                                <tr>
-                                    <td colspan="6">Loading requests…</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </article>
-            </section>
-
-            <!-- Public visitors get this instead of the manager tools -->
-            <div id="clubAdminGate" class="pub-gate">
-                <h3>🔐 Club Manager Tools are private</h3>
-                <p>
-                    Signing up players, viewing a live roster and approving join
-                    requests need a Club Admin account. Club Managers are assigned
-                    by the Super Admin in the Admin Panel.
-                </p>
-                <a href="login.html" class="btn btn-green">Login as Club Admin →</a>
-                <p><small>Players: <a href="login.html" style="color: var(--green);">log in to request a club</a>.</small></p>
-            </div>
         </section>
 
 
@@ -941,7 +1130,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/club-admin.js"></script>
+    <script src="js/club-admin.js?v=3"></script>
     <script>
     (function () {
         if (!window.AUTH) return;
@@ -953,7 +1142,7 @@
 
         var user = AUTH.currentUser();
         if (user && AUTH.hasRole(AUTH.ROLES.CLUB_ADMIN)) {
-            if (who) who.textContent = user.name + " (" + user.email + ")";
+            if (who) who.textContent = user.name || "Club Admin";
             bar.hidden = false;
         }
 

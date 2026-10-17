@@ -1,39 +1,62 @@
-/* =====================================================
-   PUBLIC PAGE STYLESHEET - login-system.html
-   Built on top of style.css (the same colors, navbar,
-   buttons, cards and tables used on the home page), so
-   the public page finally looks like part of the project.
-
-   Order:
-   1. Import the shared design system
-   2. Page shell + header / nav
-   3. Sections + headings
-   4. Articles (cards)
-   5. Tables
-   6. Definition lists
-   7. Forms
-   8. Role gate (public vs Club Admin only)
-   9. Footer
-   10. Mobile
-   ===================================================== */
-
-/* ---------- 1. SHARED DESIGN SYSTEM ---------- */
 @import url("style.css");
 
-/* ---------- 2. PAGE SHELL + HEADER ---------- */
-.pub-body {
-  display: block; /* style.css keeps the page in normal flow */
-  padding-bottom: 0;
+/* =====================================================
+   PUBLIC PAGE + CLUB ADMIN DASHBOARD STYLESHEET
+   login-system.html  (shared by the public portal and
+   the Club Admin dashboard)
+
+   Design rules for this page:
+     - pure white surfaces, no gradients or tinted fills
+     - NO box-shadow, text-shadow, glow, blur or filter
+     - thin light-gray borders (#E5E7EB)
+     - dark text (#1F2937) with a green accent
+     - hover may change colour / border / background only
+
+   Loaded ONLY by login-system.html, so none of this can
+   reach the Super Admin, Player or Login pages.
+   ===================================================== */
+
+/* ---------- 1. LIGHT PALETTE ----------
+   Re-declared after the @import so these win over the
+   dark values in style.css for this page only. */
+:root {
+  --bg: #FFFFFF;          /* page background  */
+  --bg2: #FFFFFF;         /* alternate section / card surface */
+  --card: #FFFFFF;        /* cards, tables, inputs */
+  --border: #E5E7EB;      /* thin light-gray separator */
+  --green: #16A34A;       /* accent */
+  --green-hover: #15803D; /* accent hover */
+  --text: #1F2937;        /* body text */
+  --muted: #6B7280;       /* secondary text */
+  --row-hover: #F9FAFB;   /* neutral table row hover */
+  --danger: #DC2626;      /* reject / error text */
+  --green-dark: #FFFFFF;  /* was a tint; kept flat on purpose */
+  --radius: 10px;
 }
 
-/* skip link for keyboard users */
+/* ---------- 2. NEUTRALISE DARK RULES INHERITED FROM style.css ---------- */
+body,
+.pub-body { background: var(--bg); color: var(--text); }
+
+.section { border-top: 1px solid var(--border); }
+.section.alt { background: var(--bg2); }
+
+.navbar { background: var(--bg2); border-bottom: 1px solid var(--border); }
+.navbar nav a.active,
+.navbar nav a:hover { color: var(--green); border-bottom: 2px solid var(--green); }
+
+.btn-green { color: #FFFFFF; }
+.btn-outline { border: 1px solid var(--border); color: var(--text); }
+.btn-outline:hover { border-color: var(--green); color: var(--green); }
+
+/* ---------- 3. TYPOGRAPHY ---------- */
 .pub-skip {
   position: absolute;
   left: -9999px;
   background: var(--green);
-  color: #06270f;
+  color: #FFFFFF;
   padding: 10px 16px;
-  border-radius: 0 0 10px 0;
+  border-radius: 0 0 var(--radius) 0;
   font-weight: bold;
   z-index: 50;
 }
@@ -42,21 +65,15 @@
 .pub-nav li a {
   display: block;
   padding: 8px 2px;
+  font-size: 14px;
 }
 .pub-nav li a:hover,
-.pub-nav li a:focus { color: #fff; }
+.pub-nav li a:focus-visible { color: var(--green); }
 
-/* When you arrive with #clubs etc. the sticky header must not
-   cover the heading of the section you jumped to. */
-.pub-body section {
-  scroll-margin-top: 84px;
-}
-
-/* ---------- 3. SECTIONS + HEADINGS ---------- */
 .pub-body h1 { font-size: 22px; }
-.pub-body h2 { margin-bottom: 6px; }
-.pub-body h3 { font-size: 16px; margin: 0 0 6px; }
-.pub-body h4 { font-size: 14px; margin: 0 0 4px; }
+.pub-body h2 { margin-bottom: 6px; color: var(--text); }
+.pub-body h3 { font-size: 16px; margin: 0 0 6px; color: var(--text); }
+.pub-body h4 { font-size: 14px; margin: 0 0 4px; color: var(--text); }
 .pub-body p { margin-bottom: 10px; }
 
 .pub-lead {
@@ -66,7 +83,6 @@
   margin-bottom: 20px;
 }
 
-/* small green label above a section heading */
 .pub-kicker {
   color: var(--green);
   font-size: 12px;
@@ -75,27 +91,28 @@
   text-transform: uppercase;
 }
 
-/* ---------- 4. ARTICLES (cards) ---------- */
+/* Coming from an anchor link must not hide the heading */
+.pub-body section { scroll-margin-top: 24px; }
+
+/* ---------- 4. CARDS (flat: white + thin border) ---------- */
 .pub-body article {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 16px;
 }
 .pub-body article > :last-child { margin-bottom: 0; }
+.pub-body article:hover { border-color: #D1D5DB; }
 
-/* articles that hold only a definition list read better without a title */
 .pub-plain {
   background: transparent;
   border: none;
   padding: 0;
 }
 
-/* a titled group of articles inside one section */
 .pub-stack { margin-top: 20px; }
 
-/* two columns on wide screens, one column on small ones */
 .pub-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -105,22 +122,23 @@
 .pub-grid-2 article { margin-bottom: 0; }
 
 /* ---------- 5. TABLES ---------- */
-/* the public page uses plain <table>, not the .table class */
 .pub-body table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius);
   overflow: hidden;
 }
 .pub-body thead th {
   color: var(--muted);
   font-size: 12px;
+  font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  background: var(--bg2);
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
 }
 .pub-body th,
 .pub-body td {
@@ -128,11 +146,11 @@
   border-bottom: 1px solid var(--border);
   text-align: left;
   vertical-align: top;
+  color: var(--text);
 }
 .pub-body tbody tr:last-child td { border-bottom: none; }
-.pub-body tbody tr:hover { background: #0f2417; }
+.pub-body tbody tr:hover { background: var(--row-hover); }
 
-/* horizontal scroll instead of a broken layout on phones */
 .pub-table-wrap { overflow-x: auto; }
 
 /* ---------- 6. DEFINITION LISTS ---------- */
@@ -147,9 +165,8 @@
   font-size: 13px;
   font-weight: bold;
 }
-.pub-body dd { margin: 0; font-size: 14px; }
+.pub-body dd { margin: 0; font-size: 14px; color: var(--text); }
 
-/* style.css clears list bullets, so put them back where they help */
 .pub-body ul.pub-list {
   list-style: disc;
   padding-left: 20px;
@@ -160,36 +177,61 @@
 .pub-body ul.pub-list li { margin: 0; }
 
 /* ---------- 7. FORMS ---------- */
-/* the public markup wraps each field in its own <p> */
 .pub-body form > p { margin-bottom: 12px; }
+
+.pub-body label {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
 .pub-body input,
 .pub-body select,
 .pub-body textarea {
   width: 100%;
-  padding: 11px 12px;
-  border-radius: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
   border: 1px solid var(--border);
-  background: var(--bg2);
-  color: #fff;
+  background: var(--card);
+  color: var(--text);
   font-family: Arial, sans-serif;
   font-size: 14px;
 }
 .pub-body textarea { resize: vertical; }
+
+/* placeholders stay readable on white */
+.pub-body input::placeholder,
+.pub-body textarea::placeholder { color: #9CA3AF; }
+
+/* Visible focus ring, drawn as a border so nothing glows */
+.pub-body input:focus,
+.pub-body select:focus,
+.pub-body textarea:focus {
+  outline: 2px solid var(--green);
+  outline-offset: 0;
+  border-color: var(--green);
+}
+
 .pub-body button[type="submit"],
 .pub-body button[type="button"] {
   background: var(--green);
-  color: #06270f;
-  border: none;
-  border-radius: 20px;
-  padding: 11px 22px;
+  color: #FFFFFF;
+  border: 1px solid var(--green);
+  border-radius: var(--radius);
+  padding: 10px 20px;
   font-size: 14px;
   font-weight: bold;
   font-family: Arial, sans-serif;
   cursor: pointer;
 }
-.pub-body button[type="submit"]:hover { filter: brightness(1.08); }
+.pub-body button[type="submit"]:hover,
+.pub-body button[type="button"]:hover {
+  background: var(--green-hover);
+  border-color: var(--green-hover);
+}
 
-/* inline link buttons (View / Register / Read More) */
 .pub-body .pub-actions {
   display: flex;
   flex-wrap: wrap;
@@ -200,69 +242,41 @@
   color: var(--green);
   font-size: 14px;
   font-weight: bold;
-  border-bottom: 1px solid transparent;
 }
-.pub-body .pub-actions a:hover { border-bottom-color: var(--green); }
-
-/* status message used by js/club-admin.js */
-#clubMsg {
-  min-height: 20px;
-  font-size: 14px;
+.pub-body .pub-actions a:hover {
+  color: var(--green-hover);
+  text-decoration: underline;
 }
 
-/* ---------- 8. ROLE GATE ----------
-   The page is public. Everything that needs a signed-in
-   Club Admin lives inside #clubAdminPanel, which
-   js/club-admin.js hides unless the role matches.          */
+/* ---------- 8. BADGES (outlined, never filled) ---------- */
+.pub-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  background: var(--card);
+  color: var(--green);
+  border: 1px solid var(--green);
+  white-space: nowrap;
+}
+.pub-badge.yellow { color: #B45309; border-color: #B45309; }
+.pub-badge.grey   { color: var(--muted); border-color: var(--border); }
 
+/* ---------- 9. ROLE GATE ---------- */
 .pub-gate {
-  background: var(--bg2);
-  border: 1px dashed var(--border);
-  border-radius: 14px;
-  padding: 22px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
   text-align: center;
 }
 .pub-gate h3 { font-size: 16px; }
 .pub-gate p { color: var(--muted); font-size: 14px; }
 .pub-gate .btn { margin-top: 6px; }
+.pub-gate a:not(.btn) { color: var(--green); }
 
-/* the Club Admin only block gets a green edge so it reads as "members only" */
-#clubAdminPanel {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--green);
-  border-radius: 14px;
-  padding: 20px;
-  margin-top: 24px;
-}
-#clubAdminPanel > h3 { margin-bottom: 4px; }
-
-/* signed-in banner (existing #clubAdminBar) */
-#clubAdminBar {
-  background: #12281a;
-  border: 1px solid #1f4a31;
-  border-radius: 12px;
-  padding: 12px 16px;
-  margin-bottom: 18px;
-  font-size: 14px;
-}
-#clubAdminBar a { color: var(--green); font-weight: bold; }
-#clubAdminBar a + a { margin-left: 8px; }
-
-/* badges used in the public tables */
-.pub-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: bold;
-  background: #143324;
-  color: var(--green);
-}
-.pub-badge.yellow { background: #2a2212; color: #f5c542; }
-.pub-badge.grey   { background: #1b2620; color: var(--muted); }
-
-/* ---------- 9. FOOTER ---------- */
+/* ---------- 10. FOOTER ---------- */
 .pub-footer {
   background: var(--bg2);
   border-top: 1px solid var(--border);
@@ -278,18 +292,21 @@
   font-size: 13px;
   color: var(--muted);
 }
-.pub-footer ul {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.pub-footer ul { display: flex; gap: 8px; flex-wrap: wrap; }
+.pub-footer a { color: var(--muted); }
 .pub-footer a:hover { color: var(--green); }
 
-/* ---------- 10. MOBILE ---------- */
+/* ---------- 11. FOCUS VISIBILITY (no glow) ---------- */
+.pub-body a:focus-visible,
+.pub-body button:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+/* ---------- 12. MOBILE ---------- */
 @media (max-width: 800px) {
-  /* style.css hides .navbar nav under 800px. On this page that nav
-     is the only way to reach the public sections, so keep it and
-     let it wrap instead. */
+  /* style.css hides .navbar nav under 800px; here it is the only
+     way to reach the sections, so keep it and let it wrap. */
   .navbar nav { display: block; }
   .pub-nav ul { flex-wrap: wrap; gap: 12px; }
   .pub-body section { scroll-margin-top: 120px; }
