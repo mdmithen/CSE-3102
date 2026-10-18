@@ -62,10 +62,21 @@
   if (panelEl) panelEl.hidden = !isClubAdmin;
   if (gateEl) gateEl.hidden = isClubAdmin;
 
+  /* Presentation only: while a Club Admin is signed in the page
+     switches into "app mode", which is the single class that lets
+     css/club-admin.css use the full page width and hide the
+     public chrome. It is added and removed by this file only, and
+     it is never left behind for a signed-out visitor. */
+  if (document.body) {
+    if (isClubAdmin) document.body.classList.add("cad-mode");
+    else document.body.classList.remove("cad-mode");
+  }
+
   if (!isClubAdmin) return;
 
   var user = AUTH.currentUser();
   var msgEl = document.getElementById("clubMsg");
+  var statusEl = document.getElementById("cadStatus");
   var rosterBody = document.getElementById("roster-body");
   var requestsBody = document.getElementById("join-requests-body");
 
@@ -73,10 +84,20 @@
     return window.SB || null;
   }
 
+  /* Every message is written to the shared status line under the
+     top bar as well as into #clubMsg, so feedback raised while the
+     manager is on any tab stays visible. Same text, two places. */
   function say(text, isError) {
-    if (!msgEl) return;
-    msgEl.textContent = text || "";
-    msgEl.style.color = isError ? "#e5534b" : "";
+    var line = text || "";
+
+    if (msgEl) {
+      msgEl.textContent = line;
+      msgEl.style.color = isError ? "#DC2626" : "";
+    }
+    if (statusEl) {
+      statusEl.textContent = line;
+      statusEl.classList.toggle("is-error", !!isError);
+    }
   }
 
   function esc(value) {
@@ -112,7 +133,7 @@
 
       if (!myClubId) {
         say("No club is assigned to you yet. Ask the super admin to make you a club manager.", true);
-        if (rosterBody) rosterBody.innerHTML = '<tr><td colspan="7">No club assigned.</td></tr>';
+        if (rosterBody) rosterBody.innerHTML = '<tr><td colspan="4">No club assigned.</td></tr>';
         if (requestsBody) requestsBody.innerHTML = '<tr><td colspan="6">No club assigned.</td></tr>';
         renderStats();
         renderSummary();
@@ -415,12 +436,15 @@
         paintRoster(rows);
       })
       .catch(function (err) {
-        rosterBody.innerHTML = '<tr><td colspan="7">Could not load the roster.</td></tr>';
+        rosterBody.innerHTML = '<tr><td colspan="4">Could not load the roster.</td></tr>';
         say(errText(err), true);
       });
   }
 
-  /* Roster rows, optionally filtered by the top-bar search box */
+  /* Roster rows, optionally filtered by the top-bar search box.
+     Sport / District / Contact were removed from the table: the
+     query only ever fetched id, full_name, position and status, so
+     those three columns could only ever print "—". */
   function paintRoster(rows) {
     if (!rosterBody) return;
 
@@ -430,11 +454,11 @@
     });
 
     if (!rows.length) {
-      rosterBody.innerHTML = '<tr><td colspan="7">No players in this club yet.</td></tr>';
+      rosterBody.innerHTML = '<tr><td colspan="4">No players in this club yet.</td></tr>';
       return;
     }
     if (!list.length) {
-      rosterBody.innerHTML = '<tr><td colspan="7">No players match "' +
+      rosterBody.innerHTML = '<tr><td colspan="4">No players match "' +
         esc(rosterQuery) + '".</td></tr>';
       return;
     }
@@ -445,10 +469,7 @@
       tr.innerHTML =
         "<td>PLY-" + ("00" + p.id).slice(-3) + "</td>" +
         "<td>" + esc(p.full_name) + "</td>" +
-        "<td>—</td>" +
         "<td>" + esc(p.position || "—") + "</td>" +
-        "<td>—</td>" +
-        "<td>—</td>" +
         "<td>" + esc(p.status || "Active") + "</td>";
       rosterBody.appendChild(tr);
     });
@@ -656,6 +677,14 @@
       t.classList.toggle("is-active", on);
       t.setAttribute("aria-selected", String(on));
     });
+
+    /* Mirror the active tab onto the sidebar. data-cad-side holds the
+       panel name; the public-site links carry "site" and never light up. */
+    var sideLinks = document.querySelectorAll("#clubAdminPanel .cad-side-nav a[data-cad-side]");
+    Array.prototype.forEach.call(sideLinks, function (a) {
+      var key = a.getAttribute("data-cad-side");
+      a.classList.toggle("is-active", !!key && key !== "site" && key === name);
+    });
   }
 
   function bindCadTabs() {
@@ -668,22 +697,41 @@
       showPanel(btn.getAttribute("data-tab"));
     });
 
-    // Sidebar links jump to a section and open its tab
+    /* Sidebar links stay inside the dashboard and open the matching
+       tab. data-cad-scroll then scrolls one card into view, which is
+       what "Join Requests" uses. The public-site links (.cad-side-ext)
+       have no data-cad-tab, so they still navigate as normal anchors. */
     var sideNav = document.querySelector(".cad-side-nav");
     if (sideNav) {
       sideNav.addEventListener("click", function (e) {
-        var link = e.target.closest("a[data-cad-nav]");
-        if (link) {
-          var target = link.getAttribute("data-cad-nav");
-          if (target === "players") showPanel("players");
-          else showPanel("club");
-          return;
-        }
-        // Items that map straight onto a dashboard tab
         var tabLink = e.target.closest("a[data-cad-tab]");
-        if (tabLink) showPanel(tabLink.getAttribute("data-cad-tab"));
+        if (!tabLink) return;
+
+        e.preventDefault();
+        showPanel(tabLink.getAttribute("data-tab"));
+
+        var scrollTo = tabLink.getAttribute("data-cad-scroll");
+        if (scrollTo) {
+          var card = document.getElementById(scrollTo);
+          if (card) card.scrollIntoView({ block: "start" });
+        }
       });
     }
+  }
+
+  /* The notification bell is a real button now: it opens the Players
+     tab and scrolls to the pending requests instead of jumping to an
+     anchor that is hidden when another tab is active. */
+  function bindCadBell() {
+    var bell = document.getElementById("cadBell");
+    if (!bell) return;
+
+    bell.addEventListener("click", function (e) {
+      e.preventDefault();
+      showPanel("players");
+      var card = document.getElementById("join-requests");
+      if (card) card.scrollIntoView({ block: "start" });
+    });
   }
 
   /* Switching clubs reloads the roster and requests for that club */
@@ -708,7 +756,8 @@
     });
   }
 
-  /* Top-bar search filters the live roster */
+  /* Top-bar search filters the live roster. The ⌘K chip shown inside
+     the field is now real: Ctrl / Cmd + K focuses the box. */
   function bindCadSearch() {
     var input = document.getElementById("cadSearch");
     if (!input) return;
@@ -716,6 +765,14 @@
     input.addEventListener("input", function () {
       rosterQuery = input.value || "";
       paintRoster(lastRoster);
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) {
+        e.preventDefault();
+        input.focus();
+        input.select();
+      }
     });
   }
 
@@ -751,6 +808,7 @@
   showPanel("club");
 
   bindCadTabs();
+  bindCadBell();
   bindClubSwitcher();
   bindCadSearch();
   bindSideLogout();

@@ -95,21 +95,21 @@
 
                   <nav class="cad-side-nav">
                     <ul>
-                      <li><a href="#clubs" class="is-active" data-cad-nav="overview"><span aria-hidden="true">▦</span> Club Portal</a></li>
-                      <li><a href="#players"><span aria-hidden="true">🧑</span> Player Portal</a></li>
-                      <li><a href="#club-roster" data-cad-nav="players"><span aria-hidden="true">👥</span> Players</a></li>
-                      <li><a href="#clubs-directory"><span aria-hidden="true">🏟</span> Clubs</a></li>
-                      <li><a href="#tournaments"><span aria-hidden="true">🏆</span> Tournaments</a></li>
-                      <li><a href="#matches" data-cad-tab="matches"><span aria-hidden="true">📅</span> Fixtures</a></li>
-                      <li><a href="#venues" data-cad-tab="venues"><span aria-hidden="true">📍</span> Venues</a></li>
-                      <li><a href="#equipment" data-cad-tab="equipment"><span aria-hidden="true">🎒</span> Equipment</a></li>
+                      <li><a href="#clubs" class="is-active" data-cad-tab="club" data-cad-side="club"><span aria-hidden="true">▦</span> Club Portal</a></li>
+                      <li><a href="#players" class="cad-side-ext" data-cad-side="site"><span aria-hidden="true">🧑</span> Player Portal<i aria-hidden="true">↗</i></a></li>
+                      <li><a href="#club-roster" data-cad-tab="players" data-cad-side="players"><span aria-hidden="true">👥</span> Players</a></li>
+                      <li><a href="#clubs-directory" class="cad-side-ext" data-cad-side="site"><span aria-hidden="true">🏟</span> Clubs<i aria-hidden="true">↗</i></a></li>
+                      <li><a href="#tournaments" class="cad-side-ext" data-cad-side="site"><span aria-hidden="true">🏆</span> Tournaments<i aria-hidden="true">↗</i></a></li>
+                      <li><a href="#matches" data-cad-tab="matches" data-cad-side="matches"><span aria-hidden="true">📅</span> Fixtures</a></li>
+                      <li><a href="#venues" data-cad-tab="venues" data-cad-side="venues"><span aria-hidden="true">📍</span> Venues</a></li>
+                      <li><a href="#equipment" data-cad-tab="equipment" data-cad-side="equipment"><span aria-hidden="true">🎒</span> Equipment</a></li>
                     </ul>
 
                     <p class="cad-side-title">System</p>
                     <ul>
-                      <li><a href="#join-requests" data-cad-nav="players"><span aria-hidden="true">✉</span> Join Requests</a></li>
-                      <li><a href="#news"><span aria-hidden="true">🗞</span> News &amp; Events</a></li>
-                      <li><a href="#reports" data-cad-tab="reports"><span aria-hidden="true">📊</span> Reports</a></li>
+                      <li><a href="#join-requests" data-cad-tab="players" data-cad-scroll="join-requests" data-cad-side="requests"><span aria-hidden="true">✉</span> Join Requests</a></li>
+                      <li><a href="#news" class="cad-side-ext" data-cad-side="site"><span aria-hidden="true">🗞</span> News &amp; Events<i aria-hidden="true">↗</i></a></li>
+                      <li><a href="#reports" data-cad-tab="reports" data-cad-side="reports"><span aria-hidden="true">📊</span> Reports</a></li>
                     </ul>
                   </nav>
 
@@ -146,12 +146,13 @@
                     <div class="cad-top-actions">
                       <label class="cad-role-picker">
                         <span class="cad-sr">Signed-in role</span>
-                        <select id="cadRoleSelect" disabled>
+                        <span class="cad-role-badge" aria-hidden="true">🏟️</span>
+                        <select id="cadRoleSelect" disabled aria-label="Signed-in role">
                           <option>🏟️ Club Manager</option>
                         </select>
                       </label>
 
-                      <a class="cad-icon-btn" href="#join-requests" aria-label="Pending join requests">
+                      <a class="cad-icon-btn" id="cadBell" href="#join-requests" aria-label="Pending join requests">
                         🔔<em id="cadNotifCount" hidden>0</em>
                       </a>
 
@@ -166,6 +167,11 @@
                       <a href="#" id="clubAdminLogout" class="cad-profile-chevron" aria-label="Sign out">Logout</a>
                     </div>
                   </header>
+
+                  <!-- One shared status line, so a message raised in any tab
+                       is always visible. js/club-admin.js mirrors every
+                       say() call here as well as into #clubMsg. -->
+                  <p class="cad-status" id="cadStatus" role="status" aria-live="polite"></p>
 
                   <!-- ---- dark teal club banner ---- -->
                   <section class="cad-banner" aria-label="Managed club">
@@ -187,19 +193,19 @@
                   <div class="cad-stats" id="cadStats" aria-label="Club statistics"></div>
 
                   <!-- ---- horizontal navigation tabs ---- -->
-                  <nav class="cad-tabs" id="cadTabs" role="tablist" aria-label="Club Admin sections">
-                    <button type="button" class="cad-tab is-active" role="tab" data-tab="club"    aria-selected="true"><span aria-hidden="true">🏟</span> My Club</button>
-                    <button type="button" class="cad-tab" role="tab" data-tab="players" aria-selected="false"><span aria-hidden="true">👥</span> Players</button>
-                    <button type="button" class="cad-tab" role="tab" data-tab="teams"   aria-selected="false"><span aria-hidden="true">🏷</span> Teams</button>
-                    <button type="button" class="cad-tab" role="tab" data-tab="matches" aria-selected="false"><span aria-hidden="true">📅</span> Matches</button>
-                    <button type="button" class="cad-tab" role="tab" data-tab="venues"  aria-selected="false"><span aria-hidden="true">📍</span> Venue Booking</button>
-                    <button type="button" class="cad-tab" role="tab" data-tab="equipment" aria-selected="false"><span aria-hidden="true">🎒</span> Equipment</button>
-                    <button type="button" class="cad-tab" role="tab" data-tab="cards"   aria-selected="false"><span aria-hidden="true">🪪</span> Player Cards</button>
-                    <button type="button" class="cad-tab" role="tab" data-tab="reports" aria-selected="false"><span aria-hidden="true">📊</span> Reports</button>
+                  <nav class="cad-tabs" id="cadTabs" role="tablist" aria-label="Club Manager sections">
+                    <button type="button" class="cad-tab is-active" role="tab" id="cad-tab-club"      data-tab="club"      aria-controls="cad-panel-club"      aria-selected="true"><span aria-hidden="true">🏟</span> My Club</button>
+                    <button type="button" class="cad-tab" role="tab" id="cad-tab-players"   data-tab="players"   aria-controls="cad-panel-players"   aria-selected="false"><span aria-hidden="true">👥</span> Players</button>
+                    <button type="button" class="cad-tab" role="tab" id="cad-tab-teams"     data-tab="teams"     aria-controls="teams"               aria-selected="false"><span aria-hidden="true">🏷</span> Teams</button>
+                    <button type="button" class="cad-tab" role="tab" id="cad-tab-matches"   data-tab="matches"   aria-controls="matches"             aria-selected="false"><span aria-hidden="true">📅</span> Matches</button>
+                    <button type="button" class="cad-tab" role="tab" id="cad-tab-venues"    data-tab="venues"    aria-controls="venues"              aria-selected="false"><span aria-hidden="true">📍</span> Venue Booking</button>
+                    <button type="button" class="cad-tab" role="tab" id="cad-tab-equipment" data-tab="equipment" aria-controls="equipment"           aria-selected="false"><span aria-hidden="true">🎒</span> Equipment</button>
+                    <button type="button" class="cad-tab" role="tab" id="cad-tab-cards"     data-tab="cards"     aria-controls="cards"               aria-selected="false"><span aria-hidden="true">🪪</span> Player Cards</button>
+                    <button type="button" class="cad-tab" role="tab" id="cad-tab-reports"   data-tab="reports"   aria-controls="reports"             aria-selected="false"><span aria-hidden="true">📊</span> Reports</button>
                   </nav>
 
                   <!-- ---- panel: My Club ---- -->
-                  <section class="cad-panel is-active" data-panel="club" role="tabpanel">
+                  <section class="cad-panel is-active" id="cad-panel-club" data-panel="club" role="tabpanel" aria-labelledby="cad-tab-club">
                     <div class="cad-two-col">
 
                       <!-- club profile card (left) -->
@@ -217,7 +223,11 @@
                       </article>
 
                       <!-- summary information (right) -->
-                      <article class="cad-card">
+                      <article class="cad-card cad-summary-card">
+                        <div class="cad-card-head">
+                          <h3>Club Summary</h3>
+                          <span class="cad-chip cad-chip-quiet">Live</span>
+                        </div>
                         <div class="cad-statlist" id="cadSummaryFacts"></div>
                         <p class="cad-note" id="cadSummaryNote">
                           Counts come straight from the club roster and join-request tables.
@@ -227,28 +237,35 @@
                   </section>
 
                   <!-- ---- panel: Players (existing working features) ---- -->
-                  <section class="cad-panel" data-panel="players" role="tabpanel">
+                  <section class="cad-panel" id="cad-panel-players" data-panel="players" role="tabpanel" aria-labelledby="cad-tab-players">
 
                     <!-- Register New Player -->
                     <article class="cad-card" id="register-player">
-                      <h3>Register New Player</h3>
-                      <p id="clubMsg" role="status"></p>
+                      <div class="cad-card-head">
+                        <h3>Register New Player</h3>
+                        <span class="cad-chip cad-chip-quiet">Saves to the club roster</span>
+                      </div>
+                      <p id="clubMsg" class="cad-msg" role="status"></p>
                       <form id="playerForm" class="cad-form">
                         <div>
                           <label for="player-name">Player Name</label>
                           <input type="text" id="player-name" name="player_name" placeholder="Player full name" required>
                         </div>
                         <div>
+                          <label for="player-position">Position</label>
+                          <input type="text" id="player-position" name="player_position" placeholder="e.g. Midfielder">
+                        </div>
+                        <div>
                           <label for="player-id">Player ID</label>
-                          <input type="text" id="player-id" name="player_id" placeholder="PLY-005">
+                          <input type="text" id="player-id" name="player_id" placeholder="PLY-005" class="is-offline" disabled>
                         </div>
                         <div>
                           <label for="player-dob">Date of Birth</label>
-                          <input type="date" id="player-dob" name="player_dob">
+                          <input type="date" id="player-dob" name="player_dob" class="is-offline" disabled>
                         </div>
                         <div>
                           <label for="player-gender">Gender</label>
-                          <select id="player-gender" name="player_gender">
+                          <select id="player-gender" name="player_gender" class="is-offline" disabled>
                             <option value="">Select Gender</option>
                             <option>Male</option>
                             <option>Female</option>
@@ -257,7 +274,7 @@
                         </div>
                         <div>
                           <label for="player-district">District</label>
-                          <select id="player-district" name="player_district">
+                          <select id="player-district" name="player_district" class="is-offline" disabled>
                             <option value="">Select District</option>
                             <option>Dhaka</option>
                             <option>Rajshahi</option>
@@ -271,7 +288,7 @@
                         </div>
                         <div>
                           <label for="player-sport">Sport</label>
-                          <select id="player-sport" name="player_sport">
+                          <select id="player-sport" name="player_sport" class="is-offline" disabled>
                             <option value="">Select Sport</option>
                             <option>Football</option>
                             <option>Cricket</option>
@@ -282,22 +299,24 @@
                           </select>
                         </div>
                         <div>
-                          <label for="player-position">Position</label>
-                          <input type="text" id="player-position" name="player_position" placeholder="e.g. Midfielder">
-                        </div>
-                        <div>
                           <label for="player-contact">Contact Number</label>
-                          <input type="tel" id="player-contact" name="player_contact" placeholder="01XXXXXXXXX">
+                          <input type="tel" id="player-contact" name="player_contact" placeholder="01XXXXXXXXX" class="is-offline" disabled>
                         </div>
                         <div>
                           <label for="player-email">Email</label>
-                          <input type="email" id="player-email" name="player_email" placeholder="player@example.com">
+                          <input type="email" id="player-email" name="player_email" placeholder="player@example.com" class="is-offline" disabled>
                         </div>
                         <div class="cad-form-actions">
                           <button type="submit">Register Player</button>
                           <button type="reset">Clear</button>
                         </div>
                       </form>
+                      <p class="cad-note cad-note-warn">
+                        Only <b>Player Name</b> and <b>Position</b> are written to the
+                        database today. The greyed-out fields are part of the target
+                        layout but are not stored yet, so they are disabled rather
+                        than silently throwing the data away.
+                      </p>
                     </article>
 
                     <!-- Club Player Roster -->
@@ -306,21 +325,19 @@
                         <h3>Club Player Roster</h3>
                         <span class="cad-chip" id="cadRosterCount">0 players</span>
                       </div>
+                      <p class="cad-note">Type in the search bar above to filter this roster.</p>
                       <div class="cad-table-wrap">
                         <table>
                           <thead>
                             <tr>
                               <th scope="col">Player ID</th>
                               <th scope="col">Player Name</th>
-                              <th scope="col">Sport</th>
                               <th scope="col">Position</th>
-                              <th scope="col">District</th>
-                              <th scope="col">Contact</th>
                               <th scope="col">Status</th>
                             </tr>
                           </thead>
                           <tbody id="roster-body">
-                            <tr><td colspan="7">Loading roster…</td></tr>
+                            <tr><td colspan="4">Loading roster…</td></tr>
                           </tbody>
                         </table>
                       </div>
@@ -354,45 +371,57 @@
                   </section>
 
                   <!-- ---- panels with no data source yet (honest empty states) ---- -->
-                  <section class="cad-panel" id="teams" data-panel="teams" role="tabpanel">
+                  <section class="cad-panel" id="teams" data-panel="teams" role="tabpanel" aria-labelledby="cad-tab-teams">
                     <article class="cad-card cad-empty">
-                      <h3>👥 Teams</h3>
+                      <span class="cad-empty-ico" aria-hidden="true">👥</span>
+                      <h3>Teams</h3>
                       <p>Team management is not built yet, and there is no <code>teams</code> data source in this build. Nothing is faked here — the module is simply pending.</p>
+                      <span class="cad-empty-tag">Not connected yet</span>
                     </article>
                   </section>
 
-                  <section class="cad-panel" id="matches" data-panel="matches" role="tabpanel">
+                  <section class="cad-panel" id="matches" data-panel="matches" role="tabpanel" aria-labelledby="cad-tab-matches">
                     <article class="cad-card cad-empty">
-                      <h3>📅 Matches</h3>
+                      <span class="cad-empty-ico" aria-hidden="true">📅</span>
+                      <h3>Matches</h3>
                       <p>Match scheduling and results are not built yet. No <code>matches</code> queries are wired to this page.</p>
+                      <span class="cad-empty-tag">Not connected yet</span>
                     </article>
                   </section>
 
-                  <section class="cad-panel" id="venues" data-panel="venues" role="tabpanel">
+                  <section class="cad-panel" id="venues" data-panel="venues" role="tabpanel" aria-labelledby="cad-tab-venues">
                     <article class="cad-card cad-empty">
-                      <h3>📍 Venue Booking</h3>
+                      <span class="cad-empty-ico" aria-hidden="true">📍</span>
+                      <h3>Venue Booking</h3>
                       <p>Venue booking is planned. There is no venue table connected yet.</p>
+                      <span class="cad-empty-tag">Not connected yet</span>
                     </article>
                   </section>
 
-                  <section class="cad-panel" id="equipment" data-panel="equipment" role="tabpanel">
+                  <section class="cad-panel" id="equipment" data-panel="equipment" role="tabpanel" aria-labelledby="cad-tab-equipment">
                     <article class="cad-card cad-empty">
-                      <h3>🎒 Equipment</h3>
+                      <span class="cad-empty-ico" aria-hidden="true">🎒</span>
+                      <h3>Equipment</h3>
                       <p>Equipment tracking is planned. There is no equipment table connected yet.</p>
+                      <span class="cad-empty-tag">Not connected yet</span>
                     </article>
                   </section>
 
-                  <section class="cad-panel" id="cards" data-panel="cards" role="tabpanel">
+                  <section class="cad-panel" id="cards" data-panel="cards" role="tabpanel" aria-labelledby="cad-tab-cards">
                     <article class="cad-card cad-empty">
-                      <h3>🪪 Player Cards</h3>
+                      <span class="cad-empty-ico" aria-hidden="true">🪪</span>
+                      <h3>Player Cards</h3>
                       <p>Digital player card printing is planned for a future release.</p>
+                      <span class="cad-empty-tag">Not connected yet</span>
                     </article>
                   </section>
 
-                  <section class="cad-panel" id="reports" data-panel="reports" role="tabpanel">
+                  <section class="cad-panel" id="reports" data-panel="reports" role="tabpanel" aria-labelledby="cad-tab-reports">
                     <article class="cad-card cad-empty">
-                      <h3>📊 Reports</h3>
+                      <span class="cad-empty-ico" aria-hidden="true">📊</span>
+                      <h3>Reports</h3>
                       <p>Club reports will be generated from real roster and match data once those modules exist.</p>
+                      <span class="cad-empty-tag">Not connected yet</span>
                     </article>
                   </section>
 
