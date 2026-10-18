@@ -339,8 +339,8 @@
     }).join("");
   }
 
-  /* Summary card on the right: icon + figure + caption rows,
-     the same shape as the reference summary panel. */
+  /* Summary card on the right: figure + caption rows.
+     No icons - the value and its caption carry the meaning. */
   function renderSummary() {
     var host = document.getElementById("cadSummaryFacts");
     if (!host) return;
@@ -351,18 +351,17 @@
     var verified = (players && active) ? pct(active, players) : "0%";
 
     var rows = [
-      { ico: "👥", value: players === null ? "—" : players, label: "Total players" },
-      { ico: "✅", value: active === null ? "—" : active, label: "Active players" },
-      { ico: "✉",  value: counts.pending === null ? "—" : counts.pending, label: "Pending requests" },
-      { ico: "🎯", value: verified, label: "Content verified" },
-      { ico: "🏟",  value: firstVal(c, ["district"], null), label: "District" },
-      { ico: "📅", value: firstVal(c, ["founded", "established"], null), label: "Founded" }
+      { value: players === null ? "—" : players, label: "Total players" },
+      { value: active === null ? "—" : active, label: "Active players" },
+      { value: counts.pending === null ? "—" : counts.pending, label: "Pending requests" },
+      { value: verified, label: "Content verified" },
+      { value: firstVal(c, ["district"], null), label: "District" },
+      { value: firstVal(c, ["founded", "established"], null), label: "Founded" }
     ];
 
     host.innerHTML = rows.map(function (r) {
       var has = r.value !== null && r.value !== undefined && r.value !== "" && r.value !== "—";
       return '<div class="cad-statrow">' +
-        '<span class="cad-statrow-ico" aria-hidden="true">' + r.ico + "</span>" +
         '<b class="' + (has ? "" : "is-empty") + '">' + esc(has ? r.value : "—") + "</b>" +
         '<small>' + esc(r.label) + "</small>" +
       "</div>";
@@ -374,27 +373,24 @@
      Only Total Players and Pending Requests are live, because
      those are the two tables this page can actually read.
      The other four show an honest placeholder instead of a
-     made-up number. */
+     made-up number. Cards are text only: label, figure, caption. */
   function renderStats() {
     var host = document.getElementById("cadStats");
     if (!host) return;
 
     var cards = [
-      { ico: "👥", tone: "green",  label: "Total Players",    value: counts.players, live: true,  foot: "Club roster" },
-      { ico: "🏷", tone: "blue",   label: "Active Teams",     value: null, live: false, foot: "Teams pending" },
-      { ico: "📅", tone: "purple", label: "Upcoming Matches", value: null, live: false, foot: "Matches pending" },
-      { ico: "✉",  tone: "amber",  label: "Pending Requests", value: counts.pending, live: true,  foot: "Awaiting approval" },
-      { ico: "🎒", tone: "orange", label: "Equipment Items",  value: null, live: false, foot: "Equipment pending" },
-      { ico: "📍", tone: "pink",   label: "Available Venues", value: null, live: false, foot: "Venues pending" }
+      { label: "Total Players",    value: counts.players, live: true,  foot: "Club roster" },
+      { label: "Active Teams",     value: null, live: false, foot: "Teams pending" },
+      { label: "Upcoming Matches", value: null, live: false, foot: "Matches pending" },
+      { label: "Pending Requests", value: counts.pending, live: true,  foot: "Awaiting approval" },
+      { label: "Equipment Items",  value: null, live: false, foot: "Equipment pending" },
+      { label: "Available Venues", value: null, live: false, foot: "Venues pending" }
     ];
 
     host.innerHTML = cards.map(function (c) {
       var hasValue = c.value !== null && c.value !== undefined && !isNaN(c.value);
       return '<div class="cad-stat' + (c.live && hasValue ? " is-live" : "") + '">' +
-        '<div class="cad-stat-top">' +
-          '<span class="cad-stat-label">' + esc(c.label) + "</span>" +
-          '<span class="cad-stat-ico cad-tone-' + c.tone + '" aria-hidden="true">' + c.ico + "</span>" +
-        "</div>" +
+        '<span class="cad-stat-label">' + esc(c.label) + "</span>" +
         "<b>" + esc(hasValue ? c.value : "—") + "</b>" +
         '<span class="cad-stat-foot">' + esc(hasValue ? c.foot : "Not connected yet") + "</span>" +
       "</div>";
@@ -663,74 +659,184 @@
     });
   }
 
-  /* ---------- tabs, club switcher, search ---------- */
+  /* ---------- views, routing, club switcher, search ---------- */
 
-  function showPanel(name) {
-    var panels = document.querySelectorAll("#clubAdminPanel [data-panel]");
-    Array.prototype.forEach.call(panels, function (p) {
-      p.classList.toggle("is-active", p.getAttribute("data-panel") === name);
-    });
+  /* Every page the sidebar and the URL can address.
+     The key matches data-panel, data-tab and data-cad-side. */
+  var VIEWS = {
+    club: "club", players: "players", teams: "teams", matches: "matches",
+    venues: "venues", equipment: "equipment", cards: "cards",
+    reports: "reports", requests: "requests", notices: "notices"
+  };
 
-    var tabs = document.querySelectorAll("#cadTabs .cad-tab");
-    Array.prototype.forEach.call(tabs, function (t) {
-      var on = t.getAttribute("data-tab") === name;
-      t.classList.toggle("is-active", on);
-      t.setAttribute("aria-selected", String(on));
-    });
+  /* js/auth.js sends a Club Manager to login-system.html#clubs, so
+     that legacy hash has to open the Dashboard rather than nothing. */
+  var URL_ALIASES = { clubs: "club" };
 
-    /* Mirror the active tab onto the sidebar. data-cad-side holds the
-       panel name; the public-site links carry "site" and never light up. */
-    var sideLinks = document.querySelectorAll("#clubAdminPanel .cad-side-nav a[data-cad-side]");
-    Array.prototype.forEach.call(sideLinks, function (a) {
-      var key = a.getAttribute("data-cad-side");
-      a.classList.toggle("is-active", !!key && key !== "site" && key === name);
-    });
+  function viewFromUrl() {
+    var raw = String(window.location.hash || "").replace(/^#/, "");
+    if (URL_ALIASES[raw]) raw = URL_ALIASES[raw];
+    return VIEWS[raw] ? raw : null;
   }
 
-  function bindCadTabs() {
-    var tabs = document.getElementById("cadTabs");
-    if (!tabs) return;
+  /* Open a view. push=true records it in history so the browser Back
+     and Forward buttons walk through the views the manager visited,
+     without ever reloading the page. */
+  function setView(name, push) {
+    if (!VIEWS[name]) return;
+    showPanel(name);
+    if (!push) return;
 
-    tabs.addEventListener("click", function (e) {
-      var btn = e.target.closest("[data-tab]");
-      if (!btn) return;
-      showPanel(btn.getAttribute("data-tab"));
-    });
-
-    /* Sidebar links stay inside the dashboard and open the matching
-       tab. data-cad-scroll then scrolls one card into view, which is
-       what "Join Requests" uses. The public-site links (.cad-side-ext)
-       have no data-cad-tab, so they still navigate as normal anchors. */
-    var sideNav = document.querySelector(".cad-side-nav");
-    if (sideNav) {
-      sideNav.addEventListener("click", function (e) {
-        var tabLink = e.target.closest("a[data-cad-tab]");
-        if (!tabLink) return;
-
-        e.preventDefault();
-        showPanel(tabLink.getAttribute("data-tab"));
-
-        var scrollTo = tabLink.getAttribute("data-cad-scroll");
-        if (scrollTo) {
-          var card = document.getElementById(scrollTo);
-          if (card) card.scrollIntoView({ block: "start" });
-        }
-      });
+    try {
+      window.history.pushState({ cadView: name }, "", "#" + name);
+    } catch (err) {
+      /* some browsers refuse pushState on a file:// page */
+      window.location.hash = name;
     }
   }
 
-  /* The notification bell is a real button now: it opens the Players
-     tab and scrolls to the pending requests instead of jumping to an
-     anchor that is hidden when another tab is active. */
+  /* ---------- single-page section switching ---------- */
+
+  /* Single-page behaviour: exactly ONE panel is rendered at a time.
+
+     An inactive panel gets display:none from
+     css/club-admin.css AND the hidden attribute is set here, so it
+     is genuinely removed from the page rather than merely pushed
+     off-screen - a screen reader, a find-in-page and a keyboard tab
+     order all see only the page that is open.
+
+     The newly opened page also starts at the top of its own scroll
+     position, so switching pages never lands the manager halfway
+     down something they have not seen yet. */
+  function showPanel(name) {
+    var panels = document.querySelectorAll("#clubAdminPanel [data-panel]");
+    var opened = null;
+
+    Array.prototype.forEach.call(panels, function (p) {
+      var on = p.getAttribute("data-panel") === name;
+      p.classList.toggle("is-active", on);
+
+      if (on) {
+        p.removeAttribute("hidden");
+        opened = p;
+      } else {
+        p.setAttribute("hidden", "");
+        p.scrollTop = 0;
+      }
+    });
+
+    /* Reopening a page always starts from its first line */
+    if (opened) opened.scrollTop = 0;
+
+    /* The sidebar is the only navigation, so this highlight is the one
+       and only indicator of which page is open. */
+    var sideLinks = document.querySelectorAll("#clubAdminPanel .cad-side-nav a[data-cad-side]");
+    Array.prototype.forEach.call(sideLinks, function (a) {
+      a.classList.toggle("is-active", a.getAttribute("data-cad-side") === name);
+    });
+  }
+
+  function bindCadNav() {
+    var sideNav = document.querySelector(".cad-side-nav");
+    if (!sideNav) return;
+
+    sideNav.addEventListener("click", function (e) {
+      var link = e.target.closest("a[data-cad-tab]");
+      if (!link) return;
+
+      e.preventDefault();
+      setView(link.getAttribute("data-cad-tab"), true);
+    });
+
+    /* Keyboard support for the sidebar, which is now the only way to
+       change page. Up / Down move one item and wrap, Home / End jump
+       to the first and last. The links are plain <a> elements, so the
+       usual Tab key still walks them as well. */
+    sideNav.addEventListener("keydown", function (e) {
+      var list = Array.prototype.slice.call(sideNav.querySelectorAll("a[data-cad-tab]"));
+      if (!list.length) return;
+
+      var current = list.indexOf(e.target.closest("a[data-cad-tab]"));
+      if (current < 0) return;
+
+      var next;
+      if (e.key === "ArrowDown") next = (current + 1) % list.length;
+      else if (e.key === "ArrowUp") next = (current - 1 + list.length) % list.length;
+      else if (e.key === "Home") next = 0;
+      else if (e.key === "End") next = list.length - 1;
+      else return;
+
+      e.preventDefault();
+      list[next].focus();
+    });
+  }
+
+  /* Browser Back / Forward. A hash that did not come from setView()
+     carries no cadView state, so it is ignored rather than guessed at. */
+  function bindCadHistory() {
+    window.addEventListener("popstate", function (e) {
+      var name = (e.state && e.state.cadView) || viewFromUrl();
+      if (name) showPanel(name);
+    });
+  }
+
+  /* ---------- Notice Board ----------
+
+   Read-only, and deliberately empty.
+
+   There is no notice or announcement source wired to this
+   dashboard. The Club Manager scripts only read public.clubs,
+   public.players, public.join_requests and public.profiles, and
+   the `news` table named in docs/supabase-setup.md is not queried
+   by any script in this project and has no schema here either.
+
+   Adding a query for it would be new Supabase logic, which is out
+   of scope for this change, so nothing is invented to fill the
+   space - the page shows its empty state instead.
+
+   When a real data source exists, put its rows in NOTICES
+   ({ title, message, date, status }) and this page renders them.
+   Nothing else has to change, and no Publish / Edit / Delete
+   controls exist because there is nothing to manage yet. */
+
+  var NOTICES = [];
+
+  function renderNotices() {
+    var host = document.getElementById("noticeList");
+    if (!host) return;
+
+    if (!NOTICES.length) {
+      host.innerHTML =
+        '<div class="cad-empty">' +
+          "<h3>No notices available yet.</h3>" +
+          "<p>This club has not posted any announcements. Notices will " +
+          "appear here once a notice data source is connected to the " +
+          "Club Manager dashboard.</p>" +
+        "</div>";
+      return;
+    }
+
+    host.innerHTML = NOTICES.map(function (n) {
+      return '<article class="notice-item">' +
+        '<div class="notice-head">' +
+          "<h3>" + esc(n.title) + "</h3>" +
+          (n.status ? '<span class="notice-status">' + esc(n.status) + "</span>" : "") +
+        "</div>" +
+        '<p class="notice-body">' + esc(n.message) + "</p>" +
+        (n.date ? '<p class="notice-date">' + esc(n.date) + "</p>" : "") +
+      "</article>";
+    }).join("");
+  }
+
+  /* The Notifications button opens the Join Requests page, which is
+     now a page of its own rather than a card inside Players. */
   function bindCadBell() {
     var bell = document.getElementById("cadBell");
     if (!bell) return;
 
     bell.addEventListener("click", function (e) {
       e.preventDefault();
-      showPanel("players");
-      var card = document.getElementById("join-requests");
-      if (card) card.scrollIntoView({ block: "start" });
+      setView("requests", true);
     });
   }
 
@@ -756,8 +862,9 @@
     });
   }
 
-  /* Top-bar search filters the live roster. The ⌘K chip shown inside
-     the field is now real: Ctrl / Cmd + K focuses the box. */
+  /* Top-bar search filters the live roster. Ctrl / Cmd + K also
+     focuses the box, so the shortcut still works even though the
+     decorative keyboard chip was removed from the interface. */
   function bindCadSearch() {
     var input = document.getElementById("cadSearch");
     if (!input) return;
@@ -805,10 +912,21 @@
 
   renderIdentity();
   renderStats();
-  showPanel("club");
+  renderNotices();
 
-  bindCadTabs();
+  /* Open whichever view the URL asks for. Deep links and the browser
+     Back / Forward buttons therefore land on the right page, and the
+     Dashboard is the default when there is nothing to open. */
+  var startView = viewFromUrl() || "club";
+  showPanel(startView);
+
+  try {
+    window.history.replaceState({ cadView: startView }, "", "#" + startView);
+  } catch (err) { /* file:// - the hash is already correct */ }
+
+  bindCadNav();
   bindCadBell();
+  bindCadHistory();
   bindClubSwitcher();
   bindCadSearch();
   bindSideLogout();

@@ -2,7 +2,7 @@
    CLUB MANAGER DASHBOARD  (prefix: cad-)
    login-system.html  ->  #clubs  ->  #clubAdminPanel
 
-   Layout follows the reference screenshot:
+   Design: minimal, text-only, professional.
      dark navy sidebar | white top bar
      dark teal club banner
      6 compact stat cards
@@ -11,11 +11,16 @@
 
    Strict visual rules:
      - main background pure #FFFFFF
+     - NO emoji, icons, SVG, icon fonts or decorative symbols
      - NO box-shadow / text-shadow / glow / blur / gradient / filter
      - thin #E5E7EB borders
      - dark #1F2937 text, green #16A34A accent
      - hover changes colour / border / background only
      - no transition and no animation
+
+   Every interactive control is labelled with plain text
+   ("Menu", "Search", "Notifications", "Logout", "Back to Home").
+   Nothing in this file is icon-only.
 
    WHY EVERY RULE IS PREFIXED WITH #clubAdminPanel
    ------------------------------------------------
@@ -34,35 +39,54 @@
    Loaded only by login-system.html.
    ===================================================== */
 
-/* ---------- 0. APP MODE: USE THE FULL PAGE WIDTH ----------
+/* ---------- 0. APP MODE: A REAL SINGLE-PAGE DASHBOARD ----------
 
    js/club-admin.js puts .cad-mode on <body> as soon as a
    Club Admin is signed in. Only then does the dashboard
-   leave the public .container (max-width 1100px) and the
-   public chrome is hidden, so the shell behaves like the
-   reference app instead of a box inside a marketing page.
 
-   A signed-out visitor never gets .cad-mode, so the public
-   page is completely unchanged. */
+     a) leave the public .container (max-width 1100px),
+     b) hide every other section of the public page, and
+     c) lock the document to exactly one viewport.
+
+   Point (b) is the important one for a single-page app: the
+   public Players / Admin / Scout / Tournaments / Rankings / News
+   sections all live in the same document, BELOW the dashboard.
+   Without this they stay on screen and the manager scrolls
+   straight out of the application. They are matched by
+   "#main > .section:not(#clubs)" so no id has to be hard-coded,
+   and #clubAdminPanel is safe because it is nested inside
+   #clubs rather than being a direct child of #main.
+
+   A signed-out visitor never gets .cad-mode, so the public page
+   is completely unchanged. */
 
 body.cad-mode > .navbar,
 body.cad-mode > .pub-footer,
 body.cad-mode #login,
+body.cad-mode #main > .section:not(#clubs),
 body.cad-mode #clubs > .pub-kicker,
 body.cad-mode #clubs > h2,
 body.cad-mode #clubs > .pub-lead,
 body.cad-mode #clubs-directory { display: none; }
 
+/* one viewport, no document scrolling */
+body.cad-mode { overflow: hidden; }
+
 body.cad-mode #main.container {
   max-width: none;
   padding-left: 0;
   padding-right: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 body.cad-mode #clubs {
   padding: 0;
   border-top: none;
   background: #FFFFFF;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* ---------- 1. APP SHELL ---------- */
@@ -76,6 +100,7 @@ body.cad-mode #clubs {
   --cad-teal: #0C3A3E;
   --cad-teal-line: #14484D;
   --cad-teal-ink: #2DD4BF;
+  height: 100%;
   background: #FFFFFF;
   color: var(--text);
   font-family: var(--cad-font);
@@ -83,71 +108,75 @@ body.cad-mode #clubs {
 
 #clubAdminPanel[hidden] { display: none; }
 
+/* The shell fills exactly one viewport: the sidebar keeps its own
+   scroll, the main column keeps its own, and the document never
+   scrolls. min-height:0 is what lets a grid/flex child actually
+   shrink below its content instead of pushing the page taller. */
 #clubAdminPanel .cad-shell {
   display: grid;
   grid-template-columns: 264px minmax(0, 1fr);
-  align-items: start;
+  height: 100%;
+  min-height: 0;
   max-width: 100%;
   background: #FFFFFF;
   border: 0;
   border-radius: 0;
-  overflow: visible;
+  overflow: hidden;
 }
 
+/* Main column is a vertical stack: a fixed header (top bar, status,
+   banner, stats, tabs) and exactly ONE flexible region below it that
+   holds the active panel. That region is the only thing that scrolls. */
 #clubAdminPanel .cad-main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
   min-width: 0;
+  min-height: 0;
   background: #FFFFFF;
-  padding: 0 0 28px;
+  padding: 0;
+  overflow: hidden;
 }
+
+/* header blocks never shrink or scroll */
+#clubAdminPanel .cad-topbar,
+#clubAdminPanel .cad-status,
+#clubAdminPanel .cad-banner,
+#clubAdminPanel .cad-stats { flex: 0 0 auto; }
 
 /* ---------- 2. DARK NAVY SIDEBAR ---------- */
 
 #clubAdminPanel .cad-sidebar {
-  position: sticky;
-  top: 0;
-  height: 100vh;
+  height: 100%;
+  min-height: 0;
   overflow-y: auto;
   background: var(--cad-navy);
   color: #FFFFFF;
-  padding: 20px 12px 16px;
+  padding: 22px 12px 16px;
   display: flex;
   flex-direction: column;
   gap: 14px;
-  min-height: 100vh;
 }
 
-/* logo block: green rounded square + wordmark + letterspaced sub */
+/* wordmark only - the logo tile was an emoji and is gone */
 #clubAdminPanel .cad-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 6px 14px;
+  padding: 0 10px 16px;
   border-bottom: 1px solid var(--cad-navy-line);
-}
-#clubAdminPanel .cad-logo {
-  font-size: 15px;
-  width: 34px;
-  height: 34px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: #16A34A;
-  border-radius: 9px;
-  flex-shrink: 0;
 }
 #clubAdminPanel .cad-brand-text b {
   display: block;
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: -0.2px;
   color: #FFFFFF;
 }
 #clubAdminPanel .cad-brand-text small {
   display: block;
   color: #64748B;
-  font-size: 8px;
-  letter-spacing: 1.6px;
+  font-size: 9px;
+  letter-spacing: 1.8px;
   font-weight: bold;
-  margin-top: 1px;
+  margin-top: 2px;
 }
 
 /* ---------- MOBILE DRAWER TOGGLE (hidden on desktop) ----------
@@ -158,17 +187,17 @@ body.cad-mode #clubs {
   display: none;
   align-items: center;
   justify-content: center;
-  width: 38px;
   height: 38px;
   flex-shrink: 0;
-  padding: 0;
+  padding: 0 16px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: #FFFFFF;
   color: var(--text);
-  font-size: 17px;
-  line-height: 1;
+  font-size: 13px;
+  font-weight: bold;
   font-family: var(--cad-font);
+  line-height: 1;
   cursor: pointer;
 }
 #clubAdminPanel .cad-burger:hover { border-color: var(--green); color: var(--green); }
@@ -185,11 +214,11 @@ body.cad-mode #clubs {
 
 #clubAdminPanel .cad-side-title {
   font-size: 9px;
-  letter-spacing: 1.6px;
+  letter-spacing: 1.8px;
   color: #64748B;
   font-weight: bold;
   text-transform: uppercase;
-  margin: 18px 0 8px 10px;
+  margin: 20px 0 8px 12px;
 }
 #clubAdminPanel .cad-side-nav > ul:first-of-type { margin-top: 0; }
 
@@ -204,18 +233,11 @@ body.cad-mode #clubs {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 10px;
+  padding: 10px 12px;
   border-radius: 8px;
   font-size: 13.5px;
   color: #94A3B8;
   border: 1px solid transparent;
-}
-#clubAdminPanel .cad-side-nav a span {
-  width: 18px;
-  text-align: center;
-  flex-shrink: 0;
-  font-size: 13px;
-  line-height: 1.2;
 }
 #clubAdminPanel .cad-side-nav a:hover {
   background: var(--cad-navy-soft);
@@ -229,33 +251,24 @@ body.cad-mode #clubs {
   border-color: var(--cad-navy-line);
 }
 
-/* items that leave the dashboard for the public site carry a ↗ */
-#clubAdminPanel .cad-side-nav a.cad-side-ext i {
-  margin-left: auto;
-  font-style: normal;
-  font-size: 11px;
-  color: #64748B;
-}
-#clubAdminPanel .cad-side-nav a.cad-side-ext:hover i { color: #4ADE80; }
-
 /* season notice card at the foot of the sidebar */
 #clubAdminPanel .cad-season {
   margin-top: auto;
   background: #0F2E22;
   border: 1px solid #1D4A36;
   border-radius: 10px;
-  padding: 12px;
+  padding: 14px;
 }
 #clubAdminPanel .cad-season b {
   display: block;
   font-size: 13px;
   color: #FFFFFF;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 #clubAdminPanel .cad-season p {
   font-size: 11px;
   color: #86EFAC;
-  margin: 0 0 10px;
+  margin: 0 0 12px;
 }
 #clubAdminPanel .cad-season-btn {
   display: block;
@@ -265,17 +278,17 @@ body.cad-mode #clubs {
   color: #4ADE80;
   border: 1px solid #1D4A36;
   border-radius: 7px;
-  padding: 7px 10px;
+  padding: 8px 10px;
 }
 #clubAdminPanel .cad-season-btn:hover { border-color: #4ADE80; color: #86EFAC; }
 
 #clubAdminPanel .cad-side-foot {
   border-top: 1px solid var(--cad-navy-line);
-  padding-top: 12px;
+  padding-top: 14px;
   font-size: 12px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 #clubAdminPanel .cad-side-foot p {
   color: #64748B;
@@ -286,7 +299,7 @@ body.cad-mode #clubs {
   display: block;
   font-size: 13px;
   color: #FFFFFF;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 #clubAdminPanel .cad-home { color: #94A3B8; }
 #clubAdminPanel .cad-home:hover { color: #FFFFFF; }
@@ -303,18 +316,17 @@ body.cad-mode #clubs {
   flex-wrap: wrap;
   background: #FFFFFF;
   border-bottom: 1px solid var(--border);
-  padding: 12px 22px;
+  padding: 14px 24px;
 }
 
 #clubAdminPanel .cad-search {
   flex: 1 1 320px;
-  max-width: 460px;
+  max-width: 440px;
   min-width: 180px;
-  position: relative;
 }
 #clubAdminPanel .cad-search input {
   width: 100%;
-  padding: 10px 52px 10px 14px;
+  padding: 10px 14px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: #FFFFFF;
@@ -324,27 +336,8 @@ body.cad-mode #clubs {
 }
 #clubAdminPanel .cad-search input::placeholder { color: #9CA3AF; }
 
-/* keyboard shortcut hint inside the field (real shortcut: Ctrl / Cmd + K) */
-#clubAdminPanel .cad-kbd {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  font-size: 10px;
-  font-weight: bold;
-  color: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 2px 6px;
-  pointer-events: none;
-  white-space: nowrap;
-}
-#clubAdminPanel .cad-search input:focus + .cad-kbd { display: none; }
-#clubAdminPanel .cad-search input:not(:placeholder-shown) + .cad-kbd { display: none; }
-
 #clubAdminPanel .cad-search input:focus,
-#clubAdminPanel .cad-club-picker select:focus,
-#clubAdminPanel .cad-role-picker select:focus {
+#clubAdminPanel .cad-club-picker select:focus {
   outline: 2px solid var(--green);
   outline-offset: 0;
   border-color: var(--green);
@@ -357,45 +350,33 @@ body.cad-mode #clubs {
   flex-wrap: wrap;
 }
 
-/* role badge - a disabled select reads as a dead control, so the
-   label is shown as a static chip and the select is hidden. */
-#clubAdminPanel .cad-role-picker {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: #FFFFFF;
-  color: var(--text);
-  font-size: 13px;
-  font-weight: bold;
-}
-#clubAdminPanel .cad-role-badge { font-size: 13px; line-height: 1; }
-#clubAdminPanel .cad-role-picker select { display: none; }
-
-#clubAdminPanel .cad-icon-btn {
+/* shared look for every top-bar control: quiet, bordered, labelled */
+#clubAdminPanel .cad-role-picker,
+#clubAdminPanel .cad-bell {
   position: relative;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 38px;
+  gap: 8px;
   height: 38px;
-  padding: 0;
-  border-radius: 8px;
+  margin: 0;
+  padding: 0 14px;
   border: 1px solid var(--border);
+  border-radius: 8px;
   background: #FFFFFF;
   color: var(--text);
-  font-size: 16px;
   font-family: var(--cad-font);
-  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 1;
+  white-space: nowrap;
 }
-#clubAdminPanel .cad-icon-btn:hover { border-color: var(--green); color: var(--green); }
-#clubAdminPanel .cad-icon-btn em {
-  position: absolute;
-  top: -6px;
-  right: -6px;
+#clubAdminPanel .cad-bell { cursor: pointer; }
+#clubAdminPanel .cad-bell:hover { border-color: var(--green); color: var(--green); }
+#clubAdminPanel .cad-bell:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+#clubAdminPanel .cad-role-picker select { display: none; }
+
+/* pending-request counter on the Notifications button */
+#clubAdminPanel .cad-bell em {
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
@@ -407,21 +388,20 @@ body.cad-mode #clubs {
   font-style: normal;
   line-height: 18px;
   text-align: center;
-  border: 1px solid #FFFFFF;
 }
-#clubAdminPanel .cad-icon-btn em[hidden] { display: none; }
+#clubAdminPanel .cad-bell em[hidden] { display: none; }
 
 #clubAdminPanel .cad-profile {
   display: flex;
   align-items: center;
   gap: 9px;
-  padding-left: 12px;
+  padding-left: 14px;
   border-left: 1px solid var(--border);
 }
 #clubAdminPanel .cad-profile[hidden] { display: none; }
 #clubAdminPanel .cad-avatar {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: #16A34A;
   border: none;
@@ -441,12 +421,15 @@ body.cad-mode #clubs {
 }
 #clubAdminPanel .cad-profile-text small { font-size: 11px; color: var(--muted); }
 #clubAdminPanel .cad-profile-chevron {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: bold;
   color: var(--muted);
   border: 1px solid var(--border);
-  border-radius: 7px;
-  padding: 7px 11px;
+  border-radius: 8px;
+  padding: 0 14px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
 }
 #clubAdminPanel .cad-profile-chevron:hover { border-color: var(--danger); color: var(--danger); }
 
@@ -470,7 +453,7 @@ body.cad-mode #clubs {
    empty (and stays in the accessibility tree). */
 #clubAdminPanel .cad-status {
   margin: 0;
-  padding: 0 22px;
+  padding: 0 24px;
   background: #FFFFFF;
   color: var(--text);
   font-size: 13px;
@@ -478,8 +461,8 @@ body.cad-mode #clubs {
 }
 #clubAdminPanel .cad-status:empty { padding-top: 0; padding-bottom: 0; }
 #clubAdminPanel .cad-status:not(:empty) {
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 11px;
+  padding-bottom: 11px;
   border-bottom-color: var(--border);
 }
 #clubAdminPanel .cad-status.is-error { color: var(--danger); }
@@ -490,30 +473,26 @@ body.cad-mode #clubs {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 24px;
   flex-wrap: wrap;
   background: var(--cad-teal);
   color: #FFFFFF;
-  padding: 22px;
-  margin: 18px 22px 0;
+  padding: 26px 24px;
+  margin: 20px 24px 0;
   border: 1px solid var(--cad-teal-line);
   border-radius: 10px;
 }
 #clubAdminPanel .cad-banner-kicker {
-  font-size: 9px;
-  letter-spacing: 1.6px;
+  font-size: 10px;
+  letter-spacing: 1.8px;
   color: var(--cad-teal-ink);
   font-weight: bold;
-  margin: 0 0 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  margin: 0 0 8px;
   text-transform: uppercase;
 }
-#clubAdminPanel .cad-banner-kicker span { font-size: 12px; line-height: 1; }
 #clubAdminPanel .cad-banner h2 {
-  font-size: 25px;
-  margin: 0 0 6px;
+  font-size: 26px;
+  margin: 0 0 8px;
   color: #FFFFFF;
   line-height: 1.2;
 }
@@ -527,18 +506,18 @@ body.cad-mode #clubs {
 #clubAdminPanel .cad-club-picker {
   display: grid;
   gap: 6px;
-  min-width: 230px;
+  min-width: 240px;
 }
 #clubAdminPanel .cad-club-picker span {
   font-size: 9px;
-  letter-spacing: 1.6px;
+  letter-spacing: 1.8px;
   color: var(--cad-teal-ink);
   font-weight: bold;
   text-transform: uppercase;
   text-align: right;
 }
 #clubAdminPanel .cad-club-picker select {
-  padding: 9px 12px;
+  padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid #1F6C7C;
   background: #FFFFFF;
@@ -548,64 +527,37 @@ body.cad-mode #clubs {
   font-weight: bold;
 }
 
-/* ---------- 5. SIX COMPACT STAT CARDS ---------- */
+/* ---------- 5. SIX COMPACT STAT CARDS ----------
+   Text only: label, figure, caption. No icon tile. */
 
 #clubAdminPanel .cad-stats {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 14px;
-  padding: 18px 22px 4px;
+  padding: 20px 24px 4px;
   background: #FFFFFF;
 }
 #clubAdminPanel .cad-stat {
   background: #FFFFFF;
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 13px 14px;
+  padding: 15px 16px;
   min-width: 0;
 }
 #clubAdminPanel .cad-stat:hover { border-color: #D1D5DB; }
 
-/* label on the left, coloured icon chip on the right (reference layout) */
-#clubAdminPanel .cad-stat-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-}
-#clubAdminPanel .cad-stat-ico {
-  width: 30px;
-  height: 30px;
-  flex-shrink: 0;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  line-height: 1;
-}
-
-/* solid light tints, never a gradient */
-#clubAdminPanel .cad-tone-green  { color: #15803D; background: #ECFDF5; border-color: #A7F3D0; }
-#clubAdminPanel .cad-tone-blue   { color: #1D4ED8; background: #EFF6FF; border-color: #BFDBFE; }
-#clubAdminPanel .cad-tone-purple { color: #6D28D9; background: #F5F3FF; border-color: #DDD6FE; }
-#clubAdminPanel .cad-tone-amber  { color: #B45309; background: #FFFBEB; border-color: #FDE68A; }
-#clubAdminPanel .cad-tone-orange { color: #C2410C; background: #FFF7ED; border-color: #FED7AA; }
-#clubAdminPanel .cad-tone-pink   { color: #BE185D; background: #FDF2F8; border-color: #FBCFE8; }
-
 #clubAdminPanel .cad-stat-label {
+  display: block;
   font-size: 10px;
   color: var(--muted);
   font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
   line-height: 1.45;
-  padding-top: 4px;
 }
 #clubAdminPanel .cad-stat b {
   display: block;
-  font-size: 27px;
+  font-size: 28px;
   color: var(--text);
   margin-top: 10px;
   line-height: 1.1;
@@ -615,68 +567,44 @@ body.cad-mode #clubs {
   display: block;
   font-size: 10px;
   color: var(--muted);
-  margin-top: 9px;
-  padding-top: 8px;
+  margin-top: 10px;
+  padding-top: 9px;
   border-top: 1px solid var(--border);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* ---------- 6. HORIZONTAL TABS ---------- */
-
-#clubAdminPanel .cad-tabs {
-  display: flex;
-  gap: 2px;
-  overflow-x: auto;
-  margin: 14px 22px 0;
-  padding: 6px;
-  background: #FFFFFF;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-}
-
-/* Scoped on purpose: .pub-body button[type="button"] in public.css
-   would otherwise paint every tab as a solid green button. */
-#clubAdminPanel .cad-tab {
-  flex: 1 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--muted);
-  font-family: var(--cad-font);
-  font-size: 13px;
-  font-weight: bold;
-  line-height: 1.2;
-  white-space: nowrap;
-  cursor: pointer;
-}
-#clubAdminPanel .cad-tab span { font-size: 13px; }
-#clubAdminPanel .cad-tab:hover {
-  color: var(--text);
-  background: var(--row-hover);
-  border-color: var(--border);
-}
-#clubAdminPanel .cad-tab.is-active {
-  color: var(--green);
-  background: #F0FDF4;
-  border-color: #A7F3D0;
-}
-#clubAdminPanel .cad-tab:focus-visible { outline: 2px solid var(--green); outline-offset: -2px; }
+/* ---------- 6. NAVIGATION ----------
+   The left sidebar is the only navigation in this dashboard, so there
+   is deliberately no horizontal tab strip here any more. The header
+   blocks above the content (top bar, status, banner, statistics) are
+   followed straight by the single open panel. */
 
 /* ---------- 7. PANELS + WHITE CARDS ---------- */
 
+/* ---------- 7. PANELS: ONLY THE ACTIVE ONE IS RENDERED ----------
+
+   An inactive panel is display:none AND carries the hidden
+   attribute (set by showPanel in js/club-admin.js), so it is
+   genuinely removed - it is never just pushed off-screen.
+
+   The active panel is the single flexible region of the main
+   column, so it is the only place the application scrolls. It
+   only scrolls when its own content genuinely needs it. */
+
 #clubAdminPanel .cad-panel {
   display: none;
-  padding: 18px 22px 4px;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 20px 24px 28px;
   background: #FFFFFF;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
 }
 #clubAdminPanel .cad-panel.is-active { display: block; }
+#clubAdminPanel .cad-panel[hidden] { display: none; }
 
 /* Scoped on purpose: .pub-body article in public.css is more
    specific than a bare .cad-card and would win on padding,
@@ -685,7 +613,7 @@ body.cad-mode #clubs {
   background: #FFFFFF;
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 18px;
+  padding: 20px;
   margin-bottom: 16px;
 }
 #clubAdminPanel .cad-card:last-child { margin-bottom: 0; }
@@ -698,7 +626,7 @@ body.cad-mode #clubs {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 #clubAdminPanel .cad-card-head h3 { margin: 0; }
 
@@ -708,7 +636,7 @@ body.cad-mode #clubs {
   color: var(--green);
   border: 1px solid var(--green);
   border-radius: 12px;
-  padding: 3px 11px;
+  padding: 4px 12px;
   white-space: nowrap;
 }
 #clubAdminPanel .cad-chip-quiet {
@@ -731,8 +659,8 @@ body.cad-mode #clubs {
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  padding-bottom: 14px;
-  margin-bottom: 14px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
   border-bottom: 1px solid var(--border);
 }
 #clubAdminPanel .cad-crest {
@@ -774,7 +702,7 @@ body.cad-mode #clubs {
 }
 #clubAdminPanel .cad-card-sub { font-size: 12px; color: var(--muted); margin: 0; }
 
-/* summary card: one bordered box per icon / figure / caption row */
+/* summary card: one bordered box per figure + caption row */
 #clubAdminPanel .cad-statlist {
   display: grid;
   gap: 10px;
@@ -782,15 +710,14 @@ body.cad-mode #clubs {
 }
 #clubAdminPanel .cad-statrow {
   display: grid;
-  grid-template-columns: 26px auto minmax(0, 1fr);
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 14px;
+  padding: 13px 15px;
   background: #FFFFFF;
   border: 1px solid var(--border);
   border-radius: 10px;
 }
-#clubAdminPanel .cad-statrow-ico { color: var(--green); font-size: 15px; line-height: 1.2; }
 #clubAdminPanel .cad-statrow b { font-size: 20px; color: var(--text); line-height: 1.2; }
 #clubAdminPanel .cad-statrow b.is-empty { color: #9CA3AF; }
 #clubAdminPanel .cad-statrow small {
@@ -798,7 +725,7 @@ body.cad-mode #clubs {
   font-size: 10px;
   font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
   text-align: right;
 }
 
@@ -815,7 +742,7 @@ body.cad-mode #clubs {
   align-items: baseline;
   justify-content: space-between;
   gap: 14px;
-  padding: 10px 0;
+  padding: 11px 0;
   border-bottom: 1px solid var(--border);
   font-size: 14px;
 }
@@ -834,7 +761,7 @@ body.cad-mode #clubs {
   border: 1px solid #FDE68A;
   border-radius: 8px;
   color: #92400E;
-  padding: 10px 12px;
+  padding: 11px 13px;
 }
 #clubAdminPanel .cad-note code {
   background: #F3F4F6;
@@ -847,38 +774,77 @@ body.cad-mode #clubs {
 /* honest empty states for the modules with no data source */
 #clubAdminPanel .cad-empty {
   text-align: center;
-  padding: 40px 20px;
+  padding: 48px 24px;
   margin-bottom: 0;
 }
-#clubAdminPanel .cad-empty-ico {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: #F9FAFB;
-  font-size: 20px;
-  margin-bottom: 12px;
-}
-#clubAdminPanel .cad-empty h3 { margin-bottom: 8px; font-size: 16px; }
+#clubAdminPanel .cad-empty h3 { margin-bottom: 10px; font-size: 17px; }
 #clubAdminPanel .cad-empty p {
   color: var(--muted);
   font-size: 14px;
-  margin: 0 auto 14px;
+  margin: 0 auto 16px;
   max-width: 560px;
 }
 #clubAdminPanel .cad-empty-tag {
   display: inline-block;
   font-size: 10px;
   font-weight: bold;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
   color: var(--muted);
   border: 1px solid var(--border);
   border-radius: 12px;
+  padding: 5px 14px;
+}
+
+/* ---------- NOTICE BOARD ---------- */
+
+#clubAdminPanel .cad-page-head { margin: 0 0 18px; }
+#clubAdminPanel .cad-page-title {
+  font-size: 20px;
+  margin: 0 0 6px;
+  color: var(--text);
+}
+#clubAdminPanel .cad-page-sub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+#clubAdminPanel .notice-list { display: grid; gap: 14px; }
+
+#clubAdminPanel .notice-item {
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+#clubAdminPanel .notice-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+#clubAdminPanel .notice-head h3 { margin: 0; font-size: 15px; }
+#clubAdminPanel .notice-status {
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--green);
+  border: 1px solid var(--green);
+  border-radius: 12px;
   padding: 4px 12px;
+  white-space: nowrap;
+}
+#clubAdminPanel .notice-body { margin: 0; font-size: 14px; color: var(--text); }
+#clubAdminPanel .notice-date {
+  margin: 12px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted);
 }
 
 /* ---------- 8. FORMS ---------- */
@@ -886,7 +852,7 @@ body.cad-mode #clubs {
 #clubAdminPanel .cad-form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 14px;
+  gap: 16px;
 }
 #clubAdminPanel .cad-form label {
   display: block;
@@ -945,7 +911,7 @@ body.cad-mode #clubs {
   color: #FFFFFF;
   border: 1px solid var(--green);
   border-radius: 8px;
-  padding: 10px 22px;
+  padding: 11px 24px;
   font-size: 14px;
   font-weight: bold;
   font-family: var(--cad-font);
@@ -960,7 +926,7 @@ body.cad-mode #clubs {
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 10px 22px;
+  padding: 11px 24px;
   font-size: 14px;
   font-weight: bold;
   font-family: var(--cad-font);
@@ -986,7 +952,7 @@ body.cad-mode #clubs {
   background: #F9FAFB;
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 9px 12px;
+  padding: 10px 13px;
 }
 
 /* ---------- 9. TABLES ---------- */
@@ -1006,15 +972,15 @@ body.cad-mode #clubs {
   font-size: 11px;
   font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
   text-align: left;
-  padding: 10px 12px;
+  padding: 11px 14px;
   border-bottom: 1px solid var(--border);
   background: #FFFFFF;
   white-space: nowrap;
 }
 #clubAdminPanel .cad-table-wrap tbody td {
-  padding: 10px 12px;
+  padding: 11px 14px;
   border-bottom: 1px solid var(--border);
   color: var(--text);
   vertical-align: middle;
@@ -1032,14 +998,14 @@ body.cad-mode #clubs {
 #clubAdminPanel .cad-table-wrap tbody td[colspan] {
   text-align: center;
   color: var(--muted);
-  padding: 24px 12px;
+  padding: 26px 14px;
 }
 
 /* approve / reject */
 #clubAdminPanel .cad-table-wrap tbody td a {
   font-size: 13px;
   font-weight: bold;
-  margin-right: 12px;
+  margin-right: 14px;
   color: var(--green);
 }
 #clubAdminPanel .cad-table-wrap tbody td a:last-child { margin-right: 0; }
@@ -1050,7 +1016,7 @@ body.cad-mode #clubs {
 
 /* ---------- 10. RESPONSIVE ---------- */
 
-/* large desktop: give the stat cards a little more room */
+/* large desktop: a little more breathing room */
 @media (min-width: 1500px) {
   #clubAdminPanel .cad-shell { grid-template-columns: 280px minmax(0, 1fr); }
   #clubAdminPanel .cad-stat b { font-size: 30px; }
@@ -1060,7 +1026,6 @@ body.cad-mode #clubs {
 @media (max-width: 1280px) {
   #clubAdminPanel .cad-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   #clubAdminPanel .cad-two-col { grid-template-columns: minmax(0, 1fr); }
-  #clubAdminPanel .cad-summary-card { margin-bottom: 0; }
 }
 
 /* tablet: off-canvas drawer sidebar */
@@ -1083,9 +1048,15 @@ body.cad-mode #clubs {
     flex-direction: column;
     align-items: stretch;
     gap: 14px;
-    padding: 20px 12px 16px;
+    padding: 22px 12px 16px;
+    /* visibility (not just transform) so the closed drawer cannot be
+       reached with the Tab key while it is off screen */
+    visibility: hidden;
   }
-  #clubAdminPanel .cad-sidebar.is-open { transform: translateX(0); }
+  #clubAdminPanel .cad-sidebar.is-open {
+    transform: translateX(0);
+    visibility: visible;
+  }
 
   #clubAdminPanel .cad-season { margin-top: auto; }
 }
@@ -1095,34 +1066,53 @@ body.cad-mode #clubs {
   #clubAdminPanel .cad-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
-    padding: 14px 16px 4px;
+    padding: 16px 16px 4px;
   }
-  #clubAdminPanel .cad-banner { padding: 18px 16px; margin: 14px 16px 0; }
-  #clubAdminPanel .cad-banner h2 { font-size: 21px; }
+  #clubAdminPanel .cad-banner { padding: 20px 16px; margin: 16px 16px 0; }
+  #clubAdminPanel .cad-banner h2 { font-size: 22px; }
   #clubAdminPanel .cad-club-picker { min-width: 100%; }
   #clubAdminPanel .cad-club-picker span { text-align: left; }
   #clubAdminPanel .cad-topbar { padding: 12px 16px; }
   #clubAdminPanel .cad-status { padding-left: 16px; padding-right: 16px; }
-  #clubAdminPanel .cad-search { flex: 1 1 100%; order: 3; max-width: none; }
-  #clubAdminPanel .cad-search input { padding-right: 14px; }
-  #clubAdminPanel .cad-kbd { display: none; }
-  #clubAdminPanel .cad-tabs { margin: 12px 16px 0; }
-  #clubAdminPanel .cad-panel { padding: 14px 16px 4px; }
+  #clubAdminPanel .cad-search { flex: 1 1 100%; max-width: none; }
+  #clubAdminPanel .cad-panel { padding: 16px 16px 24px; }
   #clubAdminPanel .cad-profile { padding-left: 0; border-left: none; }
   #clubAdminPanel .cad-profile-text { display: none; }
   #clubAdminPanel .cad-form { grid-template-columns: minmax(0, 1fr); }
   #clubAdminPanel .cad-stat b { font-size: 22px; }
   #clubAdminPanel .cad-profile-head { gap: 10px; }
   #clubAdminPanel .cad-crest { width: 44px; height: 44px; font-size: 15px; }
-  #clubAdminPanel .cad-statrow { grid-template-columns: 22px auto minmax(0, 1fr); gap: 10px; }
+  #clubAdminPanel .cad-page-title { font-size: 18px; }
+  #clubAdminPanel .notice-item { padding: 16px; }
 }
 
-/* very small phone: one column, no clipped icons, no overflow */
+/* very small phone: one column, nothing clipped, no overflow */
 @media (max-width: 430px) {
   #clubAdminPanel .cad-stats { grid-template-columns: minmax(0, 1fr); }
-  #clubAdminPanel .cad-side-nav a span { display: none; }
   #clubAdminPanel .cad-top-actions { width: 100%; }
   #clubAdminPanel .cad-role-picker { flex: 1 1 auto; }
-  #clubAdminPanel .cad-card { padding: 14px; }
+  #clubAdminPanel .cad-card { padding: 16px; }
   #clubAdminPanel .cad-banner { margin-left: 16px; margin-right: 16px; }
+  #clubAdminPanel .cad-statrow { gap: 10px; padding: 12px 13px; }
+}
+
+/* ---------- 11. SHORT SCREENS ----------
+
+   On a short window (small laptop, landscape phone) the fixed
+   header blocks alone can fill the viewport. Rather than
+   squeezing the content to nothing, the whole main column
+   becomes the scroll area so nothing can ever be cut off.
+   The panel itself stops scrolling so there is only ever one
+   scrollbar, never two nested ones. */
+
+@media (max-height: 700px) {
+  body.cad-mode { overflow: auto; }
+  body.cad-mode #main.container { height: auto; min-height: 100vh; overflow: visible; }
+  body.cad-mode #clubs { height: auto; overflow: visible; }
+
+  #clubAdminPanel { height: auto; min-height: 100vh; }
+  #clubAdminPanel .cad-shell { height: auto; min-height: 100vh; overflow: visible; }
+  #clubAdminPanel .cad-main { height: auto; min-height: 100vh; overflow: visible; }
+  #clubAdminPanel .cad-panel { flex: 0 0 auto; overflow: visible; }
+  #clubAdminPanel .cad-sidebar { height: auto; min-height: 100vh; }
 }
