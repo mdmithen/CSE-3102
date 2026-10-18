@@ -1,106 +1,508 @@
-/* ==========================================
-   ADMIN PANEL - Simple Stylesheet
-   Same colors as welcome page (style.css)
-   1. Colors  2. Layout  3. Sidebar
-   4. Main + Cards  5. Form + Table  6. Mobile
-   ========================================== */
+/* =====================================================
+   SUPER ADMIN DASHBOARD  (prefix: sa-)
+   admin.html
 
-/* ---------- 1. COLORS ---------- */
+   Design:
+     dark navy sidebar | pure white content area
+     one panel visible at a time, driven by the sidebar
+
+   Strict visual rules:
+     - content background pure #FFFFFF
+     - sidebar #0B1524, dark teal #0C3A3E used ONLY for the
+       active menu item and small accents
+     - thin #E5E7EB borders
+     - NO emoji, icons, SVG or decorative symbols
+     - NO box-shadow / text-shadow / glow / blur / gradient / filter
+     - no transition and no animation
+
+   Loaded only by admin.html, so nothing here can reach the
+   Club Manager, the Player Dashboard or the public portal.
+   ===================================================== */
+
 :root {
-  --bg: #0b1310;
-  --bg2: #111a15;
-  --card: #15211b;
-  --border: #24352c;
-  --green: #7bf09b;
-  --text: #fff;
-  --muted: #9fb3a7;
+  --sa-font: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto,
+             "Helvetica Neue", Arial, sans-serif;
+  --sa-navy: #0B1524;
+  --sa-navy-soft: #131F33;
+  --sa-navy-line: #1E293B;
+  --sa-teal: #0C3A3E;
+  --sa-teal-line: #14484D;
+  --sa-teal-ink: #2DD4BF;
+  --sa-accent: #16A34A;
+  --sa-accent-hover: #15803D;
+  --sa-border: #E5E7EB;
+  --sa-text: #1F2937;
+  --sa-muted: #6B7280;
+  --sa-row-hover: #F9FAFB;
+  --sa-danger: #DC2626;
+  --sa-radius: 10px;
 }
 
-/* ---------- 2. LAYOUT ---------- */
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: Arial, sans-serif;
-  display: flex; /* sidebar left + main right */
-  min-height: 100vh;
+  background: #FFFFFF;
+  color: var(--sa-text);
+  font-family: var(--sa-font);
+  line-height: 1.5;
 }
+
 a { color: inherit; text-decoration: none; }
-.muted { color: var(--muted); font-size: 13px; }
 
-/* Buttons (same as welcome page) */
-.btn { display: inline-block; padding: 9px 18px; border-radius: 20px; font-size: 14px; font-weight: bold; border: 1px solid var(--border); }
-.btn-green { background: var(--green); color: #06270f; border: none; }
-.btn-outline { border: 1px solid #3a4f44; color: #fff; }
+/* ---------- 1. APP SHELL ---------- */
 
-/* ---------- 3. SIDEBAR ---------- */
-.sidebar {
-  width: 240px;
-  background: var(--bg2);
-  border-right: 1px solid var(--border);
-  padding: 20px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.sa-shell {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  min-height: 100vh;
+  max-width: 100%;
+  background: #FFFFFF;
+}
+
+/* ---------- 2. DARK NAVY SIDEBAR ---------- */
+
+.sa-sidebar {
   position: sticky;
   top: 0;
-  height: 100vh; /* full height */
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--sa-navy);
+  color: #FFFFFF;
+  padding: 22px 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
-.logo { display: flex; gap: 10px; align-items: center; }
-.logo span { font-size: 28px; }
-.logo h1 { font-size: 16px; }
-.logo p { font-size: 11px; color: var(--muted); }
 
-.menu-title { font-size: 11px; color: var(--muted); letter-spacing: 1px; margin: 12px 0 8px; }
-.sidebar nav ul { list-style: none; display: grid; gap: 4px; }
-.sidebar nav a { display: block; padding: 10px 12px; border-radius: 10px; font-size: 14px; color: var(--muted); }
-.sidebar nav a:hover { background: var(--card); color: #fff; }
-.sidebar nav a.active { background: #143324; color: var(--green); font-weight: bold; }
+.sa-brand {
+  padding: 0 10px 16px;
+  border-bottom: 1px solid var(--sa-navy-line);
+}
+.sa-brand b { display: block; font-size: 15px; letter-spacing: -0.2px; }
+.sa-brand small {
+  display: block;
+  color: #64748B;
+  font-size: 9px;
+  letter-spacing: 1.8px;
+  font-weight: bold;
+  margin-top: 2px;
+}
 
-.admin-card { margin-top: auto; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
-.admin-card small { color: var(--muted); display: block; }
+.sa-nav ul { list-style: none; display: grid; gap: 2px; }
+.sa-nav a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  color: #94A3B8;
+  border: 1px solid transparent;
+}
+.sa-nav a:hover {
+  background: var(--sa-navy-soft);
+  color: #FFFFFF;
+  border-color: var(--sa-navy-line);
+}
 
-/* ---------- 4. MAIN ---------- */
-.main { flex: 1; padding: 24px; max-width: 1000px; }
-.topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; }
-.topbar h2 { font-size: 24px; }
-.topbar p { color: var(--muted); font-size: 14px; }
-.top-actions { display: flex; gap: 10px; }
-.top-actions input { padding: 9px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--card); color: #fff; width: 220px; }
+/* the only place dark teal is used for a menu item */
+.sa-nav a.is-active {
+  background: var(--sa-teal);
+  color: #FFFFFF;
+  font-weight: bold;
+  border-color: var(--sa-teal-line);
+}
 
-/* 4 stat boxes */
-.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
-.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; gap: 12px; align-items: center; }
-.stat-card span { font-size: 28px; }
-.stat-card b { display: block; font-size: 20px; }
-.stat-card small { color: var(--muted); }
+.sa-profile {
+  margin-top: auto;
+  border-top: 1px solid var(--sa-navy-line);
+  padding-top: 14px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sa-profile p { color: #64748B; font-size: 11px; }
+.sa-profile b { font-size: 13px; color: #FFFFFF; }
+.sa-profile small {
+  color: #64748B;
+  font-size: 11px;
+  word-break: break-all;
+  margin-bottom: 6px;
+}
+.sa-home { color: #94A3B8; }
+.sa-home:hover { color: #FFFFFF; }
+.sa-logout { color: #F87171; font-weight: bold; }
+.sa-logout:hover { color: #FCA5A5; }
 
-/* White box for form + table */
-.box { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
-.box h3 { font-size: 17px; margin-bottom: 4px; }
-.box-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.mini-select { padding: 8px 12px; border-radius: 10px; background: var(--card); color: #fff; border: 1px solid var(--border); }
+/* mobile drawer toggle, hidden on desktop */
+.sa-burger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  flex-shrink: 0;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid var(--sa-border);
+  background: #FFFFFF;
+  color: var(--sa-text);
+  font-family: var(--sa-font);
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 1;
+  cursor: pointer;
+}
+.sa-burger:hover { border-color: var(--sa-accent); color: var(--sa-accent); }
 
-/* ---------- 5. FORM + TABLE ---------- */
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
-.form-grid .full { grid-column: 1 / -1; } /* take full row */
-label { font-size: 13px; font-weight: bold; display: block; margin-bottom: 6px; }
-input, select { width: 100%; padding: 11px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: #fff; font-size: 14px; }
+/* backdrop for the off-canvas drawer */
+.sa-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 21, 36, 0.55);
+  z-index: 40;
+}
+.sa-overlay[hidden] { display: none; }
 
-.table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 12px; }
-.table th, .table td { padding: 11px 10px; border-bottom: 1px solid var(--border); text-align: left; }
-.table th { color: var(--muted); font-size: 12px; }
-.badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; }
-.badge.green { background: #143324; color: var(--green); }
-.badge.yellow { background: #2a2212; color: #f5c542; }
-.danger { color: #ff7b7b; }
+/* ---------- 3. WHITE MAIN COLUMN ---------- */
 
-.foot { text-align: center; color: var(--muted); font-size: 13px; padding: 16px; }
+.sa-main {
+  min-width: 0;
+  background: #FFFFFF;
+  padding: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+}
 
-/* ---------- 6. MOBILE ---------- */
-@media (max-width: 800px) {
-  body { flex-direction: column; }
-  .sidebar { width: 100%; height: auto; position: static; }
-  .grid-4, .form-grid { grid-template-columns: 1fr; }
-  .topbar { flex-direction: column; align-items: flex-start; }
+.sa-topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 18px 28px;
+  background: #FFFFFF;
+  border-bottom: 1px solid var(--sa-border);
+}
+.sa-heading h2 { font-size: 22px; color: var(--sa-text); }
+.sa-heading p { font-size: 13px; color: var(--sa-muted); }
+
+/* shared status line: always present, collapses when empty */
+.sa-status {
+  margin: 0;
+  padding: 0 28px;
+  background: #FFFFFF;
+  font-size: 13px;
+  border-bottom: 1px solid transparent;
+}
+.sa-status:empty { padding-top: 0; padding-bottom: 0; }
+.sa-status:not(:empty) {
+  padding-top: 11px;
+  padding-bottom: 11px;
+  border-bottom-color: var(--sa-border);
+}
+
+/* ---------- 4. PANELS: ONLY ONE AT A TIME ---------- */
+
+.sa-panels { flex: 1 1 auto; min-height: 0; }
+
+.sa-panel { display: none; }
+.sa-panel.is-active { display: block; }
+
+/* ---------- 5. CARDS ---------- */
+
+.sa-card {
+  background: #FFFFFF;
+  border: 1px solid var(--sa-border);
+  border-radius: var(--sa-radius);
+  padding: 20px;
+  margin: 24px 28px;
+}
+.sa-card h3 { font-size: 15px; color: var(--sa-text); }
+.sa-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.sa-card-head h3 { margin: 0; }
+
+.sa-chip {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--sa-accent);
+  border: 1px solid var(--sa-accent);
+  border-radius: 12px;
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+
+/* small teal accent bar, the only other teal use */
+.sa-card-head > div { position: relative; padding-left: 12px; }
+.sa-card-head > div::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--sa-teal);
+}
+
+/* ---------- 6. LIVE STAT CARDS ---------- */
+
+.sa-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+}
+.sa-stat {
+  background: #FFFFFF;
+  border: 1px solid var(--sa-border);
+  border-radius: var(--sa-radius);
+  padding: 15px 16px;
+  min-width: 0;
+}
+.sa-stat-label {
+  display: block;
+  font-size: 10px;
+  color: var(--sa-muted);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.sa-stat b {
+  display: block;
+  font-size: 28px;
+  color: var(--sa-text);
+  margin-top: 10px;
+  line-height: 1.1;
+}
+.sa-stat-foot {
+  display: block;
+  font-size: 10px;
+  color: var(--sa-muted);
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--sa-border);
+}
+
+/* ---------- 7. NOTES / MESSAGES ---------- */
+
+.sa-note { font-size: 12px; color: var(--sa-muted); margin-top: 12px; }
+.sa-note-warn {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: 8px;
+  color: #92400E;
+  padding: 11px 13px;
+}
+.sa-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--sa-muted);
+  margin-top: 6px;
+}
+
+.sa-msg { font-size: 13px; color: var(--sa-muted); margin: 14px 0; }
+.sa-msg:not(:empty) {
+  background: var(--sa-row-hover);
+  border: 1px solid var(--sa-border);
+  border-radius: 8px;
+  padding: 10px 13px;
+}
+
+/* ---------- 8. FORM ---------- */
+
+.sa-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.sa-form .full { grid-column: 1 / -1; }
+.sa-form label {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--sa-text);
+  margin-bottom: 6px;
+}
+.sa-form input,
+.sa-form select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--sa-border);
+  background: #FFFFFF;
+  color: var(--sa-text);
+  font-family: var(--sa-font);
+  font-size: 14px;
+}
+.sa-form input::placeholder { color: #9CA3AF; }
+.sa-form input:focus,
+.sa-form select:focus {
+  outline: 2px solid var(--sa-accent);
+  outline-offset: 0;
+  border-color: var(--sa-accent);
+}
+
+.sa-btn {
+  display: inline-block;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: var(--sa-font);
+  border: 1px solid var(--sa-border);
+  background: #FFFFFF;
+  color: var(--sa-text);
+  cursor: pointer;
+}
+.sa-btn:hover { border-color: var(--sa-accent); color: var(--sa-accent); }
+.sa-btn-primary {
+  background: var(--sa-accent);
+  border-color: var(--sa-accent);
+  color: #FFFFFF;
+}
+.sa-btn-primary:hover {
+  background: var(--sa-accent-hover);
+  border-color: var(--sa-accent-hover);
+  color: #FFFFFF;
+}
+.sa-btn:focus-visible {
+  outline: 2px solid var(--sa-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- 9. TABLES ---------- */
+
+.sa-table-wrap { overflow-x: auto; }
+.sa-table-wrap table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: #FFFFFF;
+  border: 1px solid var(--sa-border);
+  border-radius: 8px;
+}
+.sa-table-wrap thead th {
+  color: var(--sa-muted);
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  text-align: left;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--sa-border);
+  background: #FFFFFF;
+  white-space: nowrap;
+}
+.sa-table-wrap tbody td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--sa-border);
+  color: var(--sa-text);
+  vertical-align: middle;
+}
+.sa-table-wrap tbody tr:last-child td { border-bottom: none; }
+.sa-table-wrap tbody tr:hover { background: var(--sa-row-hover); }
+.sa-table-wrap tbody td:first-child {
+  color: var(--sa-muted);
+  font-weight: bold;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.sa-table-wrap tbody td[colspan] {
+  text-align: center;
+  color: var(--sa-muted);
+  padding: 26px 14px;
+}
+.sa-table-wrap tbody td a {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--sa-accent);
+}
+.sa-table-wrap tbody td a:hover { color: var(--sa-accent-hover); text-decoration: underline; }
+.sa-table-wrap tbody td a:focus-visible {
+  outline: 2px solid var(--sa-accent);
+  outline-offset: 2px;
+}
+
+.sa-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: bold;
+  border: 1px solid var(--sa-border);
+  color: var(--sa-muted);
+  white-space: nowrap;
+}
+.sa-badge.green  { color: var(--sa-accent); border-color: var(--sa-accent); }
+.sa-badge.yellow { color: #B45309; border-color: #FDE68A; background: #FFFBEB; }
+
+/* ---------- 10. FOOTER ---------- */
+
+.sa-foot {
+  padding: 16px 28px 0;
+  font-size: 12px;
+  color: var(--sa-muted);
+  border-top: 1px solid var(--sa-border);
+  margin: 0 28px;
+  padding-top: 16px;
+}
+
+/* ---------- 11. FOCUS VISIBILITY ---------- */
+
+.sa-shell a:focus-visible,
+.sa-shell button:focus-visible {
+  outline: 2px solid var(--sa-accent);
+  outline-offset: 2px;
+}
+
+/* screen-reader only */
+.sa-skip {
+  position: absolute;
+  left: -9999px;
+  background: var(--sa-accent);
+  color: #FFFFFF;
+  padding: 10px 16px;
+  z-index: 50;
+}
+.sa-skip:focus { left: 0; top: 0; }
+
+/* ---------- 12. RESPONSIVE ---------- */
+
+/* tablet: off-canvas drawer sidebar */
+@media (max-width: 1024px) {
+  .sa-shell { grid-template-columns: minmax(0, 1fr); }
+  .sa-burger { display: inline-flex; }
+
+  .sa-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 272px;
+    height: 100vh;
+    z-index: 45;
+    transform: translateX(-100%);
+    visibility: hidden;
+  }
+  .sa-sidebar.is-open {
+    transform: translateX(0);
+    visibility: visible;
+  }
+}
+
+/* phone */
+@media (max-width: 700px) {
+  .sa-topbar { padding: 14px 16px; }
+  .sa-heading h2 { font-size: 19px; }
+  .sa-status { padding-left: 16px; padding-right: 16px; }
+  .sa-card { margin: 16px; padding: 16px; }
+  .sa-foot { margin: 0 16px; padding-left: 0; padding-right: 0; }
+  .sa-form { grid-template-columns: minmax(0, 1fr); }
+  .sa-stat b { font-size: 22px; }
 }

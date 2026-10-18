@@ -49,11 +49,17 @@
   }
 
   var msgEl = document.getElementById("adminMsg");
+  var statusEl = document.getElementById("saStatus");
 
+  /* Every message is mirrored into the status line under the top bar,
+     so feedback raised in one panel stays visible from any panel. */
   function say(text, isError) {
-    if (!msgEl) return;
-    msgEl.textContent = text || "";
-    msgEl.style.color = isError ? "#e5534b" : "";
+    var line = text || "";
+    if (msgEl) {
+      msgEl.textContent = line;
+      msgEl.style.color = isError ? "#DC2626" : "";
+    }
+    if (statusEl) statusEl.textContent = line;
   }
 
   function esc(value) {
@@ -84,6 +90,43 @@
     return (err && err.message) ? err.message : "Unknown error";
   }
 
+  /* ---------- dashboard overview ----------
+
+     The four boxes that used to sit on this page (48 clubs,
+     620 players, 12 tournaments, 8 districts) were hard-coded
+     literals, not real figures.
+
+     They are gone. What is left is counted from the two results
+     this dashboard already receives: the clubs query and the
+     admin_list_users RPC. Tournaments, Districts, Players and
+     Venues are not shown at all, because nothing in this project
+     queries them and inventing a number would be dishonest.
+
+     Nothing here adds a query or changes how an existing one is
+     handled - it only reads the row count that has already
+     arrived. */
+
+  var counts = { clubs: null, users: null };
+
+  function renderStats() {
+    var host = document.getElementById("saStats");
+    if (!host) return;
+
+    var cards = [
+      { label: "Registered Clubs", value: counts.clubs, foot: "Counted from the clubs table" },
+      { label: "All Users",        value: counts.users, foot: "Counted from admin_list_users" }
+    ];
+
+    host.innerHTML = cards.map(function (c) {
+      var has = c.value !== null && c.value !== undefined && !isNaN(c.value);
+      return '<div class="sa-stat">' +
+        '<span class="sa-stat-label">' + esc(c.label) + "</span>" +
+        "<b>" + esc(has ? c.value : "—") + "</b>" +
+        '<span class="sa-stat-foot">' + esc(has ? c.foot : "Not connected yet") + "</span>" +
+      "</div>";
+    }).join("");
+  }
+
   /* ---------- Registered clubs ---------- */
 
   function loadClubs() {
@@ -95,6 +138,12 @@
       .order("id")
       .then(function (res) {
         var rows = (res && res.data) || [];
+
+        counts.clubs = rows.length;
+        renderStats();
+
+        var clubChip = document.getElementById("saClubCount");
+        if (clubChip) clubChip.textContent = rows.length + (rows.length === 1 ? " club" : " clubs");
 
         if (!rows.length) {
           body.innerHTML = '<tr><td colspan="5" class="muted">No clubs yet — add the first one above.</td></tr>';
@@ -192,6 +241,12 @@
     sb().rpc("admin_list_users").then(function (res) {
       var rows = (res && res.data) || [];
 
+      counts.users = rows.length;
+      renderStats();
+
+      var userChip = document.getElementById("saUserCount");
+      if (userChip) userChip.textContent = rows.length + (rows.length === 1 ? " user" : " users");
+
       if (!rows.length) {
         body.innerHTML = '<tr><td colspan="4" class="muted">No users found.</td></tr>';
         return;
@@ -213,6 +268,112 @@
       say(errText(err), true);
     });
   }
+
+  /* ---------- panel navigation ----------
+
+     The sidebar is the only navigation. Exactly one panel is
+     rendered at a time: an inactive panel gets display:none from
+     css/admin.css AND the hidden attribute is set here, so it is
+     genuinely removed rather than pushed off screen.
+
+     There is no horizontal tab bar and no duplicate navigation -
+     each menu item simply reveals the one panel it belongs to. */
+
+  var PANELS = {
+    dashboard: { title: "Dashboard", sub: "Manage clubs across all districts." },
+    clubs:     { title: "Clubs",     sub: "Every registered club, and who manages it." },
+    users:     { title: "Users",     sub: "Everyone with an account, and their role." },
+    "add-club": { title: "Add Club",  sub: "Register a new club and its manager." }
+  };
+
+  function showPanel(name) {
+    var panels = document.querySelectorAll("#saPanels [data-panel]");
+    var known = !!PANELS[name];
+    if (!known) name = "dashboard";
+
+    Array.prototype.forEach.call(panels, function (p) {
+      var on = p.getAttribute("data-panel") === name;
+      p.classList.toggle("is-active", on);
+      if (on) p.removeAttribute("hidden");
+      else p.setAttribute("hidden", "");
+    });
+
+    var links = document.querySelectorAll(".sa-nav a[data-sa-nav]");
+    Array.prototype.forEach.call(links, function (a) {
+      a.classList.toggle("is-active", a.getAttribute("data-sa-nav") === name);
+    });
+
+    var meta = PANELS[name];
+    var titleEl = document.getElementById("saPageTitle");
+    var subEl = document.getElementById("saPageSub");
+    if (titleEl) titleEl.textContent = meta.title;
+    if (subEl) subEl.textContent = meta.sub;
+  }
+
+  function bindNav() {
+    var nav = document.querySelector(".sa-nav");
+    if (!nav) return;
+
+    nav.addEventListener("click", function (e) {
+      var link = e.target.closest("a[data-sa-nav]");
+      if (!link) return;
+      e.preventDefault();
+      showPanel(link.getAttribute("data-sa-nav"));
+      closeDrawer();
+    });
+  }
+
+  /* ---------- mobile sidebar drawer ---------- */
+
+  function openDrawer() {
+    var sb = document.getElementById("saSidebar");
+    var ov = document.getElementById("saOverlay");
+    var burger = document.getElementById("saBurger");
+    if (!sb) return;
+    sb.classList.add("is-open");
+    if (ov) ov.hidden = false;
+    if (burger) burger.setAttribute("aria-expanded", "true");
+  }
+
+  function closeDrawer() {
+    var sb = document.getElementById("saSidebar");
+    var ov = document.getElementById("saOverlay");
+    var burger = document.getElementById("saBurger");
+    if (!sb) return;
+    sb.classList.remove("is-open");
+    if (ov) ov.hidden = true;
+    if (burger) burger.setAttribute("aria-expanded", "false");
+  }
+
+  function bindDrawer() {
+    var burger = document.getElementById("saBurger");
+    if (burger) {
+      burger.addEventListener("click", function () {
+        var sb = document.getElementById("saSidebar");
+        if (sb && sb.classList.contains("is-open")) closeDrawer();
+        else openDrawer();
+      });
+    }
+
+    var overlay = document.getElementById("saOverlay");
+    if (overlay) overlay.addEventListener("click", closeDrawer);
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeDrawer();
+    });
+
+    window.addEventListener("resize", function () {
+      if (window.innerWidth > 1024) closeDrawer();
+    });
+  }
+
+  /* ---------- start ---------- */
+
+  renderStats();
+  showPanel("dashboard");
+
+  bindNav();
+  bindDrawer();
 
   loadClubs();
   loadUsers();

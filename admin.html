@@ -1,159 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel — District Sports</title>
-  <link rel="stylesheet" href="css/admin.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel — District Sports</title>
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
 
-  <!-- ========== SIDEBAR (left menu) ========== -->
-  <aside class="sidebar">
-    <div class="logo">
-      <span>🏆</span>
-      <div><h1>District Sports</h1><p>Super Admin</p></div>
-    </div>
+    <a class="sa-skip" href="#saMain">Skip to content</a>
 
-    <nav>
-      <ul>
-        <li><a href="index.html">🏠 Back to Home</a></li>
-        <li><a href="login.html" id="logoutBtn">🚪 Logout</a></li>
-      </ul>
-    </nav>
+    <!-- ==================== APP SHELL ==================== -->
+    <div class="sa-shell">
 
-    <div class="admin-card">
-      <p>👨‍💼</p>
-      <b id="adminName">Admin</b>
-      <small id="adminEmail">admin@districtsports.com</small>
-    </div>
-  </aside>
+        <!-- ========== DARK NAVY SIDEBAR (all navigation) ========== -->
+        <aside class="sa-sidebar" id="saSidebar" aria-label="Super Admin navigation">
+            <div class="sa-brand">
+                <b>DistrictSports</b>
+                <small>SUPER ADMIN</small>
+            </div>
 
-  <!-- ========== MAIN (right side) ========== -->
-  <main class="main">
+            <nav class="sa-nav">
+                <ul>
+                    <li><a href="#dashboard" class="is-active" data-sa-nav="dashboard" id="sa-nav-dashboard">Dashboard</a></li>
+                    <li><a href="#clubs"     data-sa-nav="clubs"     id="sa-nav-clubs">Clubs</a></li>
+                    <li><a href="#users"      data-sa-nav="users"      id="sa-nav-users">Users</a></li>
+                    <li><a href="#add-club"   data-sa-nav="add-club"   id="sa-nav-add-club">Add Club</a></li>
+                </ul>
+            </nav>
 
-    <!-- Top bar -->
-    <header class="topbar">
-      <div>
-        <h2>Dashboard</h2>
-        <p>Manage clubs across all districts.</p>
-      </div>
-      <div class="top-actions">
-        <input type="search" placeholder="🔍 Search club...">
-        <a href="#add-club" class="btn btn-green">+ Add Club</a>
-      </div>
-    </header>
+            <div class="sa-profile">
+                <p>Signed in as</p>
+                <b id="adminName">Admin</b>
+                <small id="adminEmail">admin@districtsports.com</small>
+                <a href="index.html" class="sa-home">Back to Home</a>
+                <a href="login.html" id="logoutBtn" class="sa-logout">Logout</a>
+            </div>
+        </aside>
 
-    <!-- 4 small stat boxes -->
-    <section class="grid-4">
-      <div class="stat-card"><span>🏟️</span><div><b>48</b><small>Total Clubs</small></div></div>
-      <div class="stat-card"><span>👥</span><div><b>620</b><small>Total Players</small></div></div>
-      <div class="stat-card"><span>🏆</span><div><b>12</b><small>Tournaments</small></div></div>
-      <div class="stat-card"><span>🗺️</span><div><b>8</b><small>Districts</small></div></div>
-    </section>
+        <!-- Backdrop behind the mobile drawer -->
+        <div class="sa-overlay" id="saOverlay" hidden></div>
 
-    <!-- Add new club form -->
-    <section id="add-club" class="box">
-      <h3>➕ Add New Club</h3>
-      <p class="muted">Fill in club details to register a new club.</p>
-      <form class="form-grid">
-        <div>
-          <label for="club-name">Club Name</label>
-          <input id="club-name" type="text" placeholder="e.g. Rajshahi Sports Club">
-        </div>
-        <div>
-          <label for="club-district">District</label>
-          <select id="club-district">
-            <option>Select District</option>
-            <option>Dhaka</option>
-            <option>Rajshahi</option>
-            <option>Chattogram</option>
-            <option>Sylhet</option>
-            <option>Khulna</option>
-            <option>Barishal</option>
-            <option>Rangpur</option>
-            <option>Mymensingh</option>
-          </select>
-        </div>
-        <div>
-          <label for="club-manager-email">Manager Email</label>
-          <input id="club-manager-email" type="email" placeholder="manager@gmail.com">
-          <small class="muted">Must already exist in Authentication → Users. That person becomes the Club Admin of this club.</small>
-        </div>
-        <div>
-          <label for="club-contact">Contact Number</label>
-          <input id="club-contact" type="tel" placeholder="01XXXXXXXXX">
-        </div>
-        <div class="full">
-          <label for="club-address">Club Address</label>
-          <input id="club-address" type="text" placeholder="Full club address">
-        </div>
-        <div class="full">
-          <button type="submit" class="btn btn-green">Register Club</button>
-          <button type="reset" class="btn btn-outline">Clear</button>
-        </div>
-      </form>
-      <p id="adminMsg" class="muted" role="status"></p>
-    </section>
+        <!-- ==================== MAIN COLUMN ==================== -->
+        <main class="sa-main" id="saMain">
 
-    <!-- Clubs table -->
-    <section id="clubs" class="box">
-      <div class="box-head">
-        <div>
-          <h3>🏟️ Registered Clubs</h3>
-          <p class="muted">All clubs in the system.</p>
-        </div>
-        <select class="mini-select">
-          <option>All Districts</option>
-          <option>Dhaka</option>
-          <option>Rajshahi</option>
-          <option>Chattogram</option>
-          <option>Sylhet</option>
-        </select>
-      </div>
+            <header class="sa-topbar">
+                <button type="button" class="sa-burger" id="saBurger"
+                        aria-label="Open navigation menu" aria-expanded="false">Menu</button>
+                <div class="sa-heading">
+                    <h2 id="saPageTitle">Dashboard</h2>
+                    <p id="saPageSub">Manage clubs across all districts.</p>
+                </div>
+            </header>
 
-      <table class="table">
-        <tr>
-          <th>Club ID</th>
-          <th>Club Name</th>
-          <th>Manager</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-        <tbody id="clubs-body">
-          <tr><td colspan="5" class="muted">Loading clubs…</td></tr>
-        </tbody>
-      </table>
-    </section>
+            <!-- One shared status line so feedback is visible from any panel -->
+            <p class="sa-status" id="saStatus" role="status" aria-live="polite"></p>
 
-    <!-- All users (super admin) -->
-    <section id="users" class="box">
-      <div class="box-head">
-        <div>
-          <h3>👥 All Users</h3>
-          <p class="muted">Everyone who has a Supabase Auth account, with their role.</p>
-        </div>
-      </div>
+            <!-- ==================== PANELS (one at a time) ==================== -->
+            <div class="sa-panels" id="saPanels">
 
-      <table class="table">
-        <tr>
-          <th>Email</th>
-          <th>Full Name</th>
-          <th>Role</th>
-          <th>Joined</th>
-        </tr>
-        <tbody id="users-body">
-          <tr><td colspan="4" class="muted">Loading users…</td></tr>
-        </tbody>
-      </table>
-    </section>
+                <!-- ---- panel: Dashboard overview ----
+                     Only counts that this dashboard already fetches are
+                     shown. Modules with no data source are left out
+                     rather than filled with made-up numbers. -->
+                <section class="sa-panel is-active" data-panel="dashboard" aria-labelledby="sa-nav-dashboard">
+                    <div class="sa-card">
+                        <div class="sa-card-head">
+                            <h3>Overview</h3>
+                            <span class="sa-chip">Live</span>
+                        </div>
+                        <div class="sa-stats" id="saStats"></div>
+                        <p class="sa-note">
+                            These figures are counted from the tables this dashboard
+                            already reads. Tournaments, Districts, Players and
+                            Venues are not listed because no data source for them
+                            is connected yet.
+                        </p>
+                    </div>
+                </section>
 
-    <footer class="foot">© 2026 District Sports — Admin Panel</footer>
-  </main>
+                <!-- ---- panel: Clubs (existing #clubs box) ---- -->
+                <section class="sa-panel" data-panel="clubs" aria-labelledby="sa-nav-clubs">
+                    <div class="sa-card">
+                        <div class="sa-card-head">
+                            <div>
+                                <h3>Registered Clubs</h3>
+                                <p class="sa-note">All clubs in the system.</p>
+                            </div>
+                            <span class="sa-chip" id="saClubCount">0 clubs</span>
+                        </div>
+                        <div class="sa-table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Club ID</th>
+                                        <th scope="col">Club Name</th>
+                                        <th scope="col">Manager</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clubs-body">
+                                    <tr><td colspan="5">Loading clubs…</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="js/supabase-config.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/admin.js"></script>
+                <!-- ---- panel: Users (existing #users box) ---- -->
+                <section class="sa-panel" data-panel="users" aria-labelledby="sa-nav-users">
+                    <div class="sa-card">
+                        <div class="sa-card-head">
+                            <div>
+                                <h3>All Users</h3>
+                                <p class="sa-note">Everyone with a Supabase Auth account, with their role.</p>
+                            </div>
+                            <span class="sa-chip" id="saUserCount">0 users</span>
+                        </div>
+                        <div class="sa-table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Full Name</th>
+                                        <th scope="col">Role</th>
+                                        <th scope="col">Joined</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-body">
+                                    <tr><td colspan="4">Loading users…</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ---- panel: Add Club (existing #add-club box) ---- -->
+                <section class="sa-panel" data-panel="add-club" aria-labelledby="sa-nav-add-club">
+                    <div class="sa-card">
+                        <h3>Add New Club</h3>
+                        <p class="sa-note">Fill in club details to register a new club.</p>
+                        <p id="adminMsg" class="sa-msg" role="status"></p>
+                        <form class="sa-form">
+                            <div>
+                                <label for="club-name">Club Name</label>
+                                <input id="club-name" type="text" placeholder="e.g. Rajshahi Sports Club">
+                            </div>
+                            <div>
+                                <label for="club-district">District</label>
+                                <select id="club-district">
+                                    <option>Select District</option>
+                                    <option>Dhaka</option>
+                                    <option>Rajshahi</option>
+                                    <option>Chattogram</option>
+                                    <option>Sylhet</option>
+                                    <option>Khulna</option>
+                                    <option>Barishal</option>
+                                    <option>Rangpur</option>
+                                    <option>Mymensingh</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="club-manager-email">Manager Email</label>
+                                <input id="club-manager-email" type="email" placeholder="manager@gmail.com">
+                                <small class="sa-hint">Must already exist in Authentication → Users. That person becomes the Club Admin of this club.</small>
+                            </div>
+                            <div>
+                                <label for="club-contact">Contact Number</label>
+                                <input id="club-contact" type="tel" placeholder="01XXXXXXXXX">
+                            </div>
+                            <div class="full">
+                                <label for="club-address">Club Address</label>
+                                <input id="club-address" type="text" placeholder="Full club address">
+                            </div>
+                            <div class="full">
+                                <button type="submit" class="sa-btn sa-btn-primary">Register Club</button>
+                                <button type="reset" class="sa-btn">Clear</button>
+                            </div>
+                        </form>
+                        <p class="sa-note sa-note-warn">
+                            Club Name, Contact Number and Manager Email are what the
+                            database currently stores. District and Address are still
+                            collected here but are not saved yet.
+                        </p>
+                    </div>
+                </section>
+
+            </div><!-- /.sa-panels -->
+
+            <footer class="sa-foot">2026 District Sports — Admin Panel</footer>
+        </main>
+
+    </div><!-- /.sa-shell -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
 </body>
 </html>
