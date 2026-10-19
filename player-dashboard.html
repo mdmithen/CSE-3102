@@ -11,685 +11,694 @@
   <!-- Mobile overlay (behind the off-canvas sidebar) -->
   <div class="pd-overlay" id="pdOverlay" hidden></div>
 
-  <!-- ========== SIDEBAR NAVIGATION ========== -->
-  <aside class="sidebar pd-sidebar" id="pdSidebar" aria-label="Player dashboard navigation">
+  <!-- ========== APP SHELL ========== -->
+  <div class="pd-shell">
 
-    <div class="logo">
-      <span>🏆</span>
-      <div>
-        <h1>District Sports</h1>
-        <p>Player Dashboard</p>
-      </div>
-    </div>
+    <!-- ========== DARK NAVY SIDEBAR ========== -->
+    <aside class="pd-sidebar" id="pdSidebar" aria-label="Player dashboard navigation">
 
-    <p class="menu-title">MENU</p>
-    <nav class="pd-nav">
-      <ul>
-        <li><a href="#dashboard"          data-view="dashboard"  class="active">📊 <span>Dashboard</span></a></li>
-        <li><a href="#profile"            data-view="profile">🧑‍💽 <span>My Profile</span></a></li>
-        <li><a href="#club"               data-view="club">🏟️ <span>My Club</span></a></li>
-        <li><a href="#members"            data-view="members">👥 <span>Club Members</span></a></li>
-        <li><a href="#performance"        data-view="performance">⚽ <span>My Performance</span></a></li>
-        <li><a href="#rankings"           data-view="rankings">🏅 <span>My Rankings</span></a></li>
-        <li><a href="#notices"            data-view="notices">📢 <span>Notices</span><em class="pd-count" id="noticeCount">0</em></a></li>
-        <li><a href="#matches"            data-view="matches">📅 <span>Matches &amp; Tournaments</span></a></li>
-        <li><a href="#settings"           data-view="settings">⚙️ <span>Settings</span></a></li>
-      </ul>
-    </nav>
-
-    <div class="pd-side-foot">
-      <a href="index.html" class="pd-nav-link">🏠 <span>Back to Home</span></a>
-      <a href="#" class="pd-nav-link pd-logout" id="logoutBtn">🚪 <span>Logout</span></a>
-    </div>
-
-    <!-- Player identity card -->
-    <div class="pd-me-card">
-      <img id="sideAvatar" src="images/players.png" alt="Player avatar (demo)" onerror="this.style.display='none';">
-      <b id="sideName">Rahim Ahmed</b>
-      <small id="sideMeta">PLY-001 · Rajshahi</small>
-    </div>
-  </aside>
-
-  <!-- ========== MAIN ========== -->
-  <main class="main pd-main">
-
-    <!-- Top bar -->
-    <header class="pd-topbar">
-      <button class="pd-burger" id="pdBurger" aria-label="Toggle navigation" aria-expanded="false">☰</button>
-      <div class="pd-topbar-title">
-        <h2 id="viewTitle">Dashboard</h2>
-        <p id="viewSubtitle">Overview of your season at a glance.</p>
-      </div>
-      <div class="pd-top-actions">
-        <span class="pd-demo-badge">DEMO DATA</span>
-        <span class="badge green" id="topStatus">Active</span>
-      </div>
-    </header>
-
-    <!-- ============== VIEW: DASHBOARD ============== -->
-    <section class="pd-view is-active" id="view-dashboard">
-
-      <!-- Welcome -->
-      <div class="box pd-welcome">
-        <div class="pd-welcome-main">
-          <img class="pd-avatar-lg" id="avatar" src="images/players.png" alt="Player avatar (demo)"
-               onerror="this.style.display='none';">
-          <div class="pd-welcome-text">
-            <p class="pd-hello">Welcome back,</p>
-            <h3 id="welcomeName">Rahim Ahmed</h3>
-            <p class="muted" id="welcomeLine">PLY-001 · Rajshahi Sports Club</p>
-            <div class="pd-chips" id="welcomeChips"></div>
-          </div>
-        </div>
-        <div class="pd-welcome-badges">
-          <span class="badge green" id="welcomeStatus">Active</span>
-          <small class="muted">Member since <span id="welcomeSince">2023</span></small>
-        </div>
+      <div class="pd-brand">
+        <b>District Sports</b>
+        <small>PLAYER DASHBOARD</small>
       </div>
 
-      <!-- Summary cards -->
-      <div class="pd-stats" id="statCards"></div>
+      <nav class="pd-nav">
+        <ul>
+          <li><a href="#dashboard" data-view="dashboard" class="is-active"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
+          <li><a href="#profile" data-view="profile"><span class="nav-icon">👤</span> <span>My Profile</span></a></li>
+          <li><a href="#club" data-view="club"><span class="nav-icon">🏟️</span> <span>My Club</span></a></li>
+          <li><a href="#members" data-view="members"><span class="nav-icon">👥</span> <span>Club Members</span></a></li>
+          <li><a href="#performance" data-view="performance"><span class="nav-icon">📈</span> <span>My Performance</span></a></li>
+          <li><a href="#rankings" data-view="rankings"><span class="nav-icon">🏅</span> <span>My Rankings</span></a></li>
+          <li><a href="#notices" data-view="notices"><span class="nav-icon">📢</span> <span>Notices</span><em class="pd-count" id="noticeCount">0</em></a></li>
+          <li><a href="#matches" data-view="matches"><span class="nav-icon">📅</span> <span>Matches & Tournaments</span></a></li>
+          <li><a href="#settings" data-view="settings"><span class="nav-icon">⚙️</span> <span>Settings</span></a></li>
+        </ul>
+      </nav>
 
-      <div class="pd-2col">
-        <!-- Upcoming match -->
-        <div class="box">
-          <div class="box-head">
-            <div>
-              <h3>📅 Next Match</h3>
-              <p class="muted">Your upcoming fixture (demo)</p>
-            </div>
-          </div>
-          <div id="nextMatch"></div>
-        </div>
-
-        <!-- Recent results -->
-        <div class="box">
-          <div class="box-head">
-            <div>
-              <h3>📊 Recent Results</h3>
-              <p class="muted">Last 5 matches (demo)</p>
-            </div>
-          </div>
-          <div id="recentResults"></div>
-        </div>
+      <div class="pd-profile">
+        <p>Signed in as</p>
+        <b id="sideName">Rahim Ahmed</b>
+        <small id="sideMeta">PLY-001 · Rajshahi</small>
+        <a href="index.html" class="pd-home">Back to Home</a>
+        <a href="#" class="pd-logout" id="logoutBtn">Logout</a>
       </div>
+    </aside>
 
-      <div class="pd-2col">
-        <!-- Ranking snapshot -->
-        <div class="box">
-          <div class="box-head">
-            <div>
-              <h3>🏅 Ranking Snapshot</h3>
-              <p class="muted">District Football Championship (demo)</p>
-            </div>
-          </div>
-          <div id="rankSnapshot"></div>
+    <!-- ========== MAIN COLUMN ========== -->
+    <main class="pd-main" id="pdMain">
+
+      <!-- Top bar -->
+      <header class="pd-topbar">
+        <button type="button" class="pd-burger" id="pdBurger" aria-label="Open navigation menu" aria-expanded="false">Menu</button>
+        <div class="pd-heading">
+          <h2 id="viewTitle">Dashboard</h2>
+          <p id="viewSubtitle">Overview of your season at a glance.</p>
         </div>
-
-        <!-- Notices snapshot -->
-        <div class="box">
-          <div class="box-head">
-            <div>
-              <h3>📢 Latest Notices</h3>
-              <p class="muted">From your club &amp; district (demo)</p>
-            </div>
-            <a href="#notices" class="btn btn-outline small pd-jump" data-view="notices">View all</a>
-          </div>
-          <div id="noticeSnapshot"></div>
+        <div class="pd-top-actions">
+          <span class="pd-demo-badge">DEMO DATA</span>
+          <span class="pd-badge pd-badge-green" id="topStatus">Active</span>
         </div>
-      </div>
-    </section>
+      </header>
 
-    <!-- ============== VIEW: MY PROFILE ============== -->
-    <section class="pd-view" id="view-profile">
-      <div class="pd-2col">
-        <div class="box">
-          <div class="box-head">
-            <div>
-              <h3>🧑‍💽 Personal Information</h3>
-              <p class="muted">Registered player data (demo)</p>
-            </div>
-            <span class="badge green">Verified</span>
-          </div>
-          <dl class="pd-details" id="profileDetails"></dl>
-        </div>
+      <!-- Shared status line -->
+      <p class="pd-status" id="pdStatus" role="status" aria-live="polite"></p>
 
-        <div class="box">
-          <div class="box-head">
-            <div>
-              <h3>🎽 Player ID Card</h3>
-              <p class="muted">Digital player card (demo)</p>
-            </div>
-            <span class="pd-card-stamp" id="cardStatus">Active</span>
-          </div>
+      <!-- ============== PANELS (one at a time) ============== -->
+      <div class="pd-panels" id="pdPanels">
 
-          <!-- Player ID card: avatar, ID, club, sport, position, jersey -->
-          <div class="pd-card-face" id="cardFace">
-            <span class="pd-card-jersey" id="cardJersey" aria-hidden="true">10</span>
+        <!-- ---- panel: Dashboard overview ---- -->
+        <section class="pd-panel is-active" id="view-dashboard" aria-labelledby="pd-nav-dashboard">
 
-            <div class="pd-card-top">
-              <span class="pd-avatar pd-avatar-xl" id="cardAvatar" style="--h:140">RA</span>
+          <!-- Welcome -->
+          <div class="pd-card">
+            <div class="pd-card-head">
               <div>
-                <h4 id="cardName">Rahim Ahmed</h4>
-                <small id="cardId">PLY-001</small>
+                <h3>Welcome back</h3>
+                <p class="pd-note">Overview of your season at a glance.</p>
+              </div>
+              <span class="pd-badge pd-badge-green" id="welcomeStatus">Active</span>
+            </div>
+            <div class="pd-welcome-main">
+              <img class="pd-avatar-lg" id="avatar" src="images/players.png" alt="Player avatar (demo)" onerror="this.style.display='none';">
+              <div class="pd-welcome-text">
+                <p class="pd-hello">Welcome back,</p>
+                <h3 id="welcomeName">Rahim Ahmed</h3>
+                <p class="pd-muted" id="welcomeLine">PLY-001 · Rajshahi Sports Club</p>
+                <div class="pd-chips" id="welcomeChips"></div>
+              </div>
+            </div>
+            <p class="pd-note">Member since <span id="welcomeSince">2023</span></p>
+          </div>
+
+          <!-- Summary cards -->
+          <div class="pd-stats" id="statCards"></div>
+
+          <div class="pd-grid-2">
+            <!-- Upcoming match -->
+            <div class="pd-card">
+              <div class="pd-card-head">
+                <div>
+                  <h3>Next Match</h3>
+                  <p class="pd-note">Your upcoming fixture (demo)</p>
+                </div>
+              </div>
+              <div id="nextMatch"></div>
+            </div>
+
+            <!-- Recent results -->
+            <div class="pd-card">
+              <div class="pd-card-head">
+                <div>
+                  <h3>Recent Results</h3>
+                  <p class="pd-note">Last 5 matches (demo)</p>
+                </div>
+              </div>
+              <div id="recentResults"></div>
+            </div>
+          </div>
+
+          <div class="pd-grid-2">
+            <!-- Ranking snapshot -->
+            <div class="pd-card">
+              <div class="pd-card-head">
+                <div>
+                  <h3>Ranking Snapshot</h3>
+                  <p class="pd-note">Club top scorers (demo)</p>
+                </div>
+              </div>
+              <div id="rankSnapshot"></div>
+            </div>
+
+            <!-- Notices snapshot -->
+            <div class="pd-card">
+              <div class="pd-card-head">
+                <div>
+                  <h3>Latest Notices</h3>
+                  <p class="pd-note">From your club & district (demo)</p>
+                </div>
+                <a href="#notices" class="pd-btn pd-btn-outline pd-btn-small pd-jump" data-view="notices">View all</a>
+              </div>
+              <div id="noticeSnapshot"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---- panel: My Profile ---- -->
+        <section class="pd-panel" id="view-profile" aria-labelledby="pd-nav-profile">
+          <div class="pd-grid-2">
+            <div class="pd-card">
+              <div class="pd-card-head">
+                <div>
+                  <h3>Personal Information</h3>
+                  <p class="pd-note">Registered player data (demo)</p>
+                </div>
+                <span class="pd-badge pd-badge-green">Verified</span>
+              </div>
+              <dl class="pd-details" id="profileDetails"></dl>
+            </div>
+
+            <div class="pd-card">
+              <div class="pd-card-head">
+                <div>
+                  <h3>Player ID Card</h3>
+                  <p class="pd-note">Digital player card (demo)</p>
+                </div>
+                <span class="pd-badge pd-badge-green" id="cardStatus">Active</span>
+              </div>
+
+              <!-- Player ID card -->
+              <div class="pd-card-face" id="cardFace">
+                <span class="pd-card-jersey" id="cardJersey" aria-hidden="true">10</span>
+
+                <div class="pd-card-top">
+                  <span class="pd-avatar pd-avatar-xl" id="cardAvatar" style="--h:140">RA</span>
+                  <div>
+                    <h4 id="cardName">Rahim Ahmed</h4>
+                    <small id="cardId">PLY-001</small>
+                  </div>
+                </div>
+
+                <div class="pd-card-facts">
+                  <div><small>Club</small><b id="cardClub">Rajshahi Sports Club</b></div>
+                  <div><small>Sport</small><b id="cardSport">Football</b></div>
+                  <div><small>Position</small><b id="cardPosition">Midfielder</b></div>
+                  <div><small>Jersey</small><b id="cardJerseyNo">10</b></div>
+                </div>
+
+                <div class="pd-card-body" id="cardBody"></div>
+              </div>
+              <p class="pd-note">Digital ID cards are a planned feature. This is a static demo card.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---- panel: My Club ---- -->
+        <section class="pd-panel" id="view-club" aria-labelledby="pd-nav-club">
+
+          <!-- Ask to join a club (real Supabase data) -->
+          <div class="pd-card">
+            <div class="pd-card-head">
+              <div>
+                <h3>Join a Club</h3>
+                <p class="pd-note" id="joinStatus">Pick a club and send a request — the club manager approves it.</p>
+              </div>
+            </div>
+            <form class="pd-form" id="joinClubForm" novalidate>
+              <div>
+                <label for="joinClub">Club</label>
+                <select id="joinClub"><option value="">Loading clubs…</option></select>
+              </div>
+              <div>
+                <label for="joinNote">Message (optional)</label>
+                <input id="joinNote" type="text" placeholder="e.g. I play as a midfielder">
+              </div>
+              <div class="full">
+                <button type="submit" class="pd-btn pd-btn-primary">Send Join Request</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="pd-card">
+            <div class="pd-card-head">
+              <div>
+                <h3 id="clubName">Rajshahi Sports Club</h3>
+                <p class="pd-note" id="clubMeta">DSC-001 · Established 2011</p>
+                <div class="pd-chips" id="clubChips"></div>
+              </div>
+              <div class="pd-club-stats" id="clubStats"></div>
+            </div>
+          </div>
+
+          <!-- Club KPI strip -->
+          <div class="pd-card">
+            <div class="pd-card-head">
+              <div>
+                <h3>Club Snapshot</h3>
+                <p class="pd-note">Counts come from the same roster list used on this page.</p>
+              </div>
+            </div>
+            <div class="pd-kpi-row" id="clubKpi"></div>
+
+            <h4 class="pd-subhead">Club form (last 5)</h4>
+            <div class="pd-form-strip" id="clubForm"></div>
+          </div>
+
+          <div class="pd-grid-2">
+            <div class="pd-card">
+              <h3>Club Management</h3>
+              <dl class="pd-details" id="clubManagement"></dl>
+            </div>
+            <div class="pd-card">
+              <h3>Club Information</h3>
+              <dl class="pd-details" id="clubContact"></dl>
+            </div>
+          </div>
+
+          <div class="pd-card">
+            <div class="pd-card-head">
+              <div>
+                <h3>Members</h3>
+                <p class="pd-note">A preview of the squad — see the full list for filters and profiles.</p>
+              </div>
+              <a href="#members" class="pd-btn pd-btn-primary pd-btn-small pd-jump" data-view="members">View all members →</a>
+            </div>
+            <div class="pd-member-strip" id="clubMemberStrip"></div>
+          </div>
+        </section>
+
+        <!-- ---- panel: Club Members ---- -->
+        <section class="pd-panel" id="view-members" aria-labelledby="pd-nav-members">
+          <div class="pd-card">
+            <div class="pd-card-head">
+              <div>
+                <h3>Club Members</h3>
+                <p class="pd-note">Registered at <span class="pd-inline-club">Rajshahi Sports Club</span> — sample data</p>
+              </div>
+              <span class="pd-badge pd-badge-green" id="memberCount">0 members</span>
+            </div>
+
+            <!-- Search + filters -->
+            <div class="pd-filters">
+              <div class="pd-filter-grow">
+                <label for="memberSearch">Search</label>
+                <input type="search" id="memberSearch" placeholder="Search Name, player ID, position..." aria-label="Search club members">
+              </div>
+              <div>
+                <label for="memberPosition">Position</label>
+                <select id="memberPosition" aria-label="Filter by position">
+                  <option value="">All positions</option>
+                </select>
+              </div>
+              <div>
+                <label for="memberSport">Sport</label>
+                <select id="memberSport" aria-label="Filter by sport">
+                  <option value="">All sports</option>
+                </select>
+              </div>
+              <div>
+                <label for="memberStatus">Status</label>
+                <select id="memberStatus" aria-label="Filter by status">
+                  <option value="">All statuses</option>
+                  <option value="Active">Active</option>
+                  <option value="Pending">Pending</option>
+                </select>
+              </div>
+              <div class="pd-filter-btn">
+                <button class="pd-btn pd-btn-outline pd-btn-small" id="memberClear" type="button">Clear</button>
               </div>
             </div>
 
-            <div class="pd-card-facts">
-              <div><small>Club</small><b id="cardClub">Rajshahi Sports Club</b></div>
-              <div><small>Sport</small><b id="cardSport">Football</b></div>
-              <div><small>Position</small><b id="cardPosition">Midfielder</b></div>
-              <div><small>Jersey</small><b id="cardJerseyNo">10</b></div>
+            <p class="pd-muted pd-count-line" id="memberCountText"></p>
+
+            <div class="pd-member-grid" id="memberGrid"></div>
+
+            <div class="pd-empty" id="memberEmpty" hidden>
+              <p><b>No members match your search.</b></p>
+              <p class="pd-muted">Try a different name, player ID, or clear the filters.</p>
+              <button class="pd-btn pd-btn-outline pd-btn-small" id="memberEmptyClear" type="button">Clear all filters</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ---- panel: My Performance ---- -->
+        <section class="pd-panel" id="view-performance" aria-labelledby="pd-nav-performance">
+          <div class="pd-card">
+            <div class="pd-card-head">
+              <div>
+                <h3>Season Summary</h3>
+                <p class="pd-note" id="perfSeasonLabel">Derived from the match history below — sample data</p>
+              </div>
+              <span class="pd-badge pd-badge-green">Midfielder</span>
+            </div>
+            <div class="pd-perf-grid" id="perfGrid"></div>
+          </div>
+
+          <!-- Win / draw / loss bar + win rate meter -->
+          <div class="pd-card">
+            <div class="pd-card-head">
+              <div>
+                <h3>Season Balance</h3>
+                <p class="pd-note" id="perfBalanceMeta">Derived from the match history</p>
+              </div>
+              <span class="pd-badge pd-badge-green" id="perfWinRate">—</span>
+            </div>
+            <div class="pd-form-bar" id="perfFormBar" role="img" aria-label="Win, draw and loss breakdown"></div>
+            <div class="pd-form-bar-legend" id="perfFormLegend"></div>
+          </div>
+
+          <div class="pd-grid-2">
+            <div class="pd-card">
+              <h3>Performance by Competition</h3>
+              <div class="pd-table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th scope="col">Competition</th>
+                      <th scope="col">P</th>
+                      <th scope="col">W</th>
+                      <th scope="col">D</th>
+                      <th scope="col">L</th>
+                      <th scope="col">G</th>
+                      <th scope="col">A</th>
+                    </tr>
+                  </thead>
+                  <tbody id="perfTable"></tbody>
+                </table>
+              </div>
             </div>
 
-            <div class="pd-card-body" id="cardBody"></div>
+            <div class="pd-card">
+              <h3>Achievements</h3>
+              <ul class="pd-awards" id="awardsList"></ul>
+            </div>
           </div>
-          <p class="muted pd-note">Digital ID cards are a planned feature. This is a static demo card.</p>
-        </div>
-      </div>
-    </section>
 
-    <!-- ============== VIEW: MY CLUB ============== -->
-    <section class="pd-view" id="view-club">
-
-      <!-- Ask to join a club (real Supabase data) -->
-      <div class="box">
-        <div class="box-head">
-          <div>
-            <h3>🏟️ Join a Club</h3>
-            <p class="muted" id="joinStatus">Pick a club and send a request — the club manager approves it.</p>
+          <!-- Progress chart -->
+          <div class="pd-card">
+            <div class="pd-card-head">
+              <div>
+                <h3>Progress Over Time</h3>
+                <p class="pd-note">Cumulative goals and assists across every match this season — sample data</p>
+              </div>
+              <span class="pd-badge pd-badge-yellow">Demo chart</span>
+            </div>
+            <div class="pd-chart" id="perfChart" role="img" aria-label="Line chart of cumulative goals and assists over the season"></div>
+            <div class="pd-chart-legend">
+              <span><i class="pd-key pd-key-goals"></i>Goals</span>
+              <span><i class="pd-key pd-key-assists"></i>Assists</span>
+            </div>
+            <h4 class="pd-subhead">Recent form (last 5)</h4>
+            <div class="pd-form-strip" id="perfForm"></div>
           </div>
-        </div>
-        <form class="form-grid" id="joinClubForm" novalidate>
-          <div>
-            <label for="joinClub">Club</label>
-            <select id="joinClub"><option value="">Loading clubs…</option></select>
+
+          <!-- Rating trend -->
+          <div class="pd-card">
+            <div class="pd-card-head">
+              <div>
+                <h3>Rating Trend</h3>
+                <p class="pd-note">Match rating out of 10 across the season — sample data</p>
+              </div>
+              <span class="pd-badge pd-badge-yellow">Demo chart</span>
+            </div>
+            <div class="pd-chart" id="ratingChart" role="img" aria-label="Line chart of match rating over the season"></div>
+            <div class="pd-chart-legend">
+              <span><i class="pd-key pd-key-rating"></i>Match rating (season avg <span id="ratingAvg">—</span>)</span>
+            </div>
           </div>
-          <div>
-            <label for="joinNote">Message (optional)</label>
-            <input id="joinNote" type="text" placeholder="e.g. I play as a midfielder">
+
+          <!-- Match history with filters -->
+          <div class="pd-card">
+            <div class="pd-card-head">
+              <div>
+                <h3>Match History</h3>
+                <p class="pd-note" id="perfHistoryMeta">Every match this season — sample data</p>
+              </div>
+            </div>
+
+            <div class="pd-filters">
+              <div>
+                <label for="histPeriod">Period</label>
+                <select id="histPeriod" aria-label="Filter matches by month">
+                  <option value="">All months</option>
+                </select>
+              </div>
+              <div>
+                <label for="histTournament">Tournament</label>
+                <select id="histTournament" aria-label="Filter matches by tournament">
+                  <option value="">All tournaments</option>
+                </select>
+              </div>
+              <div>
+                <label for="histResult">Result</label>
+                <select id="histResult" aria-label="Filter matches by result">
+                  <option value="">All results</option>
+                  <option value="win">Wins</option>
+                  <option value="draw">Draws</option>
+                  <option value="loss">Losses</option>
+                </select>
+              </div>
+              <div class="pd-filter-btn">
+                <button class="pd-btn pd-btn-outline pd-btn-small" id="histClear" type="button">Clear</button>
+              </div>
+            </div>
+
+            <p class="pd-muted pd-count-line" id="histCountText"></p>
+
+            <div class="pd-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Opponent</th>
+                    <th scope="col">Tournament</th>
+                    <th scope="col">Result</th>
+                    <th scope="col">Score</th>
+                    <th scope="col">My performance</th>
+                    <th scope="col">Details</th>
+                  </tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+              </table>
+            </div>
+
+            <div class="pd-empty" id="histEmpty" hidden>
+              <p><b>No matches match these filters.</b></p>
+              <p class="pd-muted">Try a different month, tournament or result.</p>
+              <button class="pd-btn pd-btn-outline pd-btn-small" id="histEmptyClear" type="button">Clear all filters</button>
+            </div>
           </div>
-          <div class="full">
-            <button type="submit" class="btn btn-green">Send Join Request</button>
+        </section>
+
+        <!-- ---- panel: My Rankings ---- -->
+        <section class="pd-panel" id="view-rankings" aria-labelledby="pd-nav-rankings">
+          <div class="pd-stats" id="rankStats"></div>
+
+          <!-- Club / District / National: one table, switched by tabs -->
+          <div class="pd-card">
+            <div class="pd-card-head">
+              <div>
+                <h3 id="rankTitle">Club Standings</h3>
+                <p class="pd-note" id="rankMeta">Top scorers — derived from the club roster</p>
+              </div>
+              <div class="pd-tabs" id="rankTabs" role="tablist" aria-label="Ranking level">
+                <button type="button" class="pd-tab is-active" role="tab" data-rank="club" aria-selected="true">Club</button>
+                <button type="button" class="pd-tab" role="tab" data-rank="district" aria-selected="false">District</button>
+                <button type="button" class="pd-tab" role="tab" data-rank="national" aria-selected="false">National</button>
+              </div>
+            </div>
+
+            <div class="pd-table-wrap">
+              <table>
+                <thead id="rankHead"></thead>
+                <tbody id="rankTable"></tbody>
+              </table>
+            </div>
+
+            <div class="pd-empty" id="rankEmpty" hidden>
+              <p><b>No ranking data for this level.</b></p>
+              <p class="pd-muted">Demo rankings for this level have not been added yet.</p>
+            </div>
+
+            <p class="pd-note" id="rankNote"></p>
           </div>
-        </form>
-      </div>
+        </section>
 
-      <div class="box pd-club-head">
-        <img class="pd-club-img" id="clubLogo" src="images/clubs.png" alt="Club logo (demo)" loading="lazy"
-             onerror="this.style.display='none';">
-        <div>
-          <h3 id="clubName">Rajshahi Sports Club</h3>
-          <p class="muted" id="clubMeta">DSC-001 · Established 2011</p>
-          <div class="pd-chips" id="clubChips"></div>
-        </div>
-        <div class="pd-club-stats" id="clubStats"></div>
-      </div>
-
-      <!-- Club KPI strip: member count, squad health, win rate -->
-      <div class="box">
-        <div class="box-head">
-          <div>
-            <h3>📊 Club Snapshot</h3>
-            <p class="muted">Counts come from the same roster list used on this page.</p>
+        <!-- ---- panel: Notices ---- -->
+        <section class="pd-panel" id="view-notices" aria-labelledby="pd-nav-notices">
+          <div class="pd-card">
+            <div class="pd-card-head">
+              <div>
+                <h3>Notices & Announcements</h3>
+                <p class="pd-note">From your club manager and district administration (demo)</p>
+              </div>
+              <div class="pd-notice-tools">
+                <select id="noticeFilter" class="pd-select" aria-label="Filter notices">
+                  <option value="">All notices</option>
+                  <option value="unread">Unread only</option>
+                  <option value="high">High priority</option>
+                  <option value="read">Read only</option>
+                </select>
+                <button class="pd-btn pd-btn-outline pd-btn-small" id="readAllBtn">Mark all read</button>
+              </div>
+            </div>
+            <ul class="pd-notices" id="noticeList"></ul>
+            <div class="pd-empty" id="noticeEmpty" hidden>
+              <p><b>No notices to show.</b></p>
+              <p class="pd-muted">Try a different filter — announcements from your club appear here.</p>
+              <button class="pd-btn pd-btn-outline pd-btn-small" id="noticeEmptyClear" type="button">Show all notices</button>
+            </div>
           </div>
-        </div>
-        <div class="pd-kpi-row" id="clubKpi"></div>
+        </section>
 
-        <h4 class="pd-subhead">Club form (last 5)</h4>
-        <div class="pd-form-strip" id="clubForm"></div>
-      </div>
+        <!-- ---- panel: Matches & Tournaments ---- -->
+        <section class="pd-panel" id="view-matches" aria-labelledby="pd-nav-matches">
+          <div class="pd-grid-2">
+            <div class="pd-card">
+              <h3>My Fixtures</h3>
+              <p class="pd-note">Scheduled matches for your club (demo)</p>
+              <div class="pd-matches" id="fixtureList"></div>
+              <div class="pd-empty" id="fixtureEmpty" hidden>
+                <p><b>No fixtures scheduled.</b></p>
+                <p class="pd-muted">Your club has no upcoming matches right now.</p>
+              </div>
+            </div>
 
-      <div class="pd-2col">
-        <div class="box">
-          <h3>👔 Club Management</h3>
-          <dl class="pd-details" id="clubManagement"></dl>
-        </div>
-        <div class="box">
-          <h3>📞 Club Information</h3>
-          <dl class="pd-details" id="clubContact"></dl>
-        </div>
-      </div>
-
-      <div class="box">
-        <div class="box-head">
-          <div>
-            <h3>👥 Members</h3>
-            <p class="muted">A preview of the squad — see the full list for filters and profiles.</p>
+            <div class="pd-card">
+              <h3>Tournaments</h3>
+              <p class="pd-note">Tournaments your club can join (demo)</p>
+              <div class="pd-tournaments" id="tournamentList"></div>
+              <div class="pd-empty" id="tournamentEmpty" hidden>
+                <p><b>No open tournaments.</b></p>
+                <p class="pd-muted">New district and national competitions appear here.</p>
+              </div>
+            </div>
           </div>
-          <a href="#members" class="btn btn-green small pd-jump" data-view="members">View all members →</a>
-        </div>
-        <div class="pd-member-strip" id="clubMemberStrip"></div>
-      </div>
-    </section>
 
-    <!-- ============== VIEW: CLUB MEMBERS ============== -->
-    <section class="pd-view" id="view-members">
-      <div class="box">
-        <div class="box-head">
-          <div>
-            <h3>👥 Club Members</h3>
-            <p class="muted">Registered at <span class="pd-inline-club">Rajshahi Sports Club</span> — sample data</p>
+          <div class="pd-card">
+            <div class="pd-card-head">
+              <div>
+                <h3>Match History</h3>
+                <p class="pd-note">Completed matches with filters and per-match detail live in My Performance.</p>
+              </div>
+              <a href="#performance" class="pd-btn pd-btn-primary pd-btn-small pd-jump" data-view="performance">Open My Performance →</a>
+            </div>
           </div>
-          <span class="badge green" id="memberCount">0 members</span>
-        </div>
+        </section>
 
-        <!-- Search + filters -->
-        <div class="pd-filters">
-          <div class="pd-filter-grow">
-            <label for="memberSearch">Search</label>
-            <input type="search" id="memberSearch" placeholder="🔍 Name, player ID, position..."
-                   aria-label="Search club members">
+        <!-- ---- panel: Settings ---- -->
+        <section class="pd-panel" id="view-settings" aria-labelledby="pd-nav-settings">
+          <div class="pd-grid-2">
+            <div class="pd-card">
+              <div class="pd-card-head">
+                <div>
+                  <h3>Edit Profile</h3>
+                  <p class="pd-note">Frontend only — saved in this browser, nothing is sent to a server.</p>
+                </div>
+              </div>
+
+              <!-- Avatar preview: initials follow whatever name is typed -->
+              <div class="pd-settings-avatar">
+                <span class="pd-avatar pd-avatar-xl" id="setAvatar" style="--h:140">RA</span>
+                <div>
+                  <b id="setAvatarName">Rahim Ahmed</b>
+                  <small class="pd-muted" id="setAvatarMeta">PLY-001 · Football</small>
+                </div>
+              </div>
+
+              <form class="pd-form" id="profileForm" novalidate>
+                <div>
+                  <label for="setName">Full Name</label>
+                  <input id="setName" type="text" required>
+                </div>
+                <div>
+                  <label for="setPhone">Contact Number</label>
+                  <input id="setPhone" type="tel">
+                </div>
+                <div>
+                  <label for="setEmail">Email</label>
+                  <input id="setEmail" type="email" required>
+                </div>
+                <div>
+                  <label for="setJersey">Jersey Number</label>
+                  <input id="setJersey" type="text">
+                </div>
+                <div>
+                  <label for="setDistrict">District</label>
+                  <select id="setDistrict">
+                    <option value="">Select District</option>
+                    <option>Dhaka</option>
+                    <option>Rajshahi</option>
+                    <option>Chattogram</option>
+                    <option>Sylhet</option>
+                    <option>Khulna</option>
+                    <option>Barishal</option>
+                    <option>Rangpur</option>
+                    <option>Mymensingh</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="setPosition">Position</label>
+                  <input id="setPosition" type="text">
+                </div>
+                <div class="full">
+                  <label for="setBio">Short Bio</label>
+                  <textarea id="setBio" rows="3" placeholder="Tell your club about yourself..."></textarea>
+                </div>
+                <div class="full pd-form-actions">
+                  <button type="submit" class="pd-btn pd-btn-primary">Save Changes</button>
+                  <button type="reset" class="pd-btn pd-btn-outline">Reset</button>
+                  <button type="button" class="pd-btn pd-btn-outline" id="clearStorage">Clear saved demo data</button>
+                </div>
+                <p class="pd-muted pd-full" id="profileFormMsg" role="status" aria-live="polite"></p>
+              </form>
+            </div>
+
+            <div class="pd-card">
+              <div class="pd-card-head">
+                <div>
+                  <h3>Security</h3>
+                  <p class="pd-note">Demo only — the check below is a visual mock, no password is changed.</p>
+                </div>
+              </div>
+              <form id="passForm" novalidate>
+                <div>
+                  <label for="curPass">Current Password</label>
+                  <input id="curPass" type="password" placeholder="••••••" required>
+                </div>
+                <div>
+                  <label for="newPass">New Password</label>
+                  <input id="newPass" type="password" placeholder="At least 6 characters" required>
+                </div>
+                <div>
+                  <label for="conPass">Confirm New Password</label>
+                  <input id="conPass" type="password" placeholder="Repeat new password" required>
+                </div>
+                <div class="pd-form-actions">
+                  <button type="submit" class="pd-btn pd-btn-primary">Update Password</button>
+                </div>
+                <p class="pd-muted" id="passFormMsg" role="status" aria-live="polite"></p>
+              </form>
+
+              <h3 class="pd-subhead">Notifications</h3>
+              <ul class="pd-toggles">
+                <li>
+                  <label><input type="checkbox" data-pref="matchReminders" checked> Match reminders (1 day before)</label>
+                </li>
+                <li>
+                  <label><input type="checkbox" data-pref="clubAnnouncements" checked> Club announcements</label>
+                </li>
+                <li>
+                  <label><input type="checkbox" data-pref="rankingUpdates"> Ranking & points updates</label>
+                </li>
+                <li>
+                  <label><input type="checkbox" data-pref="smsAlerts"> SMS alerts (may cost money)</label>
+                </li>
+              </ul>
+              <p class="pd-note">Notification choices are kept in this browser only.</p>
+            </div>
           </div>
-          <div>
-            <label for="memberPosition">Position</label>
-            <select id="memberPosition" aria-label="Filter by position">
-              <option value="">All positions</option>
-            </select>
-          </div>
-          <div>
-            <label for="memberSport">Sport</label>
-            <select id="memberSport" aria-label="Filter by sport">
-              <option value="">All sports</option>
-            </select>
-          </div>
-          <div>
-            <label for="memberStatus">Status</label>
-            <select id="memberStatus" aria-label="Filter by status">
-              <option value="">All statuses</option>
-              <option value="Active">Active</option>
-              <option value="Pending">Pending</option>
-            </select>
-          </div>
-          <div class="pd-filter-btn">
-            <button class="btn btn-outline small" id="memberClear" type="button">Clear</button>
-          </div>
-        </div>
 
-        <p class="muted pd-count-line" id="memberCountText"></p>
-
-        <div class="pd-member-grid" id="memberGrid"></div>
-
-        <div class="pd-empty" id="memberEmpty" hidden>
-          <p>🔍 <b>No members match your search.</b></p>
-          <p class="muted">Try a different name, player ID, or clear the filters.</p>
-          <button class="btn btn-outline small" id="memberEmptyClear" type="button">Clear all filters</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============== VIEW: MY PERFORMANCE ============== -->
-    <section class="pd-view" id="view-performance">
-      <div class="box">
-        <div class="box-head">
-          <div>
-            <h3>⚽ Season Summary</h3>
-            <p class="muted" id="perfSeasonLabel">Derived from the match history below — sample data</p>
-          </div>
-          <span class="badge green">Midfielder</span>
-        </div>
-        <div class="pd-perf-grid" id="perfGrid"></div>
-      </div>
-
-      <!-- Win / draw / loss bar + win rate meter -->
-      <div class="box">
-        <div class="box-head">
-          <div>
-            <h3>🧭 Season Balance</h3>
-            <p class="muted" id="perfBalanceMeta">Derived from the match history</p>
-          </div>
-          <span class="badge green" id="perfWinRate">—</span>
-        </div>
-        <div class="pd-form-bar" id="perfFormBar" role="img" aria-label="Win, draw and loss breakdown"></div>
-        <div class="pd-form-bar-legend" id="perfFormLegend"></div>
-      </div>
-
-      <div class="pd-2col">
-        <div class="box">
-          <h3>📈 Performance by Competition</h3>
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Competition</th>
-                <th scope="col">P</th>
-                <th scope="col">W</th>
-                <th scope="col">D</th>
-                <th scope="col">L</th>
-                <th scope="col">G</th>
-                <th scope="col">A</th>
-              </tr>
-            </thead>
-            <tbody id="perfTable"></tbody>
-          </table>
-        </div>
-
-        <div class="box">
-          <h3>🏅 Achievements</h3>
-          <ul class="pd-awards" id="awardsList"></ul>
-        </div>
-      </div>
-
-      <!-- Progress chart -->
-      <div class="box">
-        <div class="box-head">
-          <div>
-            <h3>📊 Progress Over Time</h3>
-            <p class="muted">Cumulative goals and assists across every match this season — sample data</p>
-          </div>
-          <span class="badge yellow">Demo chart</span>
-        </div>
-        <div class="pd-chart" id="perfChart" role="img"
-             aria-label="Line chart of cumulative goals and assists over the season"></div>
-        <div class="pd-chart-legend">
-          <span><i class="pd-key pd-key-goals"></i>Goals</span>
-          <span><i class="pd-key pd-key-assists"></i>Assists</span>
-        </div>
-        <h4 class="pd-subhead">Recent form (last 5)</h4>
-        <div class="pd-form-strip" id="perfForm"></div>
-      </div>
-
-      <!-- Rating trend: same match list, second metric -->
-      <div class="box">
-        <div class="box-head">
-          <div>
-            <h3>⭐ Rating Trend</h3>
-            <p class="muted">Match rating out of 10 across the season — sample data</p>
-          </div>
-          <span class="badge yellow">Demo chart</span>
-        </div>
-        <div class="pd-chart" id="ratingChart" role="img"
-             aria-label="Line chart of match rating over the season"></div>
-        <div class="pd-chart-legend">
-          <span><i class="pd-key pd-key-rating"></i>Match rating (season avg <span id="ratingAvg">—</span>)</span>
-        </div>
-      </div>
-
-      <!-- Match history with filters -->
-      <div class="box">
-        <div class="box-head">
-          <div>
-            <h3>📜 Match History</h3>
-            <p class="muted" id="perfHistoryMeta">Every match this season — sample data</p>
-          </div>
-        </div>
-
-        <div class="pd-filters">
-          <div>
-            <label for="histPeriod">Period</label>
-            <select id="histPeriod" aria-label="Filter matches by month">
-              <option value="">All months</option>
-            </select>
-          </div>
-          <div>
-            <label for="histTournament">Tournament</label>
-            <select id="histTournament" aria-label="Filter matches by tournament">
-              <option value="">All tournaments</option>
-            </select>
-          </div>
-          <div>
-            <label for="histResult">Result</label>
-            <select id="histResult" aria-label="Filter matches by result">
-              <option value="">All results</option>
-              <option value="win">Wins</option>
-              <option value="draw">Draws</option>
-              <option value="loss">Losses</option>
-            </select>
-          </div>
-          <div class="pd-filter-btn">
-            <button class="btn btn-outline small" id="histClear" type="button">Clear</button>
-          </div>
-        </div>
-
-        <p class="muted pd-count-line" id="histCountText"></p>
-
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Date</th>
-              <th scope="col">Opponent</th>
-              <th scope="col">Tournament</th>
-              <th scope="col">Result</th>
-              <th scope="col">Score</th>
-              <th scope="col">My performance</th>
-              <th scope="col">Details</th>
-            </tr>
-          </thead>
-          <tbody id="historyBody"></tbody>
-        </table>
-
-        <div class="pd-empty" id="histEmpty" hidden>
-          <p>🔍 <b>No matches match these filters.</b></p>
-          <p class="muted">Try a different month, tournament or result.</p>
-          <button class="btn btn-outline small" id="histEmptyClear" type="button">Clear all filters</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============== VIEW: MY RANKINGS ============== -->
-    <section class="pd-view" id="view-rankings">
-      <div class="pd-stats" id="rankStats"></div>
-
-      <!-- Club / District / National: one table, switched by tabs -->
-      <div class="box">
-        <div class="box-head">
-          <div>
-            <h3 id="rankTitle">🏅 Club Standings</h3>
-            <p class="muted" id="rankMeta">Top scorers — derived from the club roster</p>
-          </div>
-          <div class="pd-tabs" id="rankTabs" role="tablist" aria-label="Ranking level">
-            <button type="button" class="pd-tab is-active" role="tab" data-rank="club" aria-selected="true">Club</button>
-            <button type="button" class="pd-tab" role="tab" data-rank="district" aria-selected="false">District</button>
-            <button type="button" class="pd-tab" role="tab" data-rank="national" aria-selected="false">National</button>
-          </div>
-        </div>
-
-        <div class="pd-table-wrap">
-          <table class="table">
-            <thead id="rankHead"></thead>
-            <tbody id="rankTable"></tbody>
-          </table>
-        </div>
-
-        <div class="pd-empty" id="rankEmpty" hidden>
-          <p>🏅 <b>No ranking data for this level.</b></p>
-          <p class="muted">Demo rankings for this level have not been added yet.</p>
-        </div>
-
-        <p class="muted pd-note" id="rankNote"></p>
-      </div>
-    </section>
-
-    <!-- ============== VIEW: NOTICES ============== -->
-    <section class="pd-view" id="view-notices">
-      <div class="box">
-        <div class="box-head">
-          <div>
-            <h3>📢 Notices &amp; Announcements</h3>
-            <p class="muted">From your club manager and district administration (demo)</p>
-          </div>
-          <div class="pd-notice-tools">
-            <select id="noticeFilter" class="mini-select" aria-label="Filter notices">
-              <option value="">All notices</option>
-              <option value="unread">Unread only</option>
-              <option value="high">High priority</option>
-              <option value="read">Read only</option>
-            </select>
-            <button class="btn btn-outline small" id="readAllBtn">Mark all read</button>
-          </div>
-        </div>
-        <ul class="pd-notices" id="noticeList"></ul>
-        <div class="pd-empty" id="noticeEmpty" hidden>
-          <p>📭 <b>No notices to show.</b></p>
-          <p class="muted">Try a different filter — announcements from your club appear here.</p>
-          <button class="btn btn-outline small" id="noticeEmptyClear" type="button">Show all notices</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============== VIEW: MATCHES & TOURNAMENTS ============== -->
-    <section class="pd-view" id="view-matches">
-      <div class="pd-2col">
-        <div class="box">
-          <h3>📅 My Fixtures</h3>
-          <p class="muted pd-note">Scheduled matches for your club (demo)</p>
-          <div class="pd-matches" id="fixtureList"></div>
-          <div class="pd-empty" id="fixtureEmpty" hidden>
-            <p>📅 <b>No fixtures scheduled.</b></p>
-            <p class="muted">Your club has no upcoming matches right now.</p>
-          </div>
-        </div>
-
-        <div class="box">
-          <h3>🏆 Tournaments</h3>
-          <p class="muted pd-note">Tournaments your club can join (demo)</p>
-          <div class="pd-tournaments" id="tournamentList"></div>
-          <div class="pd-empty" id="tournamentEmpty" hidden>
-            <p>🏆 <b>No open tournaments.</b></p>
-            <p class="muted">New district and national competitions appear here.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="box">
-        <div class="box-head">
-          <div>
-            <h3>📜 Match History</h3>
-            <p class="muted">Completed matches with filters and per-match detail live in My Performance.</p>
-          </div>
-          <a href="#performance" class="btn btn-green small pd-jump" data-view="performance">Open My Performance →</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============== VIEW: SETTINGS ============== -->
-    <section class="pd-view" id="view-settings">
-      <div class="pd-2col">
-        <div class="box">
-          <div class="box-head">
+          <div class="pd-card pd-danger-zone">
             <div>
-              <h3>✏️ Edit Profile</h3>
-              <p class="muted">Frontend only — saved in this browser, nothing is sent to a server.</p>
+              <h3>Logout</h3>
+              <p class="pd-muted">Ends this demo session and returns you to the login page.</p>
             </div>
+            <button class="pd-btn pd-btn-outline pd-btn-danger" id="logoutBtn2">Logout</button>
           </div>
+        </section>
 
-          <!-- Avatar preview: initials follow whatever name is typed -->
-          <div class="pd-settings-avatar">
-            <span class="pd-avatar pd-avatar-xl" id="setAvatar" style="--h:140">RA</span>
-            <div>
-              <b id="setAvatarName">Rahim Ahmed</b>
-              <small class="muted" id="setAvatarMeta">PLY-001 · Football</small>
-            </div>
-          </div>
+      </div><!-- /.pd-panels -->
 
-          <form class="form-grid" id="profileForm" novalidate>
-            <div>
-              <label for="setName">Full Name</label>
-              <input id="setName" type="text" required>
-            </div>
-            <div>
-              <label for="setPhone">Contact Number</label>
-              <input id="setPhone" type="tel">
-            </div>
-            <div>
-              <label for="setEmail">Email</label>
-              <input id="setEmail" type="email" required>
-            </div>
-            <div>
-              <label for="setJersey">Jersey Number</label>
-              <input id="setJersey" type="text">
-            </div>
-            <div>
-              <label for="setDistrict">District</label>
-              <select id="setDistrict">
-                <option value="">Select District</option>
-                <option>Dhaka</option>
-                <option>Rajshahi</option>
-                <option>Chattogram</option>
-                <option>Sylhet</option>
-                <option>Khulna</option>
-                <option>Barishal</option>
-                <option>Rangpur</option>
-                <option>Mymensingh</option>
-              </select>
-            </div>
-            <div>
-              <label for="setPosition">Position</label>
-              <input id="setPosition" type="text">
-            </div>
-            <div class="full">
-              <label for="setBio">Short Bio</label>
-              <textarea id="setBio" rows="3" placeholder="Tell your club about yourself..."></textarea>
-            </div>
-            <div class="full pd-form-actions">
-              <button type="submit" class="btn btn-green">Save Changes</button>
-              <button type="reset" class="btn btn-outline">Reset</button>
-              <button type="button" class="btn btn-outline" id="clearStorage">Clear saved demo data</button>
-            </div>
-            <p class="muted pd-full" id="profileFormMsg" role="status" aria-live="polite"></p>
-          </form>
-        </div>
+      <footer class="pd-foot">
+        © 2026 District Sports — Player Dashboard · UI demo build.
+        Statistics, rankings, notices and fixtures below are sample data for the
+        class project. Only the "Join a Club" panel talks to the database.
+      </footer>
+    </main>
 
-        <div class="box">
-          <div class="box-head">
-            <div>
-              <h3>🔐 Security</h3>
-              <p class="muted">Demo only — the check below is a visual mock, no password is changed.</p>
-            </div>
-          </div>
-          <form id="passForm" novalidate>
-            <div>
-              <label for="curPass">Current Password</label>
-              <input id="curPass" type="password" placeholder="••••••" required>
-            </div>
-            <div>
-              <label for="newPass">New Password</label>
-              <input id="newPass" type="password" placeholder="At least 6 characters" required>
-            </div>
-            <div>
-              <label for="conPass">Confirm New Password</label>
-              <input id="conPass" type="password" placeholder="Repeat new password" required>
-            </div>
-            <div class="pd-form-actions">
-              <button type="submit" class="btn btn-green">Update Password</button>
-            </div>
-            <p class="muted" id="passFormMsg" role="status" aria-live="polite"></p>
-          </form>
-
-          <h3 class="pd-subhead">🔔 Notifications</h3>
-          <ul class="pd-toggles">
-            <li>
-              <label><input type="checkbox" data-pref="matchReminders" checked> Match reminders (1 day before)</label>
-            </li>
-            <li>
-              <label><input type="checkbox" data-pref="clubAnnouncements" checked> Club announcements</label>
-            </li>
-            <li>
-              <label><input type="checkbox" data-pref="rankingUpdates"> Ranking &amp; points updates</label>
-            </li>
-            <li>
-              <label><input type="checkbox" data-pref="smsAlerts"> SMS alerts (may cost money)</label>
-            </li>
-          </ul>
-          <p class="muted pd-note">Notification choices are kept in this browser only.</p>
-        </div>
-      </div>
-
-      <div class="box pd-danger-zone">
-        <div>
-          <h3>🚪 Logout</h3>
-          <p class="muted">Ends this demo session and returns you to the login page.</p>
-        </div>
-        <button class="btn btn-outline pd-danger" id="logoutBtn2">Logout</button>
-      </div>
-    </section>
-
-    <footer class="foot">
-      © 2026 District Sports — Player Dashboard · UI demo build.
-      Statistics, rankings, notices and fixtures below are sample data for the
-      class project. Only the "Join a Club" panel talks to the database.
-    </footer>
-  </main>
+  </div><!-- /.pd-shell -->
 
   <!-- Shared detail popup (member profile / match details) -->
   <div class="pd-modal" id="pdModal" hidden>
@@ -706,6 +715,7 @@
   <!-- Toast -->
   <div class="pd-toast" id="pdToast" role="status" aria-live="polite" hidden></div>
 
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/auth.js"></script>

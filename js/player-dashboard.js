@@ -528,7 +528,7 @@ function renderRankSnapshot() {
   }
 
   host.innerHTML =
-    '<table class="table"><thead><tr>' +
+    '<div class="pd-table-wrap"><table><thead><tr>' +
       "<th>Rank</th><th>Player</th><th>P</th><th>Goals</th><th>Points</th>" +
     "</tr></thead><tbody>" +
     rows.map(r => (
@@ -540,8 +540,8 @@ function renderRankSnapshot() {
         "<td>" + r.points + "</td>" +
       "</tr>"
     )).join("") +
-    "</tbody></table>" +
-    '<p class="muted pd-note">Top scorers · points = goals × 3 + assists</p>';
+    "</tbody></table></div>" +
+    '<p class="pd-muted pd-note">Top scorers · points = goals × 3 + assists</p>';
 }
 
 function renderNoticeSnapshot() {
@@ -635,9 +635,6 @@ function renderClub() {
 
   fill($("#clubName"), c.name);
   fill($("#clubMeta"), c.id + " · Established " + c.established);
-
-  const logo = $("#clubLogo");
-  if (logo) logo.src = c.logo;
 
   $("#clubChips").innerHTML = [
     "📍 " + c.district,
@@ -808,8 +805,8 @@ function renderMembers() {
 
   $("#memberGrid").innerHTML = list.map(m => {
     const badge = m.status === "Active"
-      ? '<span class="badge green">Active</span>'
-      : '<span class="badge yellow">Pending</span>';
+      ? '<span class="pd-badge pd-badge-green">Active</span>'
+      : '<span class="pd-badge pd-badge-yellow">Pending</span>';
 
     return (
       '<article class="pd-member-card' + (m.me ? " is-me" : "") + '" data-member="' + esc(m.id) + '"' +
@@ -1450,18 +1447,18 @@ function showMember(id) {
         esc(initials(m.name)) + "</span>" +
       "<div>" +
         "<h4>" + esc(m.name) + (m.me ? ' <span class="pd-you-tag">You</span>' : "") + "</h4>" +
-        "<p class='muted'>" + esc(m.id) + " · " + esc(m.position) +
+        "<p class='pd-muted'>" + esc(m.id) + " · " + esc(m.position) +
           (captain ? ' <span class="pd-captain-tag">Captain</span>' : "") + "</p>" +
         (m.status === "Active"
-          ? '<span class="badge green">Active</span>'
-          : '<span class="badge yellow">Pending</span>') +
+          ? '<span class="pd-badge pd-badge-green">Active</span>'
+          : '<span class="pd-badge pd-badge-yellow">Pending</span>') +
       "</div>" +
     "</div>" +
     '<h4 class="pd-subhead">' + esc(m.sport) + " statistics</h4>" +
     '<dl class="pd-details">' + statRows + "</dl>" +
     '<h4 class="pd-subhead">Profile details</h4>' +
     '<dl class="pd-details">' + details + "</dl>" +
-    '<p class="muted pd-note">Sample data for the class project — no database is connected yet.</p>'
+    '<p class="pd-muted pd-note">Sample data for the class project — no database is connected yet.</p>'
   ));
 }
 
@@ -1502,8 +1499,8 @@ function showMatch(id) {
     '<dl class="pd-details">' + evRows + "</dl>" +
     '<h4 class="pd-subhead">Match details</h4>' +
     '<dl class="pd-details">' + details + "</dl>" +
-    '<p class="muted pd-note">' + esc(m.note) + "</p>" +
-    '<p class="muted pd-note">Sample result — no database is connected yet.</p>'
+    '<p class="pd-muted pd-note">' + esc(m.note) + "</p>" +
+    '<p class="pd-muted pd-note">Sample result — no database is connected yet.</p>'
   ));
 }
 
@@ -1708,12 +1705,12 @@ function showView(name) {
   const view = $("#view-" + name);
   if (!view) return;
 
-  $$(".pd-view").forEach(v => v.classList.remove("is-active"));
+  $$(".pd-panel").forEach(v => v.classList.remove("is-active"));
   view.classList.add("is-active");
 
   $$(".pd-nav a").forEach(a => {
     const active = a.dataset.view === name;
-    a.classList.toggle("active", active);
+    a.classList.toggle("is-active", active);
     if (active) { a.setAttribute("aria-current", "page"); }
     else { a.removeAttribute("aria-current"); }
   });
