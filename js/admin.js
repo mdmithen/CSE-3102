@@ -17,6 +17,12 @@
 // ==========================================
 
 (function () {
+  console.log("[ADMIN] Script loaded - IIFE started");
+
+  if (!window.AUTH) {
+    console.error("[ADMIN] window.AUTH is undefined - auth.js not loaded before admin.js");
+    return;
+  }
 
   if (!window.AUTH) return;
 
@@ -47,6 +53,9 @@
   function sb() {
     return window.SB || null;
   }
+
+  /* Startup connection check */
+  console.log("[ADMIN] Supabase client at startup:", sb() ? "CONNECTED" : "NULL - check js/supabase-config.js and CDN script tag");
 
   var msgEl = document.getElementById("adminMsg");
   var statusEl = document.getElementById("saStatus");
@@ -158,7 +167,10 @@
             "<td>" + esc(club.name) + "</td>" +
             "<td>" + (club.manager_id ? "Assigned" : "—") + "</td>" +
             "<td>" + badge(club.status) + "</td>" +
-            '<td><a href="#" data-club="' + esc(club.id) + '">Set Manager</a></td>';
+            '<td>' +
+            '<a href="#" data-club="' + esc(club.id) + '">Set Manager</a> ' +
+            '<a href="#" data-delete="' + esc(club.id) + '" class="sa-delete">Delete</a>' +
+            '</td>';
           body.appendChild(tr);
         });
 
@@ -168,6 +180,16 @@
             var clubId = Number(link.getAttribute("data-club"));
             var email = window.prompt("Email of the existing user who should manage this club:");
             if (email && email.trim()) setManager(clubId, email.trim());
+          });
+        });
+
+        Array.prototype.forEach.call(body.querySelectorAll("a[data-delete]"), function (link) {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+            var clubId = Number(link.getAttribute("data-delete"));
+            var clubName = link.closest("tr").querySelector("td:nth-child(2)").textContent.trim();
+            if (!window.confirm("Delete club '" + clubName + "'? This cannot be undone.")) return;
+            deleteClub(clubId);
           });
         });
       })
@@ -194,40 +216,253 @@
     });
   }
 
+  function deleteClub(clubId) {
+    if (!sb()) { say("Supabase is not connected.", true); return; }
+
+    say("Deleting club DSC-" + pad(clubId) + "…");
+
+    sb().from("clubs").delete().eq("id", clubId).then(function (res) {
+      if (res && res.error) {
+        console.error("[DELETE CLUB] Error:", res.error);
+        say(res.error.message || "Could not delete the club.", true);
+        return;
+      }
+      say("Club DSC-" + pad(clubId) + " deleted.");
+      loadClubs();
+    }).catch(function (err) {
+      console.error("[DELETE CLUB] Catch error:", err);
+      say(errText(err), true);
+    });
+  }
+
+  /* ---------- districts (dropdown) ---------- */
+
+  var BANGLADESH_DISTRICTS = [
+    "Dhaka","Faridpur","Gazipur","Gopalganj","Kishoreganj","Madaripur",
+    "Manikganj","Munshiganj","Narayanganj","Narsingdi","Rajbari","Shariatpur",
+    "Tangail","Jamalpur","Mymensingh","Netrakona","Sherpur","Bandarban",
+    "Brahmanbaria","Chandpur","Chattogram","Cox's Bazar","Cumilla","Feni",
+    "Khagrachari","Lakshmipur","Noakhali","Rangamati","Bogura",
+    "Chapainawabganj","Joypurhat","Naogaon","Natore","Pabna","Rajshahi",
+    "Sirajganj","Bagerhat","Chuadanga","Jashore","Jhenaidah","Khulna",
+    "Kushtia","Magura","Meherpur","Narail","Satkhira","Barguna","Barishal",
+    "Bhola","Jhalakathi","Patuakhali","Pirojpur","Habiganj","Moulvibazar",
+    "Sunamganj","Sylhet","Dinajpur","Gaibandha","Kurigram","Lalmonirhat",
+    "Nilphamari","Panchagarh","Rangpur","Thakurgaon"
+  ];
+
+  function loadDistricts() {
+    var sel = document.getElementById("club-district");
+    if (!sel) return;
+
+    sel.innerHTML = '<option value="">Select District</option>';
+    BANGLADESH_DISTRICTS.forEach(function (d) {
+      var opt = document.createElement("option");
+      opt.value = d;
+      opt.textContent = d;
+      sel.appendChild(opt);
+    });
+  }
+
   /* ---------- Add club form ---------- */
 
-  var form = document.querySelector("#add-club form");
+  var form = document.querySelector("#addClubForm");
+  var submitBtn = document.querySelector("#addClubForm button[type='submit']");
+  console.log("[ADMIN] Add club form found:", !!form, "submit button found:", !!submitBtn);
   if (form) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      if (!sb()) { say("Supabase is not connected.", true); return; }
+      handleAddClub();
+    });
+  }
+  if (submitBtn) {
+    submitBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      handleAddClub();
+    });
+  }
 
-      var name = (document.getElementById("club-name").value || "").trim();
-      var phone = (document.getElementById("club-contact").value || "").trim();
-      var managerEmail = (document.getElementById("club-manager-email").value || "").trim();
+  function handleAddClub() {
+    console.log("[ADD CLUB] handleAddClub called");
+    var sbc = sb();
+    console.log("[ADD CLUB] Supabase client:", sbc ? "connected" : "NULL");
+    if (!sbc) { say("Supabase is not connected. Check the browser console.", true); return; }
 
-      if (!name) { say("Please enter the club name.", true); return; }
+    var name = (document.getElementById("club-name").value || "").trim();
+    var districtId = (document.getElementById("club-district").value || "").trim();
+    var email = (document.getElementById("club-email").value || "").trim();
+    var phone = (document.getElementById("club-contact").value || "").trim();
+    var address = (document.getElementById("club-address").value || "").trim();
+    var managerEmail = (document.getElementById("club-manager-email").value || "").trim();
+    var managerName = (document.getElementById("club-manager-name").value || "").trim();
 
-      say("Saving club…");
+    console.log("[ADD CLUB] Form data:", { name, districtId, email, phone, address, managerEmail, managerName });
 
-      sb().rpc("admin_create_club", {
-        p_name: name,
-        p_phone: phone,
-        p_email: "",
-        p_manager_email: managerEmail
-      }).then(function (res) {
-        var data = (res && res.data) || {};
-        if (data.ok) {
-          var text = "Club created (DSC-" + pad(data.club_id) + ").";
-          if (data.warning) text += " " + data.warning;
-          say(text);
-          form.reset();
-          loadClubs();
-        } else {
-          say(data.error || "Could not create the club.", true);
+    if (!name) { say("Please enter the club name.", true); return; }
+    if (!districtId) { say("Please select a district.", true); return; }
+    if (!email) { say("Please enter the club email.", true); return; }
+    if (!phone) { say("Please enter a contact number.", true); return; }
+    if (!address) { say("Please enter the club address.", true); return; }
+    if (!managerEmail) { say("Please enter the manager email.", true); return; }
+    if (!managerName) { say("Please enter the manager name.", true); return; }
+
+    say("Saving club…");
+
+    /* Resolve the selected district name to its integer id */
+    console.log("[ADD CLUB] Looking up district:", districtId);
+    sbc.from("districts")
+      .select("id")
+      .eq("name", districtId)
+      .maybeSingle()
+      .then(function (distRes) {
+        console.log("[ADD CLUB] District lookup raw result:", JSON.stringify(distRes));
+        if (distRes && distRes.error) {
+          console.error("[ADD CLUB] District lookup error:", distRes.error);
+          say("Database error looking up district: " + distRes.error.message, true);
+          return;
         }
-      }).catch(function (err) {
+        var districtRow = distRes && distRes.data ? distRes.data : null;
+        console.log("[ADD CLUB] District row found:", districtRow);
+        if (!districtRow) {
+          say("District '" + districtId + "' not found in database.", true);
+          return;
+        }
+
+          console.log("[ADD CLUB] Inserting club with district_id:", districtRow.id);
+        return sbc.from("clubs").insert([{
+          name: name,
+          district_id: districtRow.id,
+          email: email,
+          phone: phone,
+          address: address,
+          status: "Active"
+        }]).then(function (res) {
+          console.log("[ADD CLUB] Club insert raw result:", JSON.stringify(res));
+          if (res && res.error) {
+            console.error("[ADD CLUB] Club insert error:", res.error);
+            say(res.error.message || "Could not create the club.", true);
+            return;
+          }
+
+          var clubRow = res && res.data && res.data[0] ? res.data[0] : null;
+          if (!clubRow) {
+            /* Insert succeeded but data not returned — look the club up */
+            console.log("[ADD CLUB] No data in insert result, looking up club by name + district");
+            return sbc.from("clubs")
+              .select("id")
+              .eq("name", name)
+              .eq("district_id", districtRow.id)
+              .order("created_at", { ascending: false })
+              .limit(1)
+              .maybeSingle()
+              .then(function (lookupRes) {
+                if (lookupRes && lookupRes.error) {
+                  console.error("[ADD CLUB] Club lookup error:", lookupRes.error);
+                  say("Club created but could not find it to link manager.", true);
+                  return;
+                }
+                clubRow = lookupRes && lookupRes.data ? lookupRes.data : null;
+                if (!clubRow) {
+                  say("Club created but could not find it to link manager.", true);
+                  return;
+                }
+                console.log("[ADD CLUB] Club found via lookup with id:", clubRow.id);
+                return createManagerAndLink(sbc, managerEmail, managerName, phone, clubRow, name, address);
+              });
+          }
+
+          console.log("[ADD CLUB] Club inserted with id:", clubRow.id);
+          return createManagerAndLink(sbc, managerEmail, managerName, phone, clubRow, name, address);
+        }).catch(function (err) {
+          console.error("[ADD CLUB] Insert catch error:", err);
+          say(errText(err), true);
+        });
+      })
+      .catch(function (err) {
+        console.error("[ADD CLUB] District lookup catch error:", err);
         say(errText(err), true);
+      });
+  }
+
+  /* Create manager auth account + profile + users, then link to club */
+  function createManagerAndLink(sbc, managerEmail, managerName, phone, clubRow, clubName, address) {
+    console.log("[ADD CLUB] Creating manager auth user:", managerEmail);
+    return sbc.auth.signUp({
+      email: managerEmail,
+      password: "123456",
+      options: {
+        data: {
+          full_name: managerName,
+          role: "club_admin"
+        }
+      }
+    }).then(function (authRes) {
+      console.log("[ADD CLUB] Auth signUp result:", JSON.stringify(authRes));
+      if (authRes && authRes.error) {
+        console.error("[ADD CLUB] Auth signUp error:", authRes.error);
+        say("Club created, but manager account failed: " + authRes.error.message, true);
+        return;
+      }
+
+      var newUser = authRes && authRes.data && authRes.data.user ? authRes.data.user : null;
+      if (!newUser) {
+        say("Club created, but no manager user returned.", true);
+        return;
+      }
+
+      console.log("[ADD CLUB] New manager user id:", newUser.id);
+
+      /* Step 3: Upsert profile for the manager */
+      return sbc.from("profiles").upsert([{
+        id: newUser.id,
+        full_name: managerName,
+        phone: phone
+      }]).then(function (profRes) {
+        console.log("[ADD CLUB] Profile upsert result:", JSON.stringify(profRes));
+        if (profRes && profRes.error) {
+          console.error("[ADD CLUB] Profile upsert error:", profRes.error);
+          say("Club + manager account created. Profile save pending.", true);
+          return;
+        }
+
+        /* Step 3b: Upsert into users table */
+        return sbc.from("users").upsert([{
+          id: newUser.id,
+          full_name: managerName,
+          email: managerEmail,
+          phone: phone,
+          address: address,
+          club_name: clubName,
+          role: "club_admin"
+        }]).then(function (userRes) {
+          if (userRes && userRes.error) {
+            console.warn("[ADD CLUB] Users upsert error:", userRes.error.message);
+            say("Club + manager + profile created. Users table insert pending.", true);
+            return;
+          }
+
+          /* Step 4: Link manager to the club */
+          return sbc.from("clubs").update({ manager_id: newUser.id }).eq("id", clubRow.id).then(function (updRes) {
+            console.log("[ADD CLUB] Club manager link result:", JSON.stringify(updRes));
+            if (updRes && updRes.error) {
+              console.error("[ADD CLUB] Club manager link error:", updRes.error);
+              say("Club + manager account created. Manager link pending.", true);
+              return;
+            }
+
+            console.log("[ADD CLUB] Manager linked to club successfully");
+            say("Club registered! Manager account: " + managerEmail + " / 123456");
+            form.reset();
+            loadClubs();
+
+            /* Sign out the auto-created manager session and return to Super Admin login */
+            setTimeout(function () {
+              sbc.auth.signOut().then(function () {
+                window.location.href = "login.html";
+              });
+            }, 2000);
+          });
+        });
       });
     });
   }
@@ -308,6 +543,11 @@
     var subEl = document.getElementById("saPageSub");
     if (titleEl) titleEl.textContent = meta.title;
     if (subEl) subEl.textContent = meta.sub;
+
+    /* Keep the URL hash in sync with the open panel */
+    try {
+      window.location.hash = name;
+    } catch (err) {}
   }
 
   function bindNav() {
@@ -320,6 +560,14 @@
       e.preventDefault();
       showPanel(link.getAttribute("data-sa-nav"));
       closeDrawer();
+    });
+
+    /* Also support Back/Forward buttons via hash changes */
+    window.addEventListener("hashchange", function () {
+      var hash = window.location.hash.replace(/^#/, "");
+      if (hash && PANELS[hash]) {
+        showPanel(hash);
+      }
     });
   }
 
@@ -370,12 +618,21 @@
   /* ---------- start ---------- */
 
   renderStats();
-  showPanel("dashboard");
+
+  /* Open the panel from the URL hash, or Dashboard by default */
+  var startHash = window.location.hash.replace(/^#/, "");
+  if (startHash && PANELS[startHash]) {
+    showPanel(startHash);
+  } else {
+    showPanel("dashboard");
+    try { window.location.hash = "dashboard"; } catch (err) {}
+  }
 
   bindNav();
   bindDrawer();
 
   loadClubs();
   loadUsers();
+  loadDistricts();
 
 })();

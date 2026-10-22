@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Supabase Connection Test</title>
+</head>
+<body>
+  <h2>Supabase Connection Test</h2>
+  <div id="status">Loading...</div>
+  <div id="result"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script>
+    (function () {
+      var status = document.getElementById("status");
+      var result = document.getElementById("result");
+
+      console.log("window.supabase:", typeof window.supabase);
+      console.log("window.SB:", window.SB);
+
+      if (!window.SB) {
+        status.textContent = "❌ Supabase client is NULL";
+        status.style.color = "red";
+        result.innerHTML = "<p>Check: CDN script loaded? js/supabase-config.js loaded?</p>";
+        return;
+      }
+
+      status.textContent = "✅ Supabase client connected";
+      status.style.color = "green";
+
+      // Test reading clubs table
+      window.SB.from("clubs").select("count", { head: true }).then(function (res) {
+        console.log("clubs query result:", res);
+        if (res.error) {
+          result.innerHTML = "<p style='color:red'>❌ Query failed: " + res.error.message + "</p>";
+        } else {
+          result.innerHTML = "<p style='color:green'>✅ clubs table readable</p>";
+        }
+      }).catch(function (err) {
+        console.error("clubs query error:", err);
+        result.innerHTML = "<p style='color:red'>❌ Query error: " + err.message + "</p>";
+      });
+
+      // Test reading districts table
+      window.SB.from("districts").select("count", { head: true }).then(function (res) {
+        console.log("districts query result:", res);
+        if (res.error) {
+          result.innerHTML += "<p style='color:red'>❌ districts query failed: " + res.error.message + "</p>";
+        } else {
+          result.innerHTML += "<p style='color:green'>✅ districts table readable</p>";
+        }
+      }).catch(function (err) {
+        console.error("districts query error:", err);
+        result.innerHTML += "<p style='color:red'>❌ districts error: " + err.message + "</p>";
+      });
+    })();
+  </script>
+</body>
+</html>

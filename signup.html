@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up — District Sports</title>
+  <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+
+  <main class="login-page">
+    <div class="login-box">
+
+      <div class="logo">
+        <span>🏆</span>
+        <h1>District Sports</h1>
+        <p>Create your player account</p>
+      </div>
+
+      <p id="error" class="error" role="alert" aria-live="polite"></p>
+      <p id="success" style="color: var(--green); font-size: 14px; text-align: center; margin-bottom: 12px; min-height: 20px;"></p>
+
+      <form id="signupForm" novalidate>
+        <div>
+          <label for="fullName">Full Name</label>
+          <input id="fullName" name="full_name" type="text" placeholder="Rahim Ahmed" autocomplete="name" required>
+        </div>
+
+        <div>
+          <label for="email">Email Address</label>
+          <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="username" required>
+        </div>
+
+        <div>
+          <label for="password">Password</label>
+          <div class="pw-wrap">
+            <input id="password" name="password" type="password" placeholder="Create a password" autocomplete="new-password" required>
+            <button type="button" id="togglePassword" class="pw-toggle" aria-label="Show password" aria-pressed="false">Show</button>
+          </div>
+        </div>
+
+        <div>
+          <label for="phone">Phone Number</label>
+          <input id="phone" name="phone" type="tel" placeholder="01XXXXXXXXX" required>
+        </div>
+
+        <div>
+          <label for="address">Address</label>
+          <input id="address" name="address" type="text" placeholder="House, Road, District" required>
+        </div>
+
+        <div>
+          <label for="club">Club Name</label>
+          <select id="club" name="club_name" required>
+            <option value="">Select a club</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-green">Create Account</button>
+      </form>
+
+      <div class="links">
+        <a href="login.html">Already have an account? Login</a>
+        <span>•</span>
+        <a href="index.html">Back to Home</a>
+      </div>
+
+      <p class="hint">Account is created with Supabase Auth. Role: Player.</p>
+
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/signup.js"></script>
+</body>
+</html>

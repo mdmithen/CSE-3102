@@ -142,37 +142,37 @@
                         <h3>Add New Club</h3>
                         <p class="sa-note">Fill in club details to register a new club.</p>
                         <p id="adminMsg" class="sa-msg" role="status"></p>
-                        <form class="sa-form">
+                        <form class="sa-form" id="addClubForm">
                             <div>
                                 <label for="club-name">Club Name</label>
-                                <input id="club-name" type="text" placeholder="e.g. Rajshahi Sports Club">
+                                <input id="club-name" type="text" placeholder="e.g. Rajshahi Sports Club" required>
                             </div>
                             <div>
                                 <label for="club-district">District</label>
-                                <select id="club-district">
-                                    <option>Select District</option>
-                                    <option>Dhaka</option>
-                                    <option>Rajshahi</option>
-                                    <option>Chattogram</option>
-                                    <option>Sylhet</option>
-                                    <option>Khulna</option>
-                                    <option>Barishal</option>
-                                    <option>Rangpur</option>
-                                    <option>Mymensingh</option>
+                                <select id="club-district" required>
+                                    <option value="">Loading districts…</option>
                                 </select>
                             </div>
                             <div>
-                                <label for="club-manager-email">Manager Email</label>
-                                <input id="club-manager-email" type="email" placeholder="manager@gmail.com">
-                                <small class="sa-hint">Must already exist in Authentication → Users. That person becomes the Club Admin of this club.</small>
+                                <label for="club-email">Club Email</label>
+                                <input id="club-email" type="email" placeholder="club@example.com" required>
                             </div>
                             <div>
                                 <label for="club-contact">Contact Number</label>
-                                <input id="club-contact" type="tel" placeholder="01XXXXXXXXX">
+                                <input id="club-contact" type="tel" placeholder="01XXXXXXXXX" required>
                             </div>
                             <div class="full">
                                 <label for="club-address">Club Address</label>
-                                <input id="club-address" type="text" placeholder="Full club address">
+                                <input id="club-address" type="text" placeholder="Full club address" required>
+                            </div>
+                            <div>
+                                <label for="club-manager-email">Manager Email</label>
+                                <input id="club-manager-email" type="email" placeholder="manager@club.com" required>
+                                <small class="sa-hint">A club manager account is auto-created with password <b>123456</b>.</small>
+                            </div>
+                            <div>
+                                <label for="club-manager-name">Manager Name</label>
+                                <input id="club-manager-name" type="text" placeholder="Manager full name" required>
                             </div>
                             <div class="full">
                                 <button type="submit" class="sa-btn sa-btn-primary">Register Club</button>
@@ -180,9 +180,8 @@
                             </div>
                         </form>
                         <p class="sa-note sa-note-warn">
-                            Club Name, Contact Number and Manager Email are what the
-                            database currently stores. District and Address are still
-                            collected here but are not saved yet.
+                            The club is saved with status <b>Pending</b>. A club manager account is
+                            auto-created (email above, password <b>123456</b>) and linked as manager.
                         </p>
                     </div>
                 </section>
