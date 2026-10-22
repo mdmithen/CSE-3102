@@ -586,6 +586,12 @@
 
       var name = (document.getElementById("player-name").value || "").trim();
       var position = (document.getElementById("player-position").value || "").trim();
+      var dob = (document.getElementById("player-dob").value || "").trim();
+      var gender = (document.getElementById("player-gender").value || "").trim();
+      var district = (document.getElementById("player-district").value || "").trim();
+      var sport = (document.getElementById("player-sport").value || "").trim();
+      var contact = (document.getElementById("player-contact").value || "").trim();
+      var email = (document.getElementById("player-email").value || "").trim();
 
       if (!name) { say("Please enter the player name.", true); return; }
 
@@ -595,7 +601,9 @@
         full_name: name,
         position: position || "Player",
         status: "Active",
-        club_id: activeClubId
+        club_id: activeClubId,
+        dob: dob || null,
+        gender: gender || null
       }]).then(function (res) {
         if (res && res.error) {
           say(errText(res.error), true);

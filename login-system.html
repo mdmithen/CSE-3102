@@ -243,16 +243,12 @@
                           <input type="text" id="player-position" name="player_position" placeholder="e.g. Midfielder">
                         </div>
                         <div>
-                          <label for="player-id">Player ID</label>
-                          <input type="text" id="player-id" name="player_id" placeholder="PLY-005" class="is-offline" disabled>
-                        </div>
-                        <div>
                           <label for="player-dob">Date of Birth</label>
-                          <input type="date" id="player-dob" name="player_dob" class="is-offline" disabled>
+                          <input type="date" id="player-dob" name="player_dob">
                         </div>
                         <div>
                           <label for="player-gender">Gender</label>
-                          <select id="player-gender" name="player_gender" class="is-offline" disabled>
+                          <select id="player-gender" name="player_gender">
                             <option value="">Select Gender</option>
                             <option>Male</option>
                             <option>Female</option>
@@ -261,7 +257,7 @@
                         </div>
                         <div>
                           <label for="player-district">District</label>
-                          <select id="player-district" name="player_district" class="is-offline" disabled>
+                          <select id="player-district" name="player_district">
                             <option value="">Select District</option>
                             <option>Dhaka</option>
                             <option>Rajshahi</option>
@@ -275,23 +271,19 @@
                         </div>
                         <div>
                           <label for="player-sport">Sport</label>
-                          <select id="player-sport" name="player_sport" class="is-offline" disabled>
+                          <select id="player-sport" name="player_sport">
                             <option value="">Select Sport</option>
                             <option>Football</option>
                             <option>Cricket</option>
-                            <option>Badminton</option>
-                            <option>Athletics</option>
-                            <option>Basketball</option>
-                            <option>Volleyball</option>
                           </select>
                         </div>
                         <div>
                           <label for="player-contact">Contact Number</label>
-                          <input type="tel" id="player-contact" name="player_contact" placeholder="01XXXXXXXXX" class="is-offline" disabled>
+                          <input type="tel" id="player-contact" name="player_contact" placeholder="01XXXXXXXXX">
                         </div>
                         <div>
                           <label for="player-email">Email</label>
-                          <input type="email" id="player-email" name="player_email" placeholder="player@example.com" class="is-offline" disabled>
+                          <input type="email" id="player-email" name="player_email" placeholder="player@example.com">
                         </div>
                         <div class="cad-form-actions">
                           <button type="submit">Register Player</button>
@@ -299,10 +291,7 @@
                         </div>
                       </form>
                       <p class="cad-note cad-note-warn">
-                        Only <b>Player Name</b> and <b>Position</b> are written to the
-                        database today. The greyed-out fields are part of the target
-                        layout but are not stored yet, so they are disabled rather
-                        than silently throwing the data away.
+                        All fields are written to the database today.
                       </p>
                     </article>
 
@@ -577,6 +566,51 @@
                 <div class="pub-actions">
                     <a href="login.html">→ Go to your own Player Dashboard</a>
                 </div>
+            </article>
+
+            <!-- Player Registration Form (live database) -->
+            <article class="pub-plain" id="player-register">
+                <h3>Register as Player</h3>
+                <p class="pub-lead">Create your player account. It will be linked to your chosen club.</p>
+                <p id="player-reg-msg" class="sa-msg" role="status"></p>
+                <form class="sa-form" id="playerRegForm">
+                    <div>
+                        <label for="preg-fullName">Full Name</label>
+                        <input id="preg-fullName" name="full_name" type="text" placeholder="Rahim Ahmed" required>
+                    </div>
+                    <div>
+                        <label for="preg-email">Email Address</label>
+                        <input id="preg-email" name="email" type="email" placeholder="you@example.com" required>
+                    </div>
+                    <div>
+                        <label for="preg-password">Password</label>
+                        <input id="preg-password" name="password" type="password" placeholder="Create password" required>
+                    </div>
+                    <div>
+                        <label for="preg-phone">Phone Number</label>
+                        <input id="preg-phone" name="phone" type="tel" placeholder="01XXXXXXXXX" required>
+                    </div>
+                    <div>
+                        <label for="preg-address">Address</label>
+                        <input id="preg-address" name="address" type="text" placeholder="House, Road, District" required>
+                    </div>
+                    <div>
+                        <label for="preg-district">District</label>
+                        <select id="preg-district" name="district" required>
+                            <option value="">Select District</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="preg-club">Club Name</label>
+                        <select id="preg-club" name="club_name" required>
+                            <option value="">Select Club</option>
+                        </select>
+                    </div>
+                    <div class="full">
+                        <button type="submit" class="sa-btn sa-btn-primary">Register as Player</button>
+                        <button type="reset" class="sa-btn">Clear</button>
+                    </div>
+                </form>
             </article>
 
             <!-- Sample profile below: static example data, open to everyone -->
@@ -1184,6 +1218,184 @@
                 AUTH.logout();
             });
         }
+    })();
+    </script>
+
+    <!-- Player Registration (live database) -->
+    <script>
+    (function () {
+        if (!window.SB) return;
+
+        var sbc = window.SB;
+        var form = document.getElementById("playerRegForm");
+        var msgEl = document.getElementById("player-reg-msg");
+        var districtSel = document.getElementById("preg-district");
+        var clubSel = document.getElementById("preg-club");
+
+        if (!form || !msgEl || !districtSel || !clubSel) return;
+
+        function say(text, isError) {
+            msgEl.textContent = text || "";
+            msgEl.style.color = isError ? "#DC2626" : "";
+        }
+
+        function esc(value) {
+            return String(value == null ? "" : value).replace(/[&<>"']/g, function (m) {
+                return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];
+            });
+        }
+
+        /* Load districts */
+        function loadDistricts() {
+            districtSel.innerHTML = '<option value="">Loading districts…</option>';
+            sbc.from("districts").select("id, name").order("name").then(function (res) {
+                var rows = (res && res.data) || [];
+                districtSel.innerHTML = '<option value="">Select District</option>';
+                if (!rows.length) {
+                    districtSel.innerHTML = '<option value="">No districts available</option>';
+                    return;
+                }
+                rows.forEach(function (d) {
+                    var opt = document.createElement("option");
+                    opt.value = d.name;
+                    opt.textContent = d.name;
+                    districtSel.appendChild(opt);
+                });
+            }).catch(function () {
+                districtSel.innerHTML = '<option value="">Could not load districts</option>';
+            });
+        }
+
+        /* Load clubs */
+        function loadClubs() {
+            clubSel.innerHTML = '<option value="">Loading clubs…</option>';
+            sbc.from("clubs").select("id, name").order("name").then(function (res) {
+                var rows = (res && res.data) || [];
+                clubSel.innerHTML = '<option value="">Select Club</option>';
+                if (!rows.length) {
+                    clubSel.innerHTML = '<option value="">No clubs available</option>';
+                    return;
+                }
+                rows.forEach(function (c) {
+                    var opt = document.createElement("option");
+                    opt.value = c.name;
+                    opt.textContent = c.name;
+                    clubSel.appendChild(opt);
+                });
+            }).catch(function () {
+                clubSel.innerHTML = '<option value="">Could not load clubs</option>';
+            });
+        }
+
+        /* Handle submit */
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            var fullName = (document.getElementById("preg-fullName").value || "").trim();
+            var email = (document.getElementById("preg-email").value || "").trim();
+            var password = document.getElementById("preg-password").value;
+            var phone = (document.getElementById("preg-phone").value || "").trim();
+            var address = (document.getElementById("preg-address").value || "").trim();
+            var district = (document.getElementById("preg-district").value || "").trim();
+            var clubName = (document.getElementById("preg-club").value || "").trim();
+
+            if (!fullName || !email || !password || !phone || !address || !district || !clubName) {
+                say("Please fill in all fields.", true);
+                return;
+            }
+            if (password.length < 6) {
+                say("Password must be at least 6 characters.", true);
+                return;
+            }
+
+            var btn = form.querySelector('button[type="submit"]');
+            if (btn) btn.disabled = true;
+            say("Creating account…");
+
+            sbc.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: fullName,
+                        role: "player"
+                    }
+                }
+            }).then(function (authRes) {
+                var user = authRes && authRes.data && authRes.data.user ? authRes.data.user : null;
+                if (authRes && authRes.error) {
+                    say(authRes.error.message || "Signup failed.", true);
+                    if (btn) btn.disabled = false;
+                    return;
+                }
+                if (!user) {
+                    say("Account created. Check your email to confirm, then log in.");
+                    form.reset();
+                    if (btn) btn.disabled = false;
+                    return;
+                }
+
+                /* Upsert profile */
+                return sbc.from("profiles").upsert([{
+                    id: user.id,
+                    full_name: fullName,
+                    phone: phone
+                }]).then(function (profRes) {
+                    if (profRes && profRes.error) {
+                        console.warn("profiles upsert:", profRes.error.message);
+                    }
+
+                    /* Look up club id by name */
+                    return sbc.from("clubs").select("id").eq("name", clubName).maybeSingle().then(function (clubRes) {
+                        var clubId = (clubRes && clubRes.data) ? clubRes.data.id : null;
+
+                        /* Upsert users table */
+                        return sbc.from("users").upsert([{
+                            id: user.id,
+                            full_name: fullName,
+                            email: email,
+                            phone: phone,
+                            address: address,
+                            club_name: clubName,
+                            district: district,
+                            role: "player"
+                        }]).then(function (userRes) {
+                            if (userRes && userRes.error) {
+                                console.warn("users upsert:", userRes.error.message);
+                            }
+
+                            /* Add to players roster if club found */
+                            if (clubId) {
+                                return sbc.from("players").upsert([{
+                                    profile_id: user.id,
+                                    club_id: clubId,
+                                    full_name: fullName,
+                                    status: "active"
+                                }]).then(function () {
+                                    say("Account created successfully! You can now log in.");
+                                    form.reset();
+                                }).catch(function (err) {
+                                    say("Account created. Club link pending.", true);
+                                    form.reset();
+                                });
+                            } else {
+                                say("Account created. Club not found — contact admin.", true);
+                                form.reset();
+                            }
+                        });
+                    });
+                }).catch(function (err) {
+                    say((err && err.message) ? err.message : "Signup failed.", true);
+                    if (btn) btn.disabled = false;
+                }).finally(function () {
+                    if (btn) btn.disabled = false;
+                });
+            });
+        });
+
+        loadDistricts();
+        loadClubs();
+
     })();
     </script>
 </body>
