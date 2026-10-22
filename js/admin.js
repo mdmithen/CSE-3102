@@ -167,10 +167,11 @@
             "<td>" + esc(club.name) + "</td>" +
             "<td>" + (club.manager_id ? "Assigned" : "—") + "</td>" +
             "<td>" + badge(club.status) + "</td>" +
-            '<td>' +
+          '<td>' +
             '<a href="#" data-club="' + esc(club.id) + '">Set Manager</a> ' +
+            '<a href="#" data-view-players="' + esc(club.id) + '" class="sa-view-players">View Players</a> ' +
             '<a href="#" data-delete="' + esc(club.id) + '" class="sa-delete">Delete</a>' +
-            '</td>';
+          '</td>';
           body.appendChild(tr);
         });
 
@@ -190,6 +191,15 @@
             var clubName = link.closest("tr").querySelector("td:nth-child(2)").textContent.trim();
             if (!window.confirm("Delete club '" + clubName + "'? This cannot be undone.")) return;
             deleteClub(clubId);
+          });
+        });
+
+        Array.prototype.forEach.call(body.querySelectorAll("a[data-view-players]"), function (link) {
+          link.addEventListener("click", function (e) {
+            e.preventDefault();
+            var clubId = Number(link.getAttribute("data-view-players"));
+            var clubName = link.closest("tr").querySelector("td:nth-child(2)").textContent.trim();
+            viewPlayers(clubId, clubName);
           });
         });
       })
@@ -233,6 +243,67 @@
       console.error("[DELETE CLUB] Catch error:", err);
       say(errText(err), true);
     });
+  }
+
+  /* ---------- view players modal ---------- */
+
+  var viewPlayersModal = document.getElementById("saViewPlayersModal");
+  var viewPlayersBackdrop = document.getElementById("saViewPlayersBackdrop");
+  var viewPlayersBody = document.getElementById("saViewPlayersBody");
+  var viewPlayersTitle = document.getElementById("saViewPlayersTitle");
+  var viewPlayersClose = document.getElementById("saViewPlayersClose");
+  var viewPlayersDone = document.getElementById("saViewPlayersDone");
+
+  function openViewPlayers() {
+    if (viewPlayersModal) viewPlayersModal.hidden = false;
+    if (viewPlayersBackdrop) viewPlayersBackdrop.hidden = false;
+  }
+
+  function closeViewPlayers() {
+    if (viewPlayersModal) viewPlayersModal.hidden = true;
+    if (viewPlayersBackdrop) viewPlayersBackdrop.hidden = true;
+  }
+
+  if (viewPlayersClose) viewPlayersClose.addEventListener("click", closeViewPlayers);
+  if (viewPlayersDone) viewPlayersDone.addEventListener("click", closeViewPlayers);
+  if (viewPlayersBackdrop) viewPlayersBackdrop.addEventListener("click", closeViewPlayers);
+
+  function viewPlayers(clubId, clubName) {
+    if (!sb()) { say("Supabase is not connected.", true); return; }
+
+    if (viewPlayersTitle) viewPlayersTitle.textContent = "Players — " + esc(clubName);
+    if (viewPlayersBody) viewPlayersBody.innerHTML = '<p class="muted">Loading players…</p>';
+    openViewPlayers();
+
+    sb().from("players").select("*").eq("club_id", clubId).order("full_name")
+      .then(function (res) {
+        if (res && res.error) throw res.error;
+        var players = res && res.data ? res.data : [];
+
+        if (!players.length) {
+          viewPlayersBody.innerHTML = '<p class="muted">No players registered for this club.</p>';
+          return;
+        }
+
+        var rows = players.map(function (p) {
+          return "<tr>" +
+            "<td>" + esc(p.full_name) + "</td>" +
+            "<td>" + esc(p.position || "—") + "</td>" +
+            "<td>" + esc(p.status || "Active") + "</td>" +
+            "<td>" + esc(p.jersey_no || "—") + "</td>" +
+            "<td>" + esc(p.dob ? String(p.dob).slice(0, 10) : "—") + "</td>" +
+          "</tr>";
+        }).join("");
+
+        viewPlayersBody.innerHTML =
+          '<table><thead><tr>' +
+          "<th>Name</th><th>Position</th><th>Status</th><th>Jersey</th><th>DOB</th>" +
+          "</tr></thead><tbody>" + rows + "</tbody></table>";
+      })
+      .catch(function (err) {
+        console.error("[VIEW PLAYERS] Error:", err);
+        viewPlayersBody.innerHTML = '<p style="color:#DC2626">Could not load players: ' + errText(err) + '</p>';
+      });
   }
 
   /* ---------- districts (dropdown) ---------- */

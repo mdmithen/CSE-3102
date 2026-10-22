@@ -188,10 +188,26 @@
 
             </div><!-- /.sa-panels -->
 
-            <footer class="sa-foot">2026 District Sports — Admin Panel</footer>
+<footer class="sa-foot">2026 District Sports — Admin Panel</footer>
         </main>
 
-    </div><!-- /.sa-shell -->
+        <!-- View Players Modal -->
+        <div class="sa-modal" id="saViewPlayersModal" hidden>
+            <div class="sa-modal-backdrop" id="saViewPlayersBackdrop" hidden></div>
+            <div class="sa-modal-card" role="dialog" aria-modal="true" aria-labelledby="saViewPlayersTitle">
+                <div class="sa-modal-head">
+                    <h3 id="saViewPlayersTitle">Club Players</h3>
+                    <button type="button" class="sa-modal-close" id="saViewPlayersClose" aria-label="Close">✕</button>
+                </div>
+                <div class="sa-modal-body" id="saViewPlayersBody">
+                    <p class="muted">Loading players…</p>
+                </div>
+                <div class="sa-modal-foot">
+                    <button type="button" class="sa-btn" id="saViewPlayersDone">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="js/supabase-config.js"></script>
