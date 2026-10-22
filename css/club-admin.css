@@ -700,6 +700,33 @@ body.cad-mode #clubs {
   border-color: #16A34A;
   color: #FFFFFF;
 }
+
+#clubAdminPanel .cad-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 3px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+#clubAdminPanel .cad-badge.scheduled {
+  background: #EFF6FF;
+  border: 1px solid #3B82F6;
+  color: #1E40AF;
+}
+#clubAdminPanel .cad-badge.completed {
+  background: #F0FDF4;
+  border: 1px solid #16A34A;
+  color: #15803D;
+}
+#clubAdminPanel .cad-badge.cancelled {
+  background: #FEF2F2;
+  border: 1px solid #DC2626;
+  color: #B91C1C;
+}
+
+/* ---------- Match form ---------- */
+
 #clubAdminPanel .cad-card-sub { font-size: 12px; color: var(--muted); margin: 0; }
 
 /* summary card: one bordered box per figure + caption row */

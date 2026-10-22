@@ -661,6 +661,224 @@
         say(errText(err), true);
       });
     });
+
+  /* ---------- schedule a match ---------- */
+
+  var matchForm = document.getElementById("matchForm");
+  var matchMsg = document.getElementById("matchMsg");
+  var matchList = document.getElementById("matchList");
+  var matchCount = document.getElementById("matchCount");
+
+  function sayMatch(text, isError) {
+    if (matchMsg) {
+      matchMsg.textContent = text || "";
+      matchMsg.style.color = isError ? "#DC2626" : "";
+    }
+  }
+
+  /* Load all clubs for away club dropdown */
+  function loadAllClubs() {
+    var sbc = sb();
+    if (!sbc || !document.getElementById("match-away-club")) return;
+
+    var sel = document.getElementById("match-away-club");
+    sel.innerHTML = '<option value="">Select away club</option>';
+
+    sbc.from("clubs").select("id, name, status").order("name").then(function (res) {
+      var rows = (res && res.data) || [];
+      rows.forEach(function (c) {
+        if (c.id === activeClubId) return; // don't allow self
+        var opt = document.createElement("option");
+        opt.value = c.id;
+        opt.textContent = c.name + " (" + c.status + ")";
+        sel.appendChild(opt);
+      });
+    }).catch(function () {
+      sel.innerHTML = '<option value="">Could not load clubs</option>';
+    });
+  }
+
+  /* Load matches for current club */
+  function loadMatches() {
+    var sbc = sb();
+    if (!sbc || !activeClubId || !matchList) return;
+
+    matchList.innerHTML = '<tr><td colspan="5">Loading matches…</td></tr>';
+
+    sbc.from("matches").select("*")
+      .or(`home_club_id.eq.${activeClubId},away_club_id.eq.${activeClubId}`)
+      .order("match_date", { ascending: false })
+      .then(function (res) {
+        if (res && res.error) throw res.error;
+        var matches = res && res.data ? res.data : [];
+        matchCount.textContent = matches.length + (matches.length === 1 ? " match" : " matches");
+
+        if (!matches.length) {
+          matchList.innerHTML = '<tr><td colspan="5">No matches scheduled yet.</td></tr>';
+          return;
+        }
+
+        // Load club names for opponent display
+        var clubIds = matches.map(function (m) {
+          return m.home_club_id === activeClubId ? m.away_club_id : m.home_club_id;
+        });
+        var clubMap = {};
+
+        sbc.from("clubs").select("id, name").in("id", clubIds).then(function (cres) {
+          (cres && cres.data || []).forEach(function (c) {
+            clubMap[c.id] = c.name;
+          });
+
+          matchList.innerHTML = matches.map(function (m) {
+            var oppId = m.home_club_id === activeClubId ? m.away_club_id : m.home_club_id;
+            var oppName = clubMap[oppId] || ("Club #" + oppId);
+            var status = m.status || "scheduled";
+            var statusClass = status === "completed" ? "completed" : status === "cancelled" ? "cancelled" : "scheduled";
+            var homeScore = m.home_score !== null ? m.home_score : "-";
+            var awayScore = m.away_score !== null ? m.away_score : "-";
+            var score = homeScore + " - " + awayScore;
+
+            return "<tr>" +
+              "<td>" + esc(oppName) + "</td>" +
+              "<td>" + esc(m.tournament || "—") + "</td>" +
+              "<td>" + esc(formatDateFromISO(m.match_date)) + "</td>" +
+              "<td>" + esc(m.venue || "—") + "</td>" +
+              "<td><span class=\"cad-badge " + statusClass + "\">" + esc(status) + "</span> " + esc(score) + "</td>" +
+            "</tr>";
+          }).join("");
+        });
+      }).catch(function (err) {
+        console.error("[MATCHES] Load error:", err);
+        matchList.innerHTML = '<tr><td colspan="5">Could not load matches.</td></tr>';
+      });
+  }
+
+  function formatDateFromISO(iso) {
+    if (!iso) return "—";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleString();
+  }
+
+  /* Match form submit */
+  if (matchForm) {
+    matchForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var sbc = sb();
+      if (!sbc) { sayMatch("Supabase is not connected.", true); return; }
+      if (!activeClubId) { sayMatch("You are not assigned to a club yet.", true); return; }
+
+      var homeClubId = activeClubId;
+      var awayClubId = (document.getElementById("match-away-club").value || "").trim();
+      var matchDate = document.getElementById("match-date").value;
+      var tournament = (document.getElementById("match-tournament").value || "").trim();
+      var venue = (document.getElementById("match-venue").value || "").trim();
+
+      if (!awayClubId) { sayMatch("Please select an away club.", true); return; }
+      if (!matchDate) { sayMatch("Please select a match date.", true); return; }
+
+      var btn = matchForm.querySelector('button[type="submit"]');
+      if (btn) btn.disabled = true;
+      sayMatch("Scheduling match…");
+
+      /* Step 1: Insert match */
+      sbc.from("matches").insert([{
+        home_club_id: homeClubId,
+        away_club_id: Number(awayClubId),
+        match_date: matchDate,
+        tournament: tournament || null,
+        venue: venue || null,
+        status: "scheduled"
+      }]).then(function (res) {
+        if (res && res.error) throw res.error;
+
+        var matchRow = res && res.data && res.data[0] ? res.data[0] : null;
+        if (!matchRow) {
+          sayMatch("Match created but no data returned.", true);
+          if (btn) btn.disabled = false;
+          return;
+        }
+
+        /* Step 2: Create notice for all clubs */
+        var noticeTitle = "New Match Scheduled";
+        var noticeBody = "A new match has been scheduled:\n" +
+          "Home: " + (document.getElementById("match-home-club").value || "Unknown") + "\n" +
+          "Away: " + document.getElementById("match-away-club").options[document.getElementById("match-away-club").selectedIndex].text + "\n" +
+          "Date: " + formatDateFromISO(matchDate) + "\n" +
+          (tournament ? "Tournament: " + tournament + "\n" : "") +
+          (venue ? "Venue: " + venue + "\n" : "");
+
+        return sbc.from("notices").insert([{
+          user_id: null, // system notice
+          title: noticeTitle,
+          body: noticeBody,
+          category: "match",
+          is_published: true,
+          author_id: null,
+          created_at: new Date().toISOString()
+        }]).then(function (noticeRes) {
+          if (noticeRes && noticeRes.error) {
+            console.warn("[MATCH] Notice insert:", noticeRes.error.message);
+            // Match was created even if notice failed
+          }
+
+          sayMatch("Match scheduled! Notice published to all clubs.");
+          matchForm.reset();
+          loadMatches();
+          loadNotices(); // refresh notices
+          if (btn) btn.disabled = false;
+        });
+      }).catch(function (err) {
+        console.error("[MATCH] Error:", err);
+        sayMatch(errText(err), true);
+        if (btn) btn.disabled = false;
+      });
+    });
+  }
+
+  /* ---------- notices ---------- */
+
+  function loadNotices() {
+    var sbc = sb();
+    if (!sbc || !document.getElementById("noticeList")) return;
+
+    sbc.from("notices").select("*").order("created_at", { ascending: false }).limit(20)
+      .then(function (res) {
+        if (res && res.error) throw res.error;
+        var notices = res && res.data ? res.data : [];
+        renderNotices(notices);
+      }).catch(function (err) {
+        console.error("[NOTICES] Load error:", err);
+        var host = document.getElementById("noticeList");
+        if (host) host.innerHTML = '<div class="cad-empty"><h3>Could not load notices.</h3></div>';
+      });
+  }
+
+  function renderNotices(notices) {
+    var host = document.getElementById("noticeList");
+    if (!host) return;
+
+    if (!notices.length) {
+      host.innerHTML =
+        '<div class="cad-empty">' +
+        "<h3>No notices available yet.</h3>" +
+        "<p>No announcements have been posted.</p>" +
+        "</div>";
+      return;
+    }
+
+    host.innerHTML = notices.map(function (n) {
+      return '<article class="notice-item">' +
+        '<div class="notice-head">' +
+          "<h3>" + esc(n.title) + "</h3>" +
+          (n.category ? '<span class="notice-status">' + esc(n.category) + "</span>" : "") +
+        "</div>" +
+        '<p class="notice-body">' + esc(n.body) + "</p>" +
+        (n.created_at ? '<p class="notice-date">' + esc(formatDateFromISO(n.created_at)) + "</p>" : "") +
+      "</article>";
+    }).join("");
+  }
+
   }
 
   /* ---------- mobile sidebar drawer ---------- */
@@ -852,35 +1070,6 @@
    Nothing else has to change, and no Publish / Edit / Delete
    controls exist because there is nothing to manage yet. */
 
-  var NOTICES = [];
-
-  function renderNotices() {
-    var host = document.getElementById("noticeList");
-    if (!host) return;
-
-    if (!NOTICES.length) {
-      host.innerHTML =
-        '<div class="cad-empty">' +
-          "<h3>No notices available yet.</h3>" +
-          "<p>This club has not posted any announcements. Notices will " +
-          "appear here once a notice data source is connected to the " +
-          "Club Manager dashboard.</p>" +
-        "</div>";
-      return;
-    }
-
-    host.innerHTML = NOTICES.map(function (n) {
-      return '<article class="notice-item">' +
-        '<div class="notice-head">' +
-          "<h3>" + esc(n.title) + "</h3>" +
-          (n.status ? '<span class="notice-status">' + esc(n.status) + "</span>" : "") +
-        "</div>" +
-        '<p class="notice-body">' + esc(n.message) + "</p>" +
-        (n.date ? '<p class="notice-date">' + esc(n.date) + "</p>" : "") +
-      "</article>";
-    }).join("");
-  }
-
   /* The Notifications button opens the Join Requests page, which is
      now a page of its own rather than a card inside Players. */
   function bindCadBell() {
@@ -965,7 +1154,7 @@
 
   renderIdentity();
   renderStats();
-  renderNotices();
+  loadNotices();
 
   /* Open whichever view the URL asks for. Deep links and the browser
      Back / Forward buttons therefore land on the right page, and the
@@ -974,7 +1163,7 @@
   showPanel(startView);
 
   try {
-    window.history.replaceState({ cadView: startView }, "", "#" + startView);
+    window.history.pushState({ cadView: startView }, "", "#" + startView);
   } catch (err) { /* file:// - the hash is already correct */ }
 
   bindCadNav();
@@ -996,6 +1185,8 @@
       renderSummary();
       loadRoster();
       loadRequests();
+      loadAllClubs();   // for away club dropdown in match form
+      loadMatches();    // load matches for current club
     });
   }).catch(function (err) {
     // Never leave a rejected promise unhandled: report it in the
