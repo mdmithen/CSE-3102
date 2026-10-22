@@ -585,33 +585,78 @@
       if (!activeClubId) { say("You are not assigned to a club yet.", true); return; }
 
       var name = (document.getElementById("player-name").value || "").trim();
+      var email = (document.getElementById("player-email").value || "").trim();
+      var password = (document.getElementById("player-password").value || "").trim();
       var position = (document.getElementById("player-position").value || "").trim();
       var dob = (document.getElementById("player-dob").value || "").trim();
       var gender = (document.getElementById("player-gender").value || "").trim();
       var district = (document.getElementById("player-district").value || "").trim();
       var sport = (document.getElementById("player-sport").value || "").trim();
       var contact = (document.getElementById("player-contact").value || "").trim();
-      var email = (document.getElementById("player-email").value || "").trim();
 
       if (!name) { say("Please enter the player name.", true); return; }
+      if (!email) { say("Please enter the player email.", true); return; }
+      if (!password) { say("Please set a password for the player.", true); return; }
+      if (password.length < 6) { say("Password must be at least 6 characters.", true); return; }
 
-      say("Saving player…");
+      say("Creating player account…");
 
-      sb().from("players").insert([{
-        full_name: name,
-        position: position || "Player",
-        status: "Active",
-        club_id: activeClubId,
-        dob: dob || null,
-        gender: gender || null
-      }]).then(function (res) {
-        if (res && res.error) {
-          say(errText(res.error), true);
+      var sbc = sb();
+
+      /* Step 1: Create Supabase Auth account */
+      sbc.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            full_name: name,
+            role: "player"
+          }
+        }
+      }).then(function (authRes) {
+        var newUser = authRes && authRes.data && authRes.data.user ? authRes.data.user : null;
+        if (authRes && authRes.error) {
+          say(authRes.error.message || "Signup failed.", true);
           return;
         }
-        say("Player registered.");
-        form.reset();
-        loadRoster();
+        if (!newUser) {
+          say("Account created. Confirm email then log in.", true);
+          form.reset();
+          loadRoster();
+          return;
+        }
+
+        console.log("[REGISTER PLAYER] New auth user id:", newUser.id);
+
+        /* Step 2: Insert profile linked to auth user */
+        return sbc.from("profiles").insert([{
+          id: newUser.id,
+          full_name: name,
+          phone: contact
+        }]).then(function (profRes) {
+          if (profRes && profRes.error) {
+            console.warn("[REGISTER PLAYER] profiles insert:", profRes.error.message);
+          }
+
+          /* Step 3: Insert player roster row linked to profile_id */
+          return sbc.from("players").insert([{
+            profile_id: newUser.id,
+            club_id: activeClubId,
+            full_name: name,
+            position: position || "Player",
+            status: "Active",
+            dob: dob || null,
+            gender: gender || null
+          }]).then(function (plyRes) {
+            if (plyRes && plyRes.error) {
+              say(plyRes.error.message || "Player registered but roster save failed.", true);
+              return;
+            }
+            say("Player registered! Account: " + email + " / " + password);
+            form.reset();
+            loadRoster();
+          });
+        });
       }).catch(function (err) {
         say(errText(err), true);
       });
