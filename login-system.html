@@ -381,10 +381,58 @@
                   </section>
 
                   <section class="cad-panel" id="matches" data-panel="matches" aria-labelledby="cad-nav-matches">
-                    <article class="cad-card cad-empty">
-                      <h3>Matches</h3>
-                      <p>Match scheduling and results are not built yet. No <code>matches</code> queries are wired to this page.</p>
-                      <span class="cad-empty-tag">Not connected yet</span>
+                    <article class="cad-card">
+                      <div class="cad-card-head">
+                        <h3>Schedule Match</h3>
+                        <span class="cad-chip">Creates match + notice</span>
+                      </div>
+                      <p id="matchMsg" class="cad-msg" role="status"></p>
+                      <form id="matchForm" class="cad-form">
+                        <div>
+                          <label for="match-home-club">Home Club</label>
+                          <input type="text" id="match-home-club" name="home_club" placeholder="Home club" readonly>
+                        </div>
+                        <div>
+                          <label for="match-away-club">Away Club</label>
+                          <select id="match-away-club" name="away_club" required>
+                            <option value="">Select away club</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label for="match-date">Match Date & Time</label>
+                          <input type="datetime-local" id="match-date" name="match_date" required>
+                        </div>
+                        <div>
+                          <label for="match-venue">Venue</label>
+                          <input type="text" id="match-venue" name="venue" placeholder="e.g. Stadium Name">
+                        </div>
+                        <div class="cad-form-actions">
+                          <button type="submit" class="sa-btn sa-btn-primary">Schedule Match</button>
+                          <button type="reset" class="sa-btn">Clear</button>
+                        </div>
+                      </form>
+                    </article>
+
+                    <article class="cad-card">
+                      <div class="cad-card-head">
+                        <h3>Club Matches</h3>
+                        <span class="cad-chip" id="matchCount">0 matches</span>
+                      </div>
+                      <div class="cad-table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th scope="col">Opponent</th>
+                              <th scope="col">Date</th>
+                              <th scope="col">Venue</th>
+                              <th scope="col">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody id="matchList">
+                            <tr><td colspan="4">Loading matches…</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
                     </article>
                   </section>
 

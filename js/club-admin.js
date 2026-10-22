@@ -740,7 +740,6 @@
 
             return "<tr>" +
               "<td>" + esc(oppName) + "</td>" +
-              "<td>" + esc(m.tournament || "—") + "</td>" +
               "<td>" + esc(formatDateFromISO(m.match_date)) + "</td>" +
               "<td>" + esc(m.venue || "—") + "</td>" +
               "<td><span class=\"cad-badge " + statusClass + "\">" + esc(status) + "</span> " + esc(score) + "</td>" +
@@ -771,7 +770,6 @@
       var homeClubId = activeClubId;
       var awayClubId = (document.getElementById("match-away-club").value || "").trim();
       var matchDate = document.getElementById("match-date").value;
-      var tournament = (document.getElementById("match-tournament").value || "").trim();
       var venue = (document.getElementById("match-venue").value || "").trim();
 
       if (!awayClubId) { sayMatch("Please select an away club.", true); return; }
@@ -786,7 +784,6 @@
         home_club_id: homeClubId,
         away_club_id: Number(awayClubId),
         match_date: matchDate,
-        tournament: tournament || null,
         venue: venue || null,
         status: "scheduled"
       }]).then(function (res) {
@@ -805,7 +802,6 @@
           "Home: " + (document.getElementById("match-home-club").value || "Unknown") + "\n" +
           "Away: " + document.getElementById("match-away-club").options[document.getElementById("match-away-club").selectedIndex].text + "\n" +
           "Date: " + formatDateFromISO(matchDate) + "\n" +
-          (tournament ? "Tournament: " + tournament + "\n" : "") +
           (venue ? "Venue: " + venue + "\n" : "");
 
         return sbc.from("notices").insert([{
