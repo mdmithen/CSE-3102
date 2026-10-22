@@ -401,7 +401,7 @@ function playerSession() {
 const $pdPanels = $("#pdPanels");
 
 function showPanel(name) {
-  const panels = document.querySelectorAll("#pdPanels [data-view]");
+  const panels = document.querySelectorAll("#pdPanels section[id^='view-']");
   panels.forEach(function (p) {
     const on = p.id === "view-" + name;
     p.classList.toggle("is-active", on);
