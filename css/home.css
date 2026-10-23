@@ -9,8 +9,8 @@
   --text: #111827;
   --text-soft: #4B5563;
   --muted: #6B7280;
-  --accent: #0284C7;
-  --accent-dark: #0369A1;
+  --accent: #A7DDB5;
+  --accent-dark: #2E8B57;
   --hairline: #E5E7EB;
   --radius: 6px;
 }
@@ -288,6 +288,213 @@ a:focus-visible {
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
+  }
+}
+
+/* ---------- Sports Information Board ---------- */
+.board-section {
+  margin-bottom: 48px;
+}
+
+.board-section:last-child {
+  margin-bottom: 0;
+}
+
+.board-title {
+  color: var(--accent);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.board-content {
+}
+
+.empty-state {
+  color: var(--text-soft);
+  font-size: 1rem;
+  text-align: center;
+  padding: 32px 24px;
+}
+
+/* ---------- Public Notices ---------- */
+.notice-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.notice-item:last-child {
+  border-bottom: none;
+}
+
+.notice-title {
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.notice-meta {
+  color: var(--text-soft);
+  font-size: 0.875rem;
+  margin-bottom: 8px;
+}
+
+.notice-excerpt {
+  color: var(--text);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  max-height: 60px;
+  overflow: hidden;
+}
+
+.notice-excerpt.read-more {
+  max-height: 200px;
+}
+
+.read-more-link {
+  color: var(--accent);
+  font-size: 0.875rem;
+  text-decoration: underline;
+  cursor: pointer;
+  display: block;
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* ---------- Club Rankings ---------- */
+.ranking-entry {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.ranking-entry:last-child {
+  border-bottom: none;
+}
+
+.rank {
+  color: var(--accent);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.ranking-club {
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.ranking-points {
+  color: var(--text-soft);
+  font-size: 0.875rem;
+}
+
+/* ---------- Player Rankings ---------- */
+.player-ranking-entry {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.player-ranking-entry:last-child {
+  border-bottom: none;
+}
+
+.player-rank {
+  color: var(--accent);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.player-name {
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.player-club {
+  color: var(--text-soft);
+  font-size: 0.875rem;
+}
+
+/* ---------- Upcoming Matches ---------- */
+.match-entry {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.match-entry:last-child {
+  border-bottom: none;
+}
+
+.match-info {
+  color: var(--text);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.match-time {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ---------- Tablet ---------- */
+@media (max-width: 860px) {
+  .sports-board {
+    padding: 0 16px;
+  }
+
+  .board-section {
+    margin-bottom: 32px;
+  }
+
+  .board-title {
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+  }
+
+  .notice-item {
+    padding: 12px 0;
+  }
+
+  .ranking-entry,
+  .player-ranking-entry {
+    grid-template-columns: auto;
+    gap: 8px;
+  }
+
+  .rank,
+  .ranking-club,
+  .ranking-points,
+  .player-rank,
+  .player-name,
+  .player-club {
+    font-size: 0.875rem;
+  }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 620px) {
+  .board-section {
+    margin-bottom: 24px;
+  }
+
+  .board-title {
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+
+  .empty-state {
+    padding: 20px 16px;
+    font-size: 0.875rem;
   }
 }
 
