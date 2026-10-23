@@ -293,7 +293,7 @@ a:focus-visible {
 
 /* ---------- Sports Information Board ---------- */
 .board-section {
-  margin-bottom: 48px;
+  margin-bottom: 40px;
 }
 
 .board-section:last-child {
@@ -302,27 +302,32 @@ a:focus-visible {
 
 .board-title {
   color: var(--accent);
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 600;
   letter-spacing: -0.01em;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--hairline);
-}
-
-.board-content {
 }
 
 .empty-state {
   color: var(--text-soft);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   text-align: center;
-  padding: 32px 24px;
+  padding: 24px 20px;
 }
 
 /* ---------- Public Notices ---------- */
+.notice-list {
+  gap: 12px;
+}
+
 .notice-item {
-  padding: 16px 0;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
   border-bottom: 1px solid var(--hairline);
 }
 
@@ -330,48 +335,47 @@ a:focus-visible {
   border-bottom: none;
 }
 
-.notice-title {
-  color: var(--text);
-  font-size: 1rem;
-  font-weight: 500;
-  margin-bottom: 8px;
+.notice-item .category {
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.notice-meta {
-  color: var(--text-soft);
-  font-size: 0.875rem;
-  margin-bottom: 8px;
-}
-
-.notice-excerpt {
+.notice-item .notice-title {
   color: var(--text);
   font-size: 0.9375rem;
-  line-height: 1.5;
-  max-height: 60px;
-  overflow: hidden;
+  font-weight: 500;
+  margin-bottom: 4px;
+  line-height: 1.4;
 }
 
-.notice-excerpt.read-more {
-  max-height: 200px;
+.notice-item .notice-meta {
+  color: var(--text-soft);
+  font-size: 0.75rem;
 }
 
-.read-more-link {
+.notice-item .read-more-link {
   color: var(--accent);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   text-decoration: underline;
   cursor: pointer;
-  display: block;
-  text-align: right;
-  margin-top: 4px;
+  grid-column: 2 / 3;
+  margin-top: 0;
 }
 
 /* ---------- Club Rankings ---------- */
+.ranking-list {
+  gap: 8px;
+}
+
 .ranking-entry {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
-  padding: 12px 0;
+  padding: 10px 0;
   border-bottom: 1px solid var(--hairline);
 }
 
@@ -379,29 +383,33 @@ a:focus-visible {
   border-bottom: none;
 }
 
-.rank {
+.ranking-entry .rank {
   color: var(--accent);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
-.ranking-club {
+.ranking-entry .ranking-club {
   color: var(--text);
-  font-size: 1rem;
-}
-
-.ranking-points {
-  color: var(--text-soft);
   font-size: 0.875rem;
 }
 
+.ranking-entry .ranking-points {
+  color: var(--text-soft);
+  font-size: 0.75rem;
+}
+
 /* ---------- Player Rankings ---------- */
+.player-ranking-list {
+  gap: 8px;
+}
+
 .player-ranking-entry {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
-  padding: 12px 0;
+  padding: 10px 0;
   border-bottom: 1px solid var(--hairline);
 }
 
@@ -409,25 +417,33 @@ a:focus-visible {
   border-bottom: none;
 }
 
-.player-rank {
+.player-ranking-entry .player-rank {
   color: var(--accent);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
-.player-name {
+.player-ranking-entry .player-name {
   color: var(--text);
-  font-size: 1rem;
-}
-
-.player-club {
-  color: var(--text-soft);
   font-size: 0.875rem;
 }
 
+.player-ranking-entry .player-club {
+  color: var(--text-soft);
+  font-size: 0.75rem;
+}
+
 /* ---------- Upcoming Matches ---------- */
+.match-list {
+  gap: 12px;
+}
+
 .match-entry {
-  padding: 16px 0;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 0;
   border-bottom: 1px solid var(--hairline);
 }
 
@@ -435,16 +451,19 @@ a:focus-visible {
   border-bottom: none;
 }
 
-.match-info {
-  color: var(--text);
-  font-size: 0.9375rem;
-  line-height: 1.5;
-}
-
-.match-time {
+.match-entry .match-time {
   color: var(--accent);
   font-weight: 500;
+  font-size: 0.875rem;
 }
+
+.match-entry .match-venue {
+  color: var(--text-soft);
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+
 
 /* ---------- Tablet ---------- */
 @media (max-width: 860px) {
