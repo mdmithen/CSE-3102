@@ -527,12 +527,12 @@ body.cad-mode #clubs {
   font-weight: bold;
 }
 
-/* ---------- 5. SIX COMPACT STAT CARDS ----------
+/* ---------- 5. COMPACT STAT CARDS ----------
    Text only: label, figure, caption. No icon tile. */
 
 #clubAdminPanel .cad-stats {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   padding: 20px 24px 4px;
   background: #FFFFFF;
@@ -642,6 +642,16 @@ body.cad-mode #clubs {
 #clubAdminPanel .cad-chip-quiet {
   color: var(--muted);
   border-color: var(--border);
+}
+#clubAdminPanel .cad-chip-green {
+  color: #16A34A;
+  border-color: #86EFAC;
+  background: #F0FDF4;
+}
+#clubAdminPanel .cad-chip-red {
+  color: #DC2626;
+  border-color: #FECACA;
+  background: #FEF2F2;
 }
 
 /* left card is the wider one, as in the reference */
@@ -889,7 +899,8 @@ body.cad-mode #clubs {
   margin-bottom: 6px;
 }
 #clubAdminPanel .cad-form input,
-#clubAdminPanel .cad-form select {
+#clubAdminPanel .cad-form select,
+#clubAdminPanel .cad-form textarea {
   width: 100%;
   padding: 10px 12px;
   border-radius: 8px;
@@ -899,9 +910,11 @@ body.cad-mode #clubs {
   font-family: var(--cad-font);
   font-size: 14px;
 }
-#clubAdminPanel .cad-form input::placeholder { color: #9CA3AF; }
+#clubAdminPanel .cad-form input::placeholder,
+#clubAdminPanel .cad-form textarea::placeholder { color: #9CA3AF; }
 #clubAdminPanel .cad-form input:focus,
-#clubAdminPanel .cad-form select:focus {
+#clubAdminPanel .cad-form select:focus,
+#clubAdminPanel .cad-form textarea:focus {
   outline: 2px solid var(--green);
   outline-offset: 0;
   border-color: var(--green);
@@ -1051,7 +1064,7 @@ body.cad-mode #clubs {
 
 /* small desktop / large tablet */
 @media (max-width: 1280px) {
-  #clubAdminPanel .cad-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #clubAdminPanel .cad-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #clubAdminPanel .cad-two-col { grid-template-columns: minmax(0, 1fr); }
 }
 

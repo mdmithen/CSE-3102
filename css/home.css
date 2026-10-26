@@ -117,15 +117,18 @@ a:focus-visible {
 }
 
 .btn-primary {
-  background: var(--accent);
+  background: var(--accent-dark);
   color: #FFFFFF;
-  border-color: var(--accent);
+  border-color: var(--accent-dark);
+  box-shadow: 0 4px 12px rgba(46, 139, 87, 0.28);
 }
 
 .btn-primary:hover {
-  background: var(--accent-dark);
-  border-color: var(--accent-dark);
+  background: #256F46;
+  border-color: #256F46;
   color: #FFFFFF;
+  box-shadow: 0 6px 16px rgba(46, 139, 87, 0.38);
+  transform: translateY(-1px);
 }
 
 .btn-primary:focus-visible {
@@ -234,6 +237,20 @@ a:focus-visible {
 .hero-actions .btn {
   flex: 0 0 auto;
   min-width: 140px;
+}
+
+.hero-actions .btn-primary {
+  padding: 15px 38px;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border-radius: 8px;
+  box-shadow: 0 8px 22px rgba(46, 139, 87, 0.35);
+}
+
+.hero-actions .btn-primary:hover {
+  box-shadow: 0 12px 28px rgba(46, 139, 87, 0.45);
+  transform: translateY(-2px);
 }
 
 /* ---------- Features ---------- */
@@ -389,6 +406,11 @@ a:focus-visible {
   .hero-actions .btn {
     flex: 0 0 auto;
     min-width: 140px;
+  }
+
+  .hero-actions .btn-primary {
+    padding: 13px 30px;
+    font-size: 1rem;
   }
 
   .features {
@@ -637,6 +659,282 @@ a:focus-visible {
   .empty-state {
     padding: 20px 16px;
     font-size: 0.875rem;
+  }
+}
+
+/* ---------- Tournament Notice Items ---------- */
+.tourn-notice-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.tourn-badge-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+  min-width: 110px;
+}
+
+.tourn-pill {
+  background: #FEF2F2;
+  color: var(--red);
+  border: 1px solid #FECACA;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  display: inline-block;
+}
+
+.tourn-sport-tag {
+  background: #F3F4F6;
+  color: var(--text-soft);
+  font-size: 0.72rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.tourn-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tourn-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+.tourn-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tourn-meta-chip b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.tourn-description {
+  font-size: 0.85rem;
+  color: var(--text-soft);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+.tourn-action {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  align-self: center;
+}
+
+.btn-tourn-register {
+  padding: 8px 18px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.tourn-closed-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: #F3F4F6;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+/* ---------- Registration Modal ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.modal-backdrop[hidden] {
+  display: none !important;
+}
+
+.modal-box {
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid var(--hairline);
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 24px 28px 16px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.modal-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--red);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.modal-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.modal-sub {
+  font-size: 0.84rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.18s ease;
+}
+
+.modal-close:hover {
+  color: var(--text);
+  background: #F3F4F6;
+}
+
+.modal-alert {
+  margin: 16px 28px 0;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.modal-alert[hidden] {
+  display: none !important;
+}
+
+.modal-alert-success {
+  background: #ECFDF5;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+}
+
+.modal-alert-error {
+  background: #FEF2F2;
+  color: #991B1B;
+  border: 1px solid #FECACA;
+}
+
+.modal-form {
+  padding: 20px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-row label {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--hairline);
+  background: #FFFFFF;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: border-color 0.18s ease;
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent-dark);
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--hairline);
+}
+
+@media (max-width: 680px) {
+  .tourn-notice-item {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .tourn-action {
+    justify-content: flex-start;
+  }
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .modal-header,
+  .modal-form {
+    padding-left: 20px;
+    padding-right: 20px;
   }
 }
 

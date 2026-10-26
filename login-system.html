@@ -99,9 +99,8 @@
                     <ul>
                       <li><a id="cad-nav-club"      href="#club"      class="is-active" data-cad-tab="club"      data-cad-side="club">Dashboard</a></li>
                       <li><a id="cad-nav-players"   href="#players"   data-cad-tab="players"   data-cad-side="players">Players</a></li>
-                      <li><a id="cad-nav-teams"     href="#teams"     data-cad-tab="teams"     data-cad-side="teams">Teams</a></li>
+                      <li><a id="cad-nav-stats"     href="#stats"     data-cad-tab="stats"     data-cad-side="stats">Player Stats</a></li>
                       <li><a id="cad-nav-matches"   href="#matches"   data-cad-tab="matches"   data-cad-side="matches">Matches</a></li>
-                      <li><a id="cad-nav-venues"    href="#venues"    data-cad-tab="venues"    data-cad-side="venues">Venue Booking</a></li>
                       <li><a id="cad-nav-equipment" href="#equipment" data-cad-tab="equipment" data-cad-side="equipment">Equipment</a></li>
                       <li><a id="cad-nav-cards"     href="#cards"     data-cad-tab="cards"     data-cad-side="cards">Player Cards</a></li>
                       <li><a id="cad-nav-reports"   href="#reports"   data-cad-tab="reports"   data-cad-side="reports">Reports</a></li>
@@ -371,12 +370,146 @@
                     </div>
                     <div class="notice-list" id="noticeList"></div>
                   </section>
-                  <!-- ---- remaining panels with no data source yet (honest empty states) ---- -->
-                  <section class="cad-panel" id="teams" data-panel="teams" aria-labelledby="cad-nav-teams">
-                    <article class="cad-card cad-empty">
-                      <h3>Teams</h3>
-                      <p>Team management is not built yet, and there is no <code>teams</code> data source in this build. Nothing is faked here — the module is simply pending.</p>
-                      <span class="cad-empty-tag">Not connected yet</span>
+
+                  <!-- ---- panel: Player Stats (Tournament & Lifetime) ---- -->
+                  <section class="cad-panel" id="stats" data-panel="stats" aria-labelledby="cad-nav-stats">
+                    <!-- Form Card: Add / Update Player Stats -->
+                    <article class="cad-card" id="cad-player-stats-form-card">
+                      <div class="cad-card-head">
+                        <h3 id="statFormHeading">Add / Update Player Statistics</h3>
+                        <span class="cad-chip cad-chip-quiet">Updates lifetime & tournament records</span>
+                      </div>
+                      <p id="statMsg" class="cad-msg" role="status"></p>
+                      <form id="playerStatsForm" class="cad-form">
+                        <input type="hidden" id="stat-edit-id" name="edit_id" value="">
+
+                        <div>
+                          <label for="stat-player-select">Select Player *</label>
+                          <select id="stat-player-select" name="player_id" required>
+                            <option value="">Choose player from roster</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label for="stat-player-name">Player Name (if not in roster)</label>
+                          <input type="text" id="stat-player-name" name="player_name" placeholder="Full name">
+                        </div>
+
+                        <div>
+                          <label for="stat-tourn-select">Tournament / Scope</label>
+                          <select id="stat-tourn-select" name="tournament_id">
+                            <option value="">Overall / Lifetime Career</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label for="stat-position">Position</label>
+                          <select id="stat-position" name="position">
+                            <option value="Forward">Forward / Striker</option>
+                            <option value="Midfielder">Midfielder</option>
+                            <option value="Defender">Defender</option>
+                            <option value="Goalkeeper">Goalkeeper</option>
+                            <option value="Winger">Winger</option>
+                            <option value="Batsman">Batsman</option>
+                            <option value="Bowler">Bowler</option>
+                            <option value="All-Rounder">All-Rounder</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label for="stat-matches">Matches Played (MP)</label>
+                          <input type="number" id="stat-matches" name="matches_played" value="1" min="0" required>
+                        </div>
+
+                        <div>
+                          <label for="stat-goals">Goals Scored (or Runs)</label>
+                          <input type="number" id="stat-goals" name="goals" value="0" min="0" required>
+                        </div>
+
+                        <div>
+                          <label for="stat-assists">Assists (or Wickets)</label>
+                          <input type="number" id="stat-assists" name="assists" value="0" min="0">
+                        </div>
+
+                        <div>
+                          <label for="stat-minutes">Minutes Played</label>
+                          <input type="number" id="stat-minutes" name="minutes_played" value="90" min="0">
+                        </div>
+
+                        <div>
+                          <label for="stat-clean-sheets">Clean Sheets / Saves</label>
+                          <input type="number" id="stat-clean-sheets" name="clean_sheets" value="0" min="0">
+                        </div>
+
+                        <div>
+                          <label for="stat-yellow-cards">Yellow Cards</label>
+                          <input type="number" id="stat-yellow-cards" name="yellow_cards" value="0" min="0">
+                        </div>
+
+                        <div>
+                          <label for="stat-red-cards">Red Cards</label>
+                          <input type="number" id="stat-red-cards" name="red_cards" value="0" min="0">
+                        </div>
+
+                        <div>
+                          <label for="stat-motm">Man of the Match (MOTM)</label>
+                          <input type="number" id="stat-motm" name="motm_awards" value="0" min="0">
+                        </div>
+
+                        <div>
+                          <label for="stat-rating">Match Rating (1.0 - 10.0)</label>
+                          <input type="number" id="stat-rating" name="rating" value="7.5" min="1.0" max="10.0" step="0.1">
+                        </div>
+
+                        <div>
+                          <label for="stat-season">Season</label>
+                          <input type="text" id="stat-season" name="season" value="2026">
+                        </div>
+
+                        <div class="cad-form-actions cad-form-full" style="grid-column: 1 / -1;">
+                          <button type="submit" class="sa-btn sa-btn-primary" id="statSubmitBtn">Save Player Stats</button>
+                          <button type="reset" class="sa-btn" id="statResetBtn">Clear</button>
+                        </div>
+                      </form>
+                    </article>
+
+                    <!-- Table Card: Club Player Statistics -->
+                    <article class="cad-card" id="cad-player-stats-list-card">
+                      <div class="cad-card-head">
+                        <h3>Club Player Lifetime & Tournament Stats</h3>
+                        <span class="cad-chip" id="cadPlayerStatsCount">0 entries</span>
+                      </div>
+                      <p class="cad-note">These statistics are displayed publicly on the Welcome Page Player Rankings.</p>
+
+                      <div style="margin: 12px 0 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <label for="cadStatsScopeFilter" style="font-size: 13px; font-weight: bold; margin: 0;">Filter Scope:</label>
+                        <select id="cadStatsScopeFilter" style="max-width: 320px; padding: 7px 12px; border-radius: 6px; border: 1px solid var(--border); font-size: 13px;">
+                          <option value="all">All Tournaments & Lifetime</option>
+                        </select>
+                      </div>
+
+                      <div class="cad-table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th scope="col">Player</th>
+                              <th scope="col">Position</th>
+                              <th scope="col">Tournament / Scope</th>
+                              <th scope="col">Matches</th>
+                              <th scope="col">Goals</th>
+                              <th scope="col">Assists</th>
+                              <th scope="col">Rating</th>
+                              <th scope="col">Clean Sheets</th>
+                              <th scope="col">Cards</th>
+                              <th scope="col">MOTM</th>
+                              <th scope="col">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody id="cadPlayerStatsBody">
+                            <tr><td colspan="11">Loading player stats…</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
                     </article>
                   </section>
 
@@ -434,16 +567,103 @@
                         </table>
                       </div>
                     </article>
-                  </section>
 
-                  <section class="cad-panel" id="venues" data-panel="venues" aria-labelledby="cad-nav-venues">
-                    <article class="cad-card cad-empty">
-                      <h3>Venue Booking</h3>
-                      <p>Venue booking is planned. There is no venue table connected yet.</p>
-                      <span class="cad-empty-tag">Not connected yet</span>
+                    <!-- Post Tournament Notice -->
+                    <article class="cad-card" id="tournament-post-card">
+                      <div class="cad-card-head">
+                        <h3>Post Tournament Notice</h3>
+                        <span class="cad-chip cad-chip-quiet">Publishes notice to Welcome page</span>
+                      </div>
+                      <p id="tournMsg" class="cad-msg" role="status"></p>
+                      <form id="tournamentForm" class="cad-form">
+                        <div>
+                          <label for="tourn-title">Tournament Title</label>
+                          <input type="text" id="tourn-title" name="title" placeholder="e.g. District Champions Cup 2026" required>
+                        </div>
+                        <div>
+                          <label for="tourn-sport">Sport</label>
+                          <select id="tourn-sport" name="sport" required>
+                            <option value="Football">Football</option>
+                            <option value="Cricket">Cricket</option>
+                            <option value="Badminton">Badminton</option>
+                            <option value="Volleyball">Volleyball</option>
+                            <option value="Other">Other</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label for="tourn-venue">Venue / Location</label>
+                          <input type="text" id="tourn-venue" name="venue" placeholder="e.g. Rajshahi District Stadium" required>
+                        </div>
+                        <div>
+                          <label for="tourn-start-date">Start Date</label>
+                          <input type="date" id="tourn-start-date" name="start_date" required>
+                        </div>
+                        <div>
+                          <label for="tourn-end-date">End Date</label>
+                          <input type="date" id="tourn-end-date" name="end_date">
+                        </div>
+                        <div>
+                          <label for="tourn-deadline">Registration Deadline</label>
+                          <input type="date" id="tourn-deadline" name="registration_deadline" required>
+                        </div>
+                        <div>
+                          <label for="tourn-max-teams">Max Teams</label>
+                          <input type="number" id="tourn-max-teams" name="max_teams" placeholder="16" min="2" max="64" value="16">
+                        </div>
+                        <div>
+                          <label for="tourn-fee">Entry Fee</label>
+                          <input type="text" id="tourn-fee" name="entry_fee" placeholder="e.g. Free or 1000 BDT">
+                        </div>
+                        <div class="cad-form-full" style="grid-column: 1 / -1;">
+                          <label for="tourn-desc">Tournament Details & Rules</label>
+                          <textarea id="tourn-desc" name="description" rows="3" placeholder="Enter tournament rules, eligibility, prizes, contact details..."></textarea>
+                        </div>
+                        <div class="cad-form-actions cad-form-full" style="grid-column: 1 / -1;">
+                          <button type="submit" class="sa-btn sa-btn-primary">Publish Tournament Notice</button>
+                          <button type="reset" class="sa-btn">Clear</button>
+                        </div>
+                      </form>
+                    </article>
+
+                    <!-- Tournament Registration Requests -->
+                    <article class="cad-card" id="tournament-requests-card">
+                      <div class="cad-card-head">
+                        <h3>Tournament Registration Requests</h3>
+                        <span class="cad-chip" id="cadTournReqCount">0 requests</span>
+                      </div>
+                      <p class="cad-note">Teams and clubs that registered for your tournaments from the welcome page.</p>
+
+                      <div style="margin: 12px 0 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                        <label for="cadTournFilter" style="font-size: 13px; font-weight: bold; margin: 0;">Filter Tournament:</label>
+                        <select id="cadTournFilter" style="max-width: 320px; padding: 7px 12px; border-radius: 6px; border: 1px solid var(--border); font-size: 13px;">
+                          <option value="all">All My Tournaments</option>
+                        </select>
+                      </div>
+
+                      <div class="cad-table-wrap">
+                        <table>
+                          <thead>
+                            <tr>
+                              <th scope="col">Tournament</th>
+                              <th scope="col">Team / Club</th>
+                              <th scope="col">Type</th>
+                              <th scope="col">Contact Person</th>
+                              <th scope="col">Contact Info</th>
+                              <th scope="col">District</th>
+                              <th scope="col">Requested</th>
+                              <th scope="col">Status</th>
+                              <th scope="col">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody id="cadTournRequestsBody">
+                            <tr><td colspan="9">Loading tournament requests…</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
                     </article>
                   </section>
 
+                  <!-- ---- remaining panels with no data source yet (honest empty states) ---- -->
                   <section class="cad-panel" id="equipment" data-panel="equipment" aria-labelledby="cad-nav-equipment">
                     <article class="cad-card cad-empty">
                       <h3>Equipment</h3>

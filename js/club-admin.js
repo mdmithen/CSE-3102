@@ -380,11 +380,9 @@
 
     var cards = [
       { label: "Total Players",    value: counts.players, live: true,  foot: "Club roster" },
-      { label: "Active Teams",     value: null, live: false, foot: "Teams pending" },
       { label: "Upcoming Matches", value: null, live: false, foot: "Matches pending" },
       { label: "Pending Requests", value: counts.pending, live: true,  foot: "Awaiting approval" },
-      { label: "Equipment Items",  value: null, live: false, foot: "Equipment pending" },
-      { label: "Available Venues", value: null, live: false, foot: "Venues pending" }
+      { label: "Equipment Items",  value: null, live: false, foot: "Equipment pending" }
     ];
 
     host.innerHTML = cards.map(function (c) {
@@ -832,6 +830,553 @@
     });
   }
 
+  /* ====================================================
+     TOURNAMENTS & REGISTRATION REQUESTS (Matches panel)
+     ==================================================== */
+  var tournamentForm = document.getElementById("tournamentForm");
+  var tournMsg = document.getElementById("tournMsg");
+  var cadTournFilter = document.getElementById("cadTournFilter");
+  var cadTournRequestsBody = document.getElementById("cadTournRequestsBody");
+  var cadTournReqCount = document.getElementById("cadTournReqCount");
+
+  var myTournamentsList = [];
+  var myTournRequestsList = [];
+
+  function sayTourn(text, isError) {
+    if (tournMsg) {
+      tournMsg.textContent = text || "";
+      tournMsg.style.color = isError ? "#DC2626" : "var(--green)";
+    }
+    if (text) say(text, isError);
+  }
+
+  /* Handle Tournament Form Submission */
+  if (tournamentForm) {
+    tournamentForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var sbc = sb();
+      if (!sbc) { sayTourn("Supabase is not connected.", true); return; }
+      if (!activeClubId) { sayTourn("You are not assigned to a club yet.", true); return; }
+
+      var title = (document.getElementById("tourn-title").value || "").trim();
+      var sport = document.getElementById("tourn-sport").value;
+      var venue = (document.getElementById("tourn-venue").value || "").trim();
+      var startDate = document.getElementById("tourn-start-date").value;
+      var endDate = document.getElementById("tourn-end-date").value || null;
+      var deadline = document.getElementById("tourn-deadline").value;
+      var maxTeams = parseInt(document.getElementById("tourn-max-teams").value, 10) || 16;
+      var entryFee = (document.getElementById("tourn-fee").value || "").trim() || "Free";
+      var desc = (document.getElementById("tourn-desc").value || "").trim();
+
+      if (!title || !startDate || !deadline || !venue) {
+        sayTourn("Please fill in all required tournament fields.", true);
+        return;
+      }
+
+      var btn = tournamentForm.querySelector('button[type="submit"]');
+      if (btn) btn.disabled = true;
+      sayTourn("Publishing tournament notice…");
+
+      sbc.from("tournaments").insert([{
+        club_id: activeClubId,
+        title: title,
+        sport: sport,
+        venue: venue,
+        start_date: startDate,
+        end_date: endDate,
+        registration_deadline: deadline,
+        max_teams: maxTeams,
+        entry_fee: entryFee,
+        description: desc || null,
+        status: "open",
+        created_at: new Date().toISOString()
+      }]).then(function (res) {
+        if (res && res.error) throw res.error;
+
+        // Also publish to notices table for platform-wide notice boards
+        var clubName = currentClub() ? currentClub().name : "District Sports Club";
+        var noticeBody = "🏆 Tournament: " + title + "\n" +
+          "Organized by: " + clubName + "\n" +
+          "Sport: " + sport + " | Venue: " + venue + "\n" +
+          "Dates: " + startDate + (endDate ? " to " + endDate : "") + "\n" +
+          "Registration Deadline: " + deadline + "\n" +
+          "Entry Fee: " + entryFee + "\n" +
+          (desc ? "\n" + desc : "");
+
+        sbc.from("notices").insert([{
+          title: "🏆 " + title + " (Tournament)",
+          body: noticeBody,
+          category: "tournament",
+          is_published: true,
+          created_at: new Date().toISOString()
+        }]).then(function () {
+          sayTourn("Tournament notice published successfully! Live on Welcome page.");
+          tournamentForm.reset();
+          loadTournamentsAndRequests();
+          loadNotices();
+          if (btn) btn.disabled = false;
+        }).catch(function (notErr) {
+          console.warn("[TOURNAMENT] Notice insert warning:", notErr);
+          sayTourn("Tournament notice published successfully! Live on Welcome page.");
+          tournamentForm.reset();
+          loadTournamentsAndRequests();
+          if (btn) btn.disabled = false;
+        });
+      }).catch(function (err) {
+        console.error("[TOURNAMENT] Error:", err);
+        sayTourn("Error publishing tournament: " + errText(err) + " (Make sure tournaments SQL table exists in Supabase)", true);
+        if (btn) btn.disabled = false;
+      });
+    });
+  }
+
+  /* Load tournaments posted by activeClubId and their registration requests */
+  function loadTournamentsAndRequests() {
+    var sbc = sb();
+    if (!sbc || !activeClubId || !cadTournRequestsBody) return;
+
+    cadTournRequestsBody.innerHTML = '<tr><td colspan="9">Loading tournament requests…</td></tr>';
+
+    sbc.from("tournaments").select("*").eq("club_id", activeClubId).order("created_at", { ascending: false })
+      .then(function (res) {
+        if (res && res.error) throw res.error;
+        myTournamentsList = (res && res.data) || [];
+
+        // Populate tournament filter dropdown
+        if (cadTournFilter) {
+          var currentVal = cadTournFilter.value || "all";
+          var opts = '<option value="all">All My Tournaments (' + myTournamentsList.length + ')</option>';
+          myTournamentsList.forEach(function (t) {
+            opts += '<option value="' + esc(t.id) + '">' + esc(t.title) + " (" + esc(t.sport || "Sport") + ")</option>";
+          });
+          cadTournFilter.innerHTML = opts;
+          cadTournFilter.value = currentVal;
+        }
+
+        if (!myTournamentsList.length) {
+          cadTournRequestsBody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 24px; color: var(--muted);">' +
+            'You have not posted any tournaments yet. Use the form above to announce a tournament!' +
+            '</td></tr>';
+          if (cadTournReqCount) cadTournReqCount.textContent = "0 requests";
+          return;
+        }
+
+        var tournIds = myTournamentsList.map(function (t) { return t.id; });
+        return sbc.from("tournament_requests").select("*").in("tournament_id", tournIds).order("created_at", { ascending: false })
+          .then(function (reqRes) {
+            if (reqRes && reqRes.error) throw reqRes.error;
+            myTournRequestsList = (reqRes && reqRes.data) || [];
+            renderTournamentRequestsTable();
+          });
+      }).catch(function (err) {
+        console.warn("[TOURNAMENT_REQ] Load:", err);
+        cadTournRequestsBody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 20px; color: var(--muted);">' +
+          'No tournament requests available or tables pending in Supabase.' +
+          '</td></tr>';
+      });
+  }
+
+  function renderTournamentRequestsTable() {
+    if (!cadTournRequestsBody) return;
+
+    var filterId = cadTournFilter ? cadTournFilter.value : "all";
+    var filtered = myTournRequestsList;
+    if (filterId !== "all") {
+      filtered = filtered.filter(function (r) { return String(r.tournament_id) === String(filterId); });
+    }
+
+    if (cadTournReqCount) {
+      cadTournReqCount.textContent = filtered.length + " request" + (filtered.length === 1 ? "" : "s");
+    }
+
+    if (!filtered.length) {
+      cadTournRequestsBody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 24px; color: var(--muted);">' +
+        'No registration requests received yet for the selected tournament.' +
+        '</td></tr>';
+      return;
+    }
+
+    // Map tournament id to title
+    var tournMap = {};
+    myTournamentsList.forEach(function (t) { tournMap[t.id] = t.title; });
+
+    cadTournRequestsBody.innerHTML = filtered.map(function (r) {
+      var tournTitle = tournMap[r.tournament_id] || "Tournament #" + r.tournament_id;
+      var when = r.created_at ? String(r.created_at).slice(0, 10) : "—";
+      var statusClass = r.status === "approved" ? "cad-chip-green" : (r.status === "rejected" ? "cad-chip-red" : "cad-chip-quiet");
+
+      var contactInfo = esc(r.contact_email || "");
+      if (r.contact_phone) {
+        contactInfo += (contactInfo ? "<br>" : "") + '<small style="color:var(--muted);">' + esc(r.contact_phone) + "</small>";
+      }
+
+      var actions = "";
+      if (r.status === "pending") {
+        actions = '<div style="display:flex; gap:6px;">' +
+          '<button type="button" class="sa-btn sa-btn-primary" style="padding:4px 8px; font-size:12px;" data-tourn-decide="' + esc(r.id) + '" data-action="approve">Approve</button>' +
+          '<button type="button" class="sa-btn" style="padding:4px 8px; font-size:12px; color:#DC2626;" data-tourn-decide="' + esc(r.id) + '" data-action="reject">Reject</button>' +
+          '</div>';
+      } else {
+        actions = '<span style="font-size:12px; font-weight:bold; color:' + (r.status === "approved" ? "#16A34A" : "#DC2626") + '">' +
+          (r.status === "approved" ? "✓ Approved" : "✗ Rejected") +
+          '</span>';
+      }
+
+      return "<tr>" +
+        "<td><b>" + esc(tournTitle) + "</b></td>" +
+        "<td>" + esc(r.team_name || "—") + (r.player_count ? ' <small style="color:var(--muted)">(' + esc(r.player_count) + " players)</small>" : "") + "</td>" +
+        "<td><span class=\"cad-chip\">" + esc(r.applicant_type || "Club") + "</span></td>" +
+        "<td>" + esc(r.contact_name || "—") + "</td>" +
+        "<td>" + contactInfo + "</td>" +
+        "<td>" + esc(r.district || "—") + "</td>" +
+        "<td>" + esc(when) + "</td>" +
+        "<td><span class=\"cad-chip " + statusClass + "\">" + esc(r.status || "pending") + "</span></td>" +
+        "<td>" + actions + "</td>" +
+        "</tr>";
+    }).join("");
+
+    // Bind approve and reject buttons
+    Array.prototype.forEach.call(cadTournRequestsBody.querySelectorAll("button[data-tourn-decide]"), function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        var reqId = btn.getAttribute("data-tourn-decide");
+        var action = btn.getAttribute("data-action");
+        decideTournamentRequest(reqId, action === "approve" ? "approved" : "rejected");
+      });
+    });
+  }
+
+  function decideTournamentRequest(reqId, newStatus) {
+    var sbc = sb();
+    if (!sbc) return;
+
+    sbc.from("tournament_requests").update({ status: newStatus }).eq("id", reqId)
+      .then(function (res) {
+        if (res && res.error) throw res.error;
+        sayTourn("Request marked as " + newStatus + ".");
+        loadTournamentsAndRequests();
+      }).catch(function (err) {
+        console.error("[TOURNAMENT_REQ] Decide error:", err);
+        sayTourn("Could not update request: " + errText(err), true);
+      });
+  }
+
+  if (cadTournFilter) {
+    cadTournFilter.addEventListener("change", function () {
+      renderTournamentRequestsTable();
+    });
+  }
+
+  /* ====================================================
+     PLAYER STATISTICS (Tournament & Lifetime Records)
+     ==================================================== */
+  var playerStatsForm = document.getElementById("playerStatsForm");
+  var statMsg = document.getElementById("statMsg");
+  var statPlayerSelect = document.getElementById("stat-player-select");
+  var statTournSelect = document.getElementById("stat-tourn-select");
+  var cadStatsScopeFilter = document.getElementById("cadStatsScopeFilter");
+  var cadPlayerStatsBody = document.getElementById("cadPlayerStatsBody");
+  var cadPlayerStatsCount = document.getElementById("cadPlayerStatsCount");
+  var statFormHeading = document.getElementById("statFormHeading");
+  var statSubmitBtn = document.getElementById("statSubmitBtn");
+  var statResetBtn = document.getElementById("statResetBtn");
+
+  var clubPlayerStatsList = [];
+
+  function sayPlayerStat(text, isError) {
+    if (statMsg) {
+      statMsg.textContent = text || "";
+      statMsg.style.color = isError ? "#DC2626" : "var(--green)";
+    }
+    if (text) say(text, isError);
+  }
+
+  function loadPlayerStats() {
+    var sbc = sb();
+    if (!sbc || !activeClubId || !cadPlayerStatsBody) return;
+
+    // 1. Populate player dropdown from roster
+    if (statPlayerSelect) {
+      var selVal = statPlayerSelect.value;
+      var pOpts = '<option value="">Choose player from roster</option>';
+      if (lastRoster && lastRoster.length) {
+        lastRoster.forEach(function (p) {
+          pOpts += '<option value="' + esc(p.id) + '" data-name="' + esc(p.full_name) + '" data-pos="' + esc(p.position || 'Forward') + '">' +
+            esc(p.full_name) + (p.position ? ' (' + esc(p.position) + ')' : '') +
+            '</option>';
+        });
+      }
+      statPlayerSelect.innerHTML = pOpts;
+      statPlayerSelect.value = selVal;
+    }
+
+    // 2. Populate tournament dropdowns
+    if (statTournSelect) {
+      var tVal = statTournSelect.value;
+      var tOpts = '<option value="">Overall / Lifetime Career</option>';
+      if (myTournamentsList && myTournamentsList.length) {
+        myTournamentsList.forEach(function (t) {
+          tOpts += '<option value="' + esc(t.id) + '">🏆 ' + esc(t.title) + '</option>';
+        });
+      }
+      statTournSelect.innerHTML = tOpts;
+      statTournSelect.value = tVal;
+    }
+
+    if (cadStatsScopeFilter) {
+      var scopeVal = cadStatsScopeFilter.value || "all";
+      var sOpts = '<option value="all">All Tournaments & Lifetime</option>' +
+                  '<option value="lifetime">Overall / Lifetime Only</option>';
+      if (myTournamentsList && myTournamentsList.length) {
+        myTournamentsList.forEach(function (t) {
+          sOpts += '<option value="' + esc(t.id) + '">🏆 ' + esc(t.title) + '</option>';
+        });
+      }
+      cadStatsScopeFilter.innerHTML = sOpts;
+      cadStatsScopeFilter.value = scopeVal;
+    }
+
+    // 3. Fetch player stats for active club
+    cadPlayerStatsBody.innerHTML = '<tr><td colspan="11">Loading player stats…</td></tr>';
+
+    sbc.from("player_stats")
+      .select("*")
+      .eq("club_id", activeClubId)
+      .order("goals", { ascending: false })
+      .order("rating", { ascending: false })
+      .then(function (res) {
+        if (res && res.error) throw res.error;
+        clubPlayerStatsList = (res && res.data) || [];
+        renderPlayerStatsTable();
+      }).catch(function (err) {
+        console.warn("[PLAYER_STATS] Load error:", err);
+        cadPlayerStatsBody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding: 20px; color: var(--muted);">' +
+          'No player stats recorded yet. Use the form above to add professional stats!' +
+          '</td></tr>';
+        if (cadPlayerStatsCount) cadPlayerStatsCount.textContent = "0 entries";
+      });
+  }
+
+  function renderPlayerStatsTable() {
+    if (!cadPlayerStatsBody) return;
+
+    var scope = cadStatsScopeFilter ? cadStatsScopeFilter.value : "all";
+    var filtered = clubPlayerStatsList;
+
+    if (scope === "lifetime") {
+      filtered = filtered.filter(function (s) { return !s.tournament_id; });
+    } else if (scope !== "all") {
+      filtered = filtered.filter(function (s) { return String(s.tournament_id) === String(scope); });
+    }
+
+    if (cadPlayerStatsCount) {
+      cadPlayerStatsCount.textContent = filtered.length + " entr" + (filtered.length === 1 ? "y" : "ies");
+    }
+
+    if (!filtered.length) {
+      cadPlayerStatsBody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding: 24px; color: var(--muted);">' +
+        'No statistics found for this scope. Add a player stat using the form above.' +
+        '</td></tr>';
+      return;
+    }
+
+    // Map tournament id to title
+    var tournMap = {};
+    if (myTournamentsList) {
+      myTournamentsList.forEach(function (t) { tournMap[t.id] = t.title; });
+    }
+
+    cadPlayerStatsBody.innerHTML = filtered.map(function (s) {
+      var scopeLabel = s.tournament_id ? ("🏆 " + (tournMap[s.tournament_id] || "Tournament #" + s.tournament_id)) : "🌟 Lifetime / Overall";
+      var cardsStr = (s.yellow_cards ? '🟨 ' + s.yellow_cards : '') + (s.red_cards ? ' 🟥 ' + s.red_cards : '');
+      if (!cardsStr) cardsStr = '—';
+
+      return "<tr>" +
+        "<td><b>" + esc(s.player_name) + "</b></td>" +
+        "<td><span class=\"cad-chip\">" + esc(s.position || "Forward") + "</span></td>" +
+        "<td><small>" + esc(scopeLabel) + "</small></td>" +
+        "<td><b>" + esc(s.matches_played || 0) + "</b></td>" +
+        "<td><b style=\"color:#16A34A; font-size:15px;\">" + esc(s.goals || 0) + "</b></td>" +
+        "<td>" + esc(s.assists || 0) + "</td>" +
+        "<td><span class=\"cad-chip cad-chip-green\">⭐ " + esc(s.rating || "7.5") + "</span></td>" +
+        "<td>" + esc(s.clean_sheets || 0) + "</td>" +
+        "<td>" + cardsStr + "</td>" +
+        "<td>" + (s.motm_awards ? ("🏅 " + s.motm_awards) : "0") + "</td>" +
+        "<td>" +
+          '<div style="display:flex; gap:6px;">' +
+            '<button type="button" class="sa-btn" style="padding:4px 8px; font-size:12px;" data-edit-stat="' + esc(s.id) + '">Edit</button>' +
+            '<button type="button" class="sa-btn" style="padding:4px 8px; font-size:12px; color:#DC2626;" data-del-stat="' + esc(s.id) + '">Delete</button>' +
+          '</div>' +
+        "</td>" +
+        "</tr>";
+    }).join("");
+
+    // Bind Edit and Delete
+    Array.prototype.forEach.call(cadPlayerStatsBody.querySelectorAll("button[data-edit-stat]"), function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        var id = btn.getAttribute("data-edit-stat");
+        editPlayerStat(id);
+      });
+    });
+
+    Array.prototype.forEach.call(cadPlayerStatsBody.querySelectorAll("button[data-del-stat]"), function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        var id = btn.getAttribute("data-del-stat");
+        deletePlayerStat(id);
+      });
+    });
+  }
+
+  function editPlayerStat(id) {
+    var found = clubPlayerStatsList.find(function (s) { return String(s.id) === String(id); });
+    if (!found) return;
+
+    document.getElementById("stat-edit-id").value = found.id;
+    if (statPlayerSelect) statPlayerSelect.value = found.player_id || "";
+    document.getElementById("stat-player-name").value = found.player_name || "";
+    if (statTournSelect) statTournSelect.value = found.tournament_id || "";
+    document.getElementById("stat-position").value = found.position || "Forward";
+    document.getElementById("stat-matches").value = found.matches_played || 0;
+    document.getElementById("stat-goals").value = found.goals || 0;
+    document.getElementById("stat-assists").value = found.assists || 0;
+    document.getElementById("stat-minutes").value = found.minutes_played || 0;
+    document.getElementById("stat-clean-sheets").value = found.clean_sheets || 0;
+    document.getElementById("stat-yellow-cards").value = found.yellow_cards || 0;
+    document.getElementById("stat-red-cards").value = found.red_cards || 0;
+    document.getElementById("stat-motm").value = found.motm_awards || 0;
+    document.getElementById("stat-rating").value = found.rating || 7.5;
+    document.getElementById("stat-season").value = found.season || "2026";
+
+    if (statFormHeading) statFormHeading.textContent = "Edit Statistics for " + found.player_name;
+    if (statSubmitBtn) statSubmitBtn.textContent = "Update Player Stats";
+
+    sayPlayerStat("Editing stats for " + found.player_name + ". Update values and click Save.");
+    var card = document.getElementById("cad-player-stats-form-card");
+    if (card) card.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function deletePlayerStat(id) {
+    if (!confirm("Are you sure you want to delete this player statistic entry?")) return;
+    var sbc = sb();
+    if (!sbc) return;
+
+    sbc.from("player_stats").delete().eq("id", id).then(function (res) {
+      if (res && res.error) throw res.error;
+      sayPlayerStat("Player stat entry deleted.");
+      loadPlayerStats();
+    }).catch(function (err) {
+      console.error("[PLAYER_STATS] Delete error:", err);
+      sayPlayerStat("Could not delete stat: " + errText(err), true);
+    });
+  }
+
+  // Handle Player Select Change to auto-fill name & position
+  if (statPlayerSelect) {
+    statPlayerSelect.addEventListener("change", function () {
+      var opt = statPlayerSelect.options[statPlayerSelect.selectedIndex];
+      if (opt && opt.value) {
+        var nameInput = document.getElementById("stat-player-name");
+        var posInput = document.getElementById("stat-position");
+        if (nameInput) nameInput.value = opt.getAttribute("data-name") || "";
+        if (posInput && opt.getAttribute("data-pos")) posInput.value = opt.getAttribute("data-pos");
+      }
+    });
+  }
+
+  // Handle Form Submit
+  if (playerStatsForm) {
+    playerStatsForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var sbc = sb();
+      if (!sbc) { sayPlayerStat("Supabase is not connected.", true); return; }
+      if (!activeClubId) { sayPlayerStat("You are not assigned to a club yet.", true); return; }
+
+      var editId = document.getElementById("stat-edit-id").value;
+      var playerId = statPlayerSelect ? statPlayerSelect.value : null;
+      var playerName = (document.getElementById("stat-player-name").value || "").trim();
+
+      if (!playerName && statPlayerSelect && statPlayerSelect.selectedIndex > 0) {
+        playerName = statPlayerSelect.options[statPlayerSelect.selectedIndex].getAttribute("data-name");
+      }
+
+      if (!playerName) {
+        sayPlayerStat("Please choose a player or enter a player name.", true);
+        return;
+      }
+
+      var tournId = statTournSelect && statTournSelect.value ? Number(statTournSelect.value) : null;
+      var position = document.getElementById("stat-position").value || "Forward";
+      var matches = parseInt(document.getElementById("stat-matches").value, 10) || 0;
+      var goals = parseInt(document.getElementById("stat-goals").value, 10) || 0;
+      var assists = parseInt(document.getElementById("stat-assists").value, 10) || 0;
+      var minutes = parseInt(document.getElementById("stat-minutes").value, 10) || 0;
+      var cleanSheets = parseInt(document.getElementById("stat-clean-sheets").value, 10) || 0;
+      var yellowCards = parseInt(document.getElementById("stat-yellow-cards").value, 10) || 0;
+      var redCards = parseInt(document.getElementById("stat-red-cards").value, 10) || 0;
+      var motmAwards = parseInt(document.getElementById("stat-motm").value, 10) || 0;
+      var rating = parseFloat(document.getElementById("stat-rating").value) || 7.5;
+      var season = (document.getElementById("stat-season").value || "2026").trim();
+
+      var record = {
+        club_id: activeClubId,
+        player_id: playerId ? Number(playerId) : null,
+        tournament_id: tournId,
+        player_name: playerName,
+        sport: "Football",
+        position: position,
+        matches_played: matches,
+        goals: goals,
+        assists: assists,
+        minutes_played: minutes,
+        clean_sheets: cleanSheets,
+        yellow_cards: yellowCards,
+        red_cards: redCards,
+        motm_awards: motmAwards,
+        rating: rating,
+        season: season,
+        updated_at: new Date().toISOString()
+      };
+
+      if (statSubmitBtn) statSubmitBtn.disabled = true;
+      sayPlayerStat("Saving player stats…");
+
+      var query = editId
+        ? sbc.from("player_stats").update(record).eq("id", editId)
+        : sbc.from("player_stats").insert([record]);
+
+      query.then(function (res) {
+        if (res && res.error) throw res.error;
+        sayPlayerStat("Player stats saved successfully! Visible on Welcome page.");
+        playerStatsForm.reset();
+        document.getElementById("stat-edit-id").value = "";
+        if (statFormHeading) statFormHeading.textContent = "Add / Update Player Statistics";
+        if (statSubmitBtn) statSubmitBtn.textContent = "Save Player Stats";
+        loadPlayerStats();
+      }).catch(function (err) {
+        console.error("[PLAYER_STATS] Save error:", err);
+        sayPlayerStat("Error saving stats: " + errText(err) + " (Make sure player_stats SQL table exists in Supabase)", true);
+      }).finally(function () {
+        if (statSubmitBtn) statSubmitBtn.disabled = false;
+      });
+    });
+
+    if (statResetBtn) {
+      statResetBtn.addEventListener("click", function () {
+        document.getElementById("stat-edit-id").value = "";
+        if (statFormHeading) statFormHeading.textContent = "Add / Update Player Statistics";
+        if (statSubmitBtn) statSubmitBtn.textContent = "Save Player Stats";
+      });
+    }
+  }
+
+  if (cadStatsScopeFilter) {
+    cadStatsScopeFilter.addEventListener("change", function () {
+      renderPlayerStatsTable();
+    });
+  }
+
   /* ---------- notices ---------- */
 
   function loadNotices() {
@@ -931,8 +1476,8 @@
   /* Every page the sidebar and the URL can address.
      The key matches data-panel, data-tab and data-cad-side. */
   var VIEWS = {
-    club: "club", players: "players", teams: "teams", matches: "matches",
-    venues: "venues", equipment: "equipment", cards: "cards",
+    club: "club", players: "players", stats: "stats", matches: "matches",
+    equipment: "equipment", cards: "cards",
     reports: "reports", requests: "requests", notices: "notices"
   };
 
@@ -1097,6 +1642,9 @@
       if (!activeClubId) return;
       loadRoster();
       loadRequests();
+      loadMatches();
+      loadTournamentsAndRequests();
+      loadPlayerStats();
     });
   }
 
@@ -1183,6 +1731,8 @@
       loadRequests();
       loadAllClubs();   // for away club dropdown in match form
       loadMatches();    // load matches for current club
+      loadTournamentsAndRequests(); // load tournaments and registration requests
+      loadPlayerStats();            // load player lifetime & tournament stats
     });
   }).catch(function (err) {
     // Never leave a rejected promise unhandled: report it in the
