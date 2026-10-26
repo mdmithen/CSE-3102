@@ -16,7 +16,7 @@
 // the dashboard cards show "—" for modules that have no
 // data source yet instead of inventing numbers.
 //
-// What a club manager can do
+// What a club manager can d
 // -------------------------
 //  - see which club they manage          -> RPC my_club_id
 //  - switch between clubs they manage    -> public.clubs (manager_id)
