@@ -6,32 +6,33 @@
   <title>Sign Up — District Sports</title>
   <link rel="stylesheet" href="css/login.css">
 </head>
-<body>
+<body class="login-page-body">
 
   <main class="login-page">
-    <div class="login-box">
+    <div class="login-box signup-box">
+      <a class="login-home-link" href="index.html">Back to home</a>
 
       <div class="logo">
-        <span>🏆</span>
+        <span class="login-brand-mark" aria-hidden="true">DS</span>
         <h1>District Sports</h1>
         <p>Create your player account</p>
       </div>
 
       <p id="error" class="error" role="alert" aria-live="polite"></p>
-      <p id="success" style="color: var(--green); font-size: 14px; text-align: center; margin-bottom: 12px; min-height: 20px;"></p>
+      <p id="success" class="signup-success" role="status" aria-live="polite"></p>
 
-      <form id="signupForm" novalidate>
-        <div>
+      <form id="signupForm" class="signup-form" novalidate>
+        <div class="signup-field">
           <label for="fullName">Full Name</label>
           <input id="fullName" name="full_name" type="text" placeholder="Rahim Ahmed" autocomplete="name" required>
         </div>
 
-        <div>
+        <div class="signup-field">
           <label for="email">Email Address</label>
           <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="username" required>
         </div>
 
-        <div>
+        <div class="signup-field">
           <label for="password">Password</label>
           <div class="pw-wrap">
             <input id="password" name="password" type="password" placeholder="Create a password" autocomplete="new-password" required>
@@ -39,30 +40,29 @@
           </div>
         </div>
 
-        <div>
+        <div class="signup-field">
           <label for="phone">Phone Number</label>
           <input id="phone" name="phone" type="tel" placeholder="01XXXXXXXXX" required>
         </div>
 
-        <div>
+        <div class="signup-field signup-field-wide">
           <label for="address">Address</label>
           <input id="address" name="address" type="text" placeholder="House, Road, District" required>
         </div>
 
-        <div>
+        <div class="signup-field signup-field-wide">
           <label for="club">Club Name</label>
           <select id="club" name="club_name" required>
             <option value="">Select a club</option>
           </select>
         </div>
 
-        <button type="submit" class="btn btn-green">Create Account</button>
+        <button type="submit" class="btn btn-green signup-submit">Create Account</button>
       </form>
 
       <div class="links">
-        <a href="login.html">Already have an account? Login</a>
-        <span>•</span>
-        <a href="index.html">Back to Home</a>
+        <span>Already have an account?</span>
+        <a href="login.html">Log in</a>
       </div>
 
       <p class="hint">Account is created with Supabase Auth. Role: Player.</p>

@@ -14,7 +14,10 @@
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="index.html">District Sports</a>
-      <nav class="header-actions" aria-label="Account">
+      <nav class="header-actions" aria-label="Main navigation">
+        <a class="nav-link" href="#sports-board">Sports board</a>
+        <a class="nav-link" href="#publicNoticesSection">Notices</a>
+        <a class="nav-link" href="#clubRankingsSection">Rankings</a>
         <a class="login-link" href="login.html">Login</a>
         <a class="btn btn-primary" href="signup.html">Sign Up</a>
       </nav>
@@ -26,6 +29,7 @@
     <section class="hero">
       <div class="container hero-inner">
         <div class="hero-copy">
+          <p class="hero-kicker">District sports, connected</p>
           <h1>District-Based Sports Club Management</h1>
           <p>One simple place to manage clubs, join teams, and organize district tournaments.</p>
           <div class="hero-actions">
@@ -62,10 +66,15 @@
     </section>
 
     <!-- ========== SPORTS INFORMATION BOARD ========== -->
-    <section class="sports-board" aria-label="Public sports information">
+    <section class="sports-board" id="sports-board" aria-label="Public sports information">
       <div class="container">
+        <div class="board-intro">
+          <p class="section-kicker">Stay in the game</p>
+          <h2>Sports information board</h2>
+          <p>Updates, standings and fixtures from across the district.</p>
+        </div>
         <!-- Public Notices -->
-        <div class="board-section">
+        <div class="board-section" id="publicNoticesSection">
           <h2 class="board-title">Public Notices</h2>
           <div class="board-content notice-list" id="publicNotices">
             <p class="empty-state">No public notices available.</p>
@@ -73,7 +82,7 @@
         </div>
 
         <!-- Club Rankings -->
-        <div class="board-section">
+        <div class="board-section" id="clubRankingsSection">
           <h2 class="board-title">Club Rankings</h2>
           <div class="board-content ranking-list" id="clubRankings">
             <p class="empty-state">No club ranking data available.</p>
@@ -81,7 +90,7 @@
         </div>
 
         <!-- Player Rankings -->
-        <div class="board-section">
+        <div class="board-section" id="playerRankingsSection">
           <h2 class="board-title">Player Rankings</h2>
           <div class="board-content player-ranking-list" id="playerRankings">
             <p class="empty-state">No player ranking data available.</p>
@@ -89,7 +98,7 @@
         </div>
 
         <!-- Upcoming Matches -->
-        <div class="board-section">
+        <div class="board-section" id="upcomingMatchesSection">
           <h2 class="board-title">Upcoming Matches</h2>
           <div class="board-content match-list" id="upcomingMatches">
             <p class="empty-state">No upcoming matches scheduled.</p>

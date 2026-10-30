@@ -171,9 +171,9 @@ function renderIdentity() {
   fill($("#avatar").alt, ((myProfile && myProfile.full_name) || "Player") + " avatar");
 
   const chips = [];
-  if (myClub && myClub.name) chips.push("🏟️ " + esc(myClub.name));
-  if (myPlayer && myPlayer.position) chips.push("🎽 " + esc(myPlayer.position));
-  if (myProfile && myProfile.full_name) chips.push("📧 " + esc(myProfile.full_name));
+  if (myClub && myClub.name) chips.push("Club: " + esc(myClub.name));
+  if (myPlayer && myPlayer.position) chips.push("Position: " + esc(myPlayer.position));
+  if (myProfile && myProfile.full_name) chips.push("Player: " + esc(myProfile.full_name));
   $("#welcomeChips").innerHTML = chips.map(t => '<span class="pd-chip">' + esc(t) + "</span>").join("");
 
   fill($("#cardName"), (myProfile && myProfile.full_name) || "Player");
@@ -200,15 +200,15 @@ function renderStatCards() {
   const total = myRoster.length;
 
   const cards = [
-    { icon: "👥", value: total, label: "Club Members", foot: "Total roster" },
-    { icon: "✅", value: wins, label: "Active Players", foot: "Active status" },
-    { icon: "🏟️", value: myClub ? 1 : 0, label: "My Club", foot: myClub ? myClub.name : "None" },
-    { icon: "📍", value: myClub && myClub.district_id ? 1 : 0, label: "District", foot: "Club district" }
+    { value: total, label: "Club Members", foot: "Total roster" },
+    { value: wins, label: "Active Players", foot: "Active status" },
+    { value: myClub ? 1 : 0, label: "My Club", foot: myClub ? myClub.name : "None" },
+    { value: myClub && myClub.district_id ? 1 : 0, label: "District", foot: "Club district" }
   ];
 
   $("#statCards").innerHTML = cards.map(c => (
     '<div class="pd-stat">' +
-      '<span class="pd-stat-icon">' + c.icon + "</span>" +
+      '<span class="pd-stat-icon" aria-hidden="true"></span>' +
       "<b>" + esc(c.value) + "</b>" +
       "<small>" + esc(c.label) + "</small>" +
       '<span class="pd-stat-foot">' + esc(c.foot) + "</span>" +
@@ -221,7 +221,7 @@ function renderRoster() {
   if (!host) return;
 
   if (!myRoster.length) {
-    host.innerHTML = '<div class="pd-empty-inline"><span>👥</span><b>No members yet</b></div>';
+    host.innerHTML = '<div class="pd-empty-inline"><b>No members yet</b></div>';
     return;
   }
 
@@ -244,7 +244,7 @@ function renderMembers() {
   fill($("#memberCountText"), "All " + total + " club members");
 
   if (!myRoster.length) {
-    host.innerHTML = '<div class="pd-empty-inline"><span>👥</span><b>No members</b></div>';
+    host.innerHTML = '<div class="pd-empty-inline"><b>No members</b></div>';
     return;
   }
 
@@ -264,7 +264,7 @@ function renderMembers() {
         "</div>" +
         '<div class="pd-member-tags">' +
           '<span class="pd-chip">' + esc(p.position || "—") + "</span>" +
-          '<span class="pd-chip">📍 ' + esc(myClub && myClub.district_id ? myClub.district_id : "—") + "</span>" +
+          '<span class="pd-chip">District: ' + esc(myClub && myClub.district_id ? myClub.district_id : "—") + "</span>" +
         "</div>" +
         '<div class="pd-member-foot">' + badge +
           '<button type="button" class="pd-member-view" data-member="' + esc(p.id) + '">View profile →</button>' +
@@ -279,10 +279,10 @@ function renderClubInfo() {
   fill($("#clubMeta"), (myPlayer && myPlayer.club_id ? "Club ID: " + myPlayer.club_id : "—") + " · Status: " + esc(myClub && myClub.status ? myClub.status : "—"));
 
   const chips = [];
-  if (myClub && myClub.status) chips.push("✅ " + esc(myClub.status));
-  if (myClub && myClub.address) chips.push("📍 " + esc(myClub.address));
-  if (myClub && myClub.phone) chips.push("📞 " + esc(myClub.phone));
-  if (myClub && myClub.email) chips.push("✉️ " + esc(myClub.email));
+  if (myClub && myClub.status) chips.push("Status: " + esc(myClub.status));
+  if (myClub && myClub.address) chips.push("Address: " + esc(myClub.address));
+  if (myClub && myClub.phone) chips.push("Phone: " + esc(myClub.phone));
+  if (myClub && myClub.email) chips.push("Email: " + esc(myClub.email));
   $("#clubChips").innerHTML = chips.map(t => '<span class="pd-chip">' + esc(t) + "</span>").join("");
 
   const stats = [];
@@ -340,7 +340,7 @@ function renderMatches(matches) {
   const upcoming = matches.filter(m => m.status === "scheduled" || m.status === "upcoming").slice(0, 5);
 
   if (!upcoming.length) {
-    host.innerHTML = '<div class="pd-empty-inline"><span>📅</span><b>No fixtures scheduled</b></div>';
+    host.innerHTML = '<div class="pd-empty-inline"><b>No fixtures scheduled</b></div>';
     return;
   }
 
@@ -350,7 +350,7 @@ function renderMatches(matches) {
       '<div class="pd-match">' +
         "<div>" +
           "<h4>vs Club #" + esc(oppClubId) + "</h4>" +
-          '<small>📅 ' + esc(formatDate(m.match_date)) + "</small>" +
+          '<small>' + esc(formatDate(m.match_date)) + "</small>" +
         "</div>" +
         '<div class="pd-match-vs"><span class="pd-match-result pd-result-upcoming">Upcoming</span></div>' +
       "</div>"
@@ -365,7 +365,7 @@ function renderRecentResults(matches) {
   const played = matches.filter(m => m.status === "completed" || m.status === "finished").slice(0, 5);
 
   if (!played.length) {
-    host.innerHTML = '<div class="pd-empty-inline"><span>📊</span><b>No results yet</b></div>';
+    host.innerHTML = '<div class="pd-empty-inline"><b>No results yet</b></div>';
     return;
   }
 

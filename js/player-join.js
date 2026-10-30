@@ -115,7 +115,7 @@
         if (row.status === "pending") {
           setStatus("Request sent to " + club + " — waiting for the manager's approval.");
         } else if (row.status === "approved") {
-          setStatus("You are a member of " + club + " ✓");
+          setStatus("You are a member of " + club + ".");
         } else {
           setStatus("Your request to " + club + " was rejected. You can try another club.");
         }

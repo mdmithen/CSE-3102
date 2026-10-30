@@ -14,7 +14,7 @@
   <!-- ========== APP SHELL ========== -->
   <div class="pd-shell">
 
-    <!-- ========== DARK NAVY SIDEBAR ========== -->
+    <!-- ========== OLIVE SIDEBAR ========== -->
     <aside class="pd-sidebar" id="pdSidebar" aria-label="Player dashboard navigation">
 
       <div class="pd-brand">
@@ -24,15 +24,15 @@
 
       <nav class="pd-nav">
         <ul>
-          <li><a href="#dashboard" data-view="dashboard" class="is-active"><span class="nav-icon">📊</span> <span>Dashboard</span></a></li>
-          <li><a href="#profile" data-view="profile"><span class="nav-icon">👤</span> <span>My Profile</span></a></li>
-          <li><a href="#club" data-view="club"><span class="nav-icon">🏟️</span> <span>My Club</span></a></li>
-          <li><a href="#members" data-view="members"><span class="nav-icon">👥</span> <span>Club Members</span></a></li>
-          <li><a href="#performance" data-view="performance"><span class="nav-icon">📈</span> <span>My Performance</span></a></li>
-          <li><a href="#rankings" data-view="rankings"><span class="nav-icon">🏅</span> <span>My Rankings</span></a></li>
-          <li><a href="#notices" data-view="notices"><span class="nav-icon">📢</span> <span>Notices</span><em class="pd-count" id="noticeCount">0</em></a></li>
-          <li><a href="#matches" data-view="matches"><span class="nav-icon">📅</span> <span>Matches & Tournaments</span></a></li>
-          <li><a href="#settings" data-view="settings"><span class="nav-icon">⚙️</span> <span>Settings</span></a></li>
+          <li><a href="#dashboard" data-view="dashboard" class="is-active"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></span> <span>Dashboard</span></a></li>
+          <li><a href="#profile" data-view="profile"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.7-3.1 3.2-5 7-5s6.3 1.9 7 5"/></svg></span> <span>My Profile</span></a></li>
+          <li><a href="#club" data-view="club"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 20h18M5 20V8l7-4 7 4v12M9 20v-6h6v6M8 9h.01M16 9h.01"/></svg></span> <span>My Club</span></a></li>
+          <li><a href="#members" data-view="members"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 20c.5-2.8 2.4-4.5 5.5-4.5s5 1.7 5.5 4.5M16 5.5a3 3 0 0 1 0 5.8M17 15c2 .5 3.2 2.1 3.5 5"/></svg></span> <span>Club Members</span></a></li>
+          <li><a href="#performance" data-view="performance"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V11h4v9M10 20V5h4v15M16 20v-7h4v7"/></svg></span> <span>My Performance</span></a></li>
+          <li><a href="#rankings" data-view="rankings"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 7H4v2a4 4 0 0 0 4 4M16 7h4v2a4 4 0 0 1-4 4M12 13v5M8 21h8M9 18h6"/></svg></span> <span>My Rankings</span></a></li>
+          <li><a href="#notices" data-view="notices"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 17h14l-1.6-2.2V10a5.4 5.4 0 0 0-10.8 0v4.8zM10 20h4"/></svg></span> <span>Notices</span><em class="pd-count" id="noticeCount">0</em></a></li>
+          <li><a href="#matches" data-view="matches"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M7.5 3.5v3M16.5 3.5v3M4 9.5h16"/></svg></span> <span>Matches & Tournaments</span></a></li>
+          <li><a href="#settings" data-view="settings"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1a1.7 1.7 0 1 1-2.4 2.4l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a1.7 1.7 0 1 1-3.4 0v-.2a1.7 1.7 0 0 0-2.9-1.2l-.1.1a1.7 1.7 0 1 1-2.4-2.4l.1-.1a1.7 1.7 0 0 0-1.2-2.9H4a1.7 1.7 0 1 1 0-3.4h.2a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a1.7 1.7 0 1 1 2.4-2.4l.1.1a1.7 1.7 0 0 0 2.9-1.2V2a1.7 1.7 0 1 1 3.4 0v.2a1.7 1.7 0 0 0 2.9 1.2l.1-.1a1.7 1.7 0 1 1 2.4 2.4l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.2a1.7 1.7 0 1 1 0 3.4h-.2a1.7 1.7 0 0 0-1.2 2.9z"/></svg></span> <span>Settings</span></a></li>
         </ul>
       </nav>
 
@@ -56,7 +56,7 @@
           <p id="viewSubtitle">Overview of your season at a glance.</p>
         </div>
         <div class="pd-top-actions">
-          <span class="pd-demo-badge">DEMO DATA</span>
+          <span class="pd-demo-badge">LIVE + DEMO DATA</span>
           <span class="pd-badge pd-badge-green" id="topStatus">Active</span>
         </div>
       </header>
@@ -111,7 +111,7 @@
               <div class="pd-card-head">
                 <div>
                   <h3>Recent Results</h3>
-                  <p class="pd-note">Last 5 matches (demo)</p>
+                  <p class="pd-note">Latest completed matches</p>
                 </div>
               </div>
               <div id="recentResults"></div>
@@ -273,7 +273,7 @@
             <div class="pd-card-head">
               <div>
                 <h3>Club Members</h3>
-                <p class="pd-note">Registered at <span class="pd-inline-club">Rajshahi Sports Club</span> — sample data</p>
+                <p class="pd-note">Players currently registered with <span class="pd-inline-club">your club</span>.</p>
               </div>
               <span class="pd-badge pd-badge-green" id="memberCount">0 members</span>
             </div>
@@ -692,9 +692,9 @@
       </div><!-- /.pd-panels -->
 
       <footer class="pd-foot">
-        © 2026 District Sports — Player Dashboard · UI demo build.
-        Statistics, rankings, notices and fixtures below are sample data for the
-        class project. Only the "Join a Club" panel talks to the database.
+        Profile, club, roster, match and join-request data use Supabase. Performance,
+        rankings, notices, tournaments and parts of the overview are demo content.
+        Profile and notification preferences are not saved to an account.
       </footer>
     </main>
 
@@ -706,7 +706,7 @@
     <div class="pd-modal-card" role="dialog" aria-modal="true" aria-labelledby="pdModalTitle">
       <div class="pd-modal-head">
         <h3 id="pdModalTitle"></h3>
-        <button type="button" class="pd-modal-close" id="pdModalClose" aria-label="Close details">✕</button>
+        <button type="button" class="pd-modal-close" id="pdModalClose" aria-label="Close details">Close</button>
       </div>
       <div class="pd-modal-body" id="pdModalBody"></div>
     </div>

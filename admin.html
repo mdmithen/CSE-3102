@@ -13,7 +13,7 @@
     <!-- ==================== APP SHELL ==================== -->
     <div class="sa-shell">
 
-        <!-- ========== DARK NAVY SIDEBAR (all navigation) ========== -->
+        <!-- ========== ADMIN SIDEBAR (all navigation) ========== -->
         <aside class="sa-sidebar" id="saSidebar" aria-label="Super Admin navigation">
             <div class="sa-brand">
                 <b>DistrictSports</b>
@@ -168,7 +168,7 @@
                             <div>
                                 <label for="club-manager-email">Manager Email</label>
                                 <input id="club-manager-email" type="email" placeholder="manager@club.com" required>
-                                <small class="sa-hint">A club manager account is auto-created with password <b>123456</b>.</small>
+                                <small class="sa-hint">A manager account will be created for the email provided.</small>
                             </div>
                             <div>
                                 <label for="club-manager-name">Manager Name</label>
@@ -180,8 +180,7 @@
                             </div>
                         </form>
                         <p class="sa-note sa-note-warn">
-                            The club is saved with status <b>Pending</b>. A club manager account is
-                            auto-created (email above, password <b>123456</b>) and linked as manager.
+                            The club is registered as active, and the manager account is linked to it.
                         </p>
                     </div>
                 </section>
@@ -197,7 +196,7 @@
             <div class="sa-modal-card" role="dialog" aria-modal="true" aria-labelledby="saViewPlayersTitle">
                 <div class="sa-modal-head">
                     <h3 id="saViewPlayersTitle">Club Players</h3>
-                    <button type="button" class="sa-modal-close" id="saViewPlayersClose" aria-label="Close">✕</button>
+                    <button type="button" class="sa-modal-close" id="saViewPlayersClose" aria-label="Close">Close</button>
                 </div>
                 <div class="sa-modal-body" id="saViewPlayersBody">
                     <p class="muted">Loading players…</p>

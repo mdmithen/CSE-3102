@@ -2,21 +2,18 @@
    CLUB MANAGER DASHBOARD  (prefix: cad-)
    login-system.html  ->  #clubs  ->  #clubAdminPanel
 
-   Design: minimal, text-only, professional.
-     dark navy sidebar | white top bar
-     dark teal club banner
-     6 compact stat cards
-     horizontal tab strip
+   Design: minimal and professional.
+     olive sidebar | white top bar
+     olive club banner
+     live statistic cards
      white content cards
 
    Strict visual rules:
      - main background pure #FFFFFF
-     - NO emoji, icons, SVG, icon fonts or decorative symbols
-     - NO box-shadow / text-shadow / glow / blur / gradient / filter
-     - thin #E5E7EB borders
-     - dark #1F2937 text, green #16A34A accent
-     - hover changes colour / border / background only
-     - no transition and no animation
+     - sidebar #556B2F, with white text and simple inline SVG icons
+     - active and hover navigation #6B8E23
+     - thin #E5E7EB borders and restrained motion
+     - dark #1F2937 text, olive #556B2F accent
 
    Every interactive control is labelled with plain text
    ("Menu", "Search", "Notifications", "Logout", "Back to Home").
@@ -145,7 +142,7 @@ body.cad-mode #clubs {
 #clubAdminPanel .cad-banner,
 #clubAdminPanel .cad-stats { flex: 0 0 auto; }
 
-/* ---------- 2. DARK NAVY SIDEBAR ---------- */
+/* ---------- 2. SIDEBAR ---------- */
 
 #clubAdminPanel .cad-sidebar {
   height: 100%;
@@ -1155,4 +1152,596 @@ body.cad-mode #clubs {
   #clubAdminPanel .cad-main { height: auto; min-height: 100vh; overflow: visible; }
   #clubAdminPanel .cad-panel { flex: 0 0 auto; overflow: visible; }
   #clubAdminPanel .cad-sidebar { height: auto; min-height: 100vh; }
+}
+
+/* ---------- District Sports olive club dashboard ---------- */
+#clubAdminPanel {
+  --cad-font: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --green: #556B2F;
+  --green-hover: #6B8E23;
+  --text: #1F2937;
+  --muted: #6B7280;
+  --border: #E5E7EB;
+  --row-hover: #F7F9F1;
+  --cad-navy: #556B2F;
+  --cad-navy-soft: #6B8E23;
+  --cad-navy-line: rgba(255, 255, 255, 0.2);
+  --cad-teal: #556B2F;
+  --cad-teal-line: #E6EBCF;
+  --cad-teal-ink: #E6EBCF;
+  color: var(--text);
+  font-family: var(--cad-font);
+  background: #FFFFFF;
+}
+
+#clubAdminPanel .cad-shell {
+  grid-template-columns: 260px minmax(0, 1fr);
+  background: #FFFFFF;
+}
+
+#clubAdminPanel .cad-main {
+  min-width: 0;
+  background: #FFFFFF;
+}
+
+#clubAdminPanel .cad-sidebar {
+  position: relative;
+  z-index: 45;
+  align-self: stretch;
+  height: 100%;
+  min-height: 0;
+  padding: 26px 16px 18px;
+  gap: 18px;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  background: #556B2F;
+  color: #FFFFFF;
+}
+
+#clubAdminPanel .cad-brand {
+  padding: 0 8px 18px;
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+#clubAdminPanel .cad-brand-text b {
+  color: #FFFFFF;
+  font-size: 16px;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+}
+
+#clubAdminPanel .cad-brand-text small {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 9px;
+  letter-spacing: 1.6px;
+}
+
+#clubAdminPanel .cad-side-title {
+  margin: 20px 0 8px 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 9px;
+  letter-spacing: 1.6px;
+}
+
+#clubAdminPanel .cad-side-nav ul {
+  gap: 5px;
+}
+
+#clubAdminPanel .cad-side-nav a {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #FFFFFF;
+  font-size: 0.88rem;
+  font-weight: 550;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+#clubAdminPanel .cad-nav-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+#clubAdminPanel .cad-side-nav a:hover,
+#clubAdminPanel .cad-side-nav a.is-active {
+  border-color: transparent;
+  background: #6B8E23;
+  color: #FFFFFF;
+}
+
+#clubAdminPanel .cad-side-nav a.is-active {
+  font-weight: 700;
+}
+
+#clubAdminPanel .cad-side-nav a:focus-visible,
+#clubAdminPanel .cad-side-foot a:focus-visible,
+#clubAdminPanel .cad-season-btn:focus-visible {
+  outline: 2px solid #FFFFFF;
+  outline-offset: 2px;
+}
+
+#clubAdminPanel .cad-season {
+  margin-top: auto;
+  border-color: rgba(255, 255, 255, 0.2);
+  background: transparent;
+}
+
+#clubAdminPanel .cad-season b,
+#clubAdminPanel .cad-season p {
+  color: #FFFFFF;
+}
+
+#clubAdminPanel .cad-season p {
+  opacity: 0.78;
+}
+
+#clubAdminPanel .cad-season-btn {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #FFFFFF;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+#clubAdminPanel .cad-season-btn:hover {
+  border-color: #6B8E23;
+  background: #6B8E23;
+  color: #FFFFFF;
+}
+
+#clubAdminPanel .cad-side-foot {
+  border-top-color: rgba(255, 255, 255, 0.2);
+}
+
+#clubAdminPanel .cad-side-foot p,
+#clubAdminPanel .cad-side-foot b,
+#clubAdminPanel .cad-home,
+#clubAdminPanel .cad-logout-link {
+  color: #FFFFFF;
+}
+
+#clubAdminPanel .cad-side-foot p {
+  opacity: 0.75;
+}
+
+#clubAdminPanel .cad-side-foot a {
+  width: fit-content;
+  transition: opacity 160ms ease;
+}
+
+#clubAdminPanel .cad-side-foot a:hover {
+  color: #FFFFFF;
+  opacity: 0.78;
+}
+
+#clubAdminPanel .cad-logout-link {
+  font-weight: 650;
+}
+
+#clubAdminPanel .cad-topbar {
+  min-height: 78px;
+  padding: 16px clamp(20px, 3vw, 42px);
+  border-bottom-color: var(--border);
+  background: #FFFFFF;
+}
+
+#clubAdminPanel .cad-search input,
+#clubAdminPanel .cad-role-picker,
+#clubAdminPanel .cad-bell,
+#clubAdminPanel .cad-profile-chevron {
+  min-height: 40px;
+  border-color: var(--border);
+  border-radius: 9px;
+  background: #FFFFFF;
+  color: var(--text);
+}
+
+#clubAdminPanel .cad-search input:focus,
+#clubAdminPanel .cad-club-picker select:focus,
+#clubAdminPanel .cad-form input:focus,
+#clubAdminPanel .cad-form select:focus,
+#clubAdminPanel .cad-form textarea:focus {
+  outline: 3px solid rgba(85, 107, 47, 0.14);
+  outline-offset: 0;
+  border-color: var(--green);
+}
+
+#clubAdminPanel .cad-bell:hover,
+#clubAdminPanel .cad-profile-chevron:hover {
+  border-color: var(--green);
+  background: #E6EBCF;
+  color: var(--green);
+}
+
+#clubAdminPanel .cad-profile {
+  border-left-color: var(--border);
+}
+
+#clubAdminPanel .cad-avatar,
+#clubAdminPanel .cad-crest {
+  border-radius: 11px;
+  background: var(--green);
+  color: #FFFFFF;
+}
+
+#clubAdminPanel .cad-status:not(:empty) {
+  border-bottom-color: var(--border);
+  background: #F7F9F1;
+}
+
+#clubAdminPanel .cad-banner {
+  margin: 22px clamp(20px, 3vw, 42px) 0;
+  padding: 26px clamp(20px, 3vw, 34px);
+  border: 1px solid #556B2F;
+  border-radius: 14px;
+  background: #556B2F;
+}
+
+#clubAdminPanel .cad-banner-kicker,
+#clubAdminPanel .cad-club-picker span {
+  color: #E6EBCF;
+}
+
+#clubAdminPanel .cad-banner h2 {
+  font-size: clamp(1.45rem, 2.4vw, 1.85rem);
+  letter-spacing: -0.035em;
+}
+
+#clubAdminPanel .cad-banner-text > p:last-child {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+#clubAdminPanel .cad-club-picker select {
+  min-height: 42px;
+  border-color: rgba(255, 255, 255, 0.45);
+  border-radius: 9px;
+}
+
+#clubAdminPanel .cad-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  gap: 14px;
+  padding: 20px clamp(20px, 3vw, 42px) 4px;
+}
+
+#clubAdminPanel .cad-stat {
+  padding: 18px;
+  border-color: var(--border);
+  border-radius: 12px;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+#clubAdminPanel .cad-stat:hover {
+  border-color: #CAD3B2;
+  background: #FBFCF8;
+}
+
+#clubAdminPanel .cad-stat-label {
+  color: var(--muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.07em;
+}
+
+#clubAdminPanel .cad-stat b {
+  color: var(--text);
+  font-size: clamp(1.8rem, 3vw, 2.15rem);
+  font-weight: 730;
+  letter-spacing: -0.045em;
+}
+
+#clubAdminPanel .cad-stat.is-live b {
+  color: var(--green);
+}
+
+#clubAdminPanel .cad-stat-foot {
+  border-top-color: var(--border);
+  color: var(--muted);
+}
+
+#clubAdminPanel .cad-panel {
+  padding: 22px clamp(20px, 3vw, 42px) 30px;
+}
+
+#clubAdminPanel .cad-card {
+  margin-bottom: 18px;
+  padding: clamp(18px, 2.2vw, 26px);
+  border-color: var(--border);
+  border-radius: 13px;
+  transition: border-color 160ms ease;
+}
+
+#clubAdminPanel .cad-card:hover {
+  border-color: #D5DCC6;
+}
+
+#clubAdminPanel .cad-card h3 {
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+#clubAdminPanel .cad-card-head {
+  margin-bottom: 18px;
+}
+
+#clubAdminPanel .cad-chip {
+  border-color: #DCE3CA;
+  border-radius: 999px;
+  background: #E6EBCF;
+  color: #556B2F;
+  font-size: 0.72rem;
+  padding: 5px 10px;
+}
+
+#clubAdminPanel .cad-chip-quiet {
+  border-color: var(--border);
+  background: #FFFFFF;
+  color: var(--muted);
+}
+
+#clubAdminPanel .cad-chip-green {
+  border-color: #DCE3CA;
+  background: #E6EBCF;
+  color: #556B2F;
+}
+
+#clubAdminPanel .cad-chip-red {
+  border-color: #FECACA;
+  background: #FEF2F2;
+  color: #B91C1C;
+}
+
+#clubAdminPanel .cad-profile-head {
+  border-bottom-color: var(--border);
+}
+
+#clubAdminPanel .cad-profile-head h3 {
+  font-size: 1.12rem;
+}
+
+#clubAdminPanel .cad-pill {
+  border-color: #DCE3CA;
+  background: #E6EBCF;
+  color: #556B2F;
+}
+
+#clubAdminPanel .cad-pill-status {
+  border-color: var(--green);
+  background: var(--green);
+  color: #FFFFFF;
+}
+
+#clubAdminPanel .cad-statrow {
+  border-color: var(--border);
+  border-radius: 9px;
+  background: #FFFFFF;
+}
+
+#clubAdminPanel .cad-facts .cad-fact {
+  border-bottom-color: var(--border);
+}
+
+#clubAdminPanel .cad-note {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+#clubAdminPanel .cad-note-warn {
+  border-color: #DCE3CA;
+  border-radius: 9px;
+  background: #E6EBCF;
+  color: #556B2F;
+}
+
+#clubAdminPanel .cad-form {
+  gap: 18px;
+}
+
+#clubAdminPanel .cad-form label {
+  color: var(--text);
+  font-size: 0.83rem;
+  font-weight: 650;
+}
+
+#clubAdminPanel .cad-form input,
+#clubAdminPanel .cad-form select,
+#clubAdminPanel .cad-form textarea,
+#clubAdminPanel #cadStatsScopeFilter,
+#clubAdminPanel #cadTournFilter {
+  min-height: 42px;
+  padding: 10px 12px;
+  border-color: var(--border);
+  border-radius: 9px;
+  font-family: var(--cad-font);
+  font-size: 0.88rem;
+}
+
+#clubAdminPanel .cad-form textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+#clubAdminPanel .cad-form-actions button[type="submit"],
+#clubAdminPanel .sa-btn.sa-btn-primary {
+  min-height: 42px;
+  padding: 10px 17px;
+  border: 1px solid var(--green);
+  border-radius: 9px;
+  background: var(--green);
+  color: #FFFFFF;
+  font-family: var(--cad-font);
+  font-size: 0.86rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+#clubAdminPanel .cad-form-actions button[type="submit"]:hover,
+#clubAdminPanel .sa-btn.sa-btn-primary:hover {
+  border-color: var(--green-hover);
+  background: var(--green-hover);
+}
+
+#clubAdminPanel .cad-form-actions button[type="reset"],
+#clubAdminPanel .sa-btn:not(.sa-btn-primary) {
+  min-height: 42px;
+  padding: 10px 17px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: #FFFFFF;
+  color: var(--text);
+  font-family: var(--cad-font);
+  font-size: 0.86rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+#clubAdminPanel .cad-form-actions button[type="reset"]:hover,
+#clubAdminPanel .sa-btn:not(.sa-btn-primary):hover {
+  border-color: #DCE3CA;
+  background: #E6EBCF;
+  color: #556B2F;
+}
+
+#clubAdminPanel .cad-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #FFFFFF;
+}
+
+#clubAdminPanel .cad-table-wrap table {
+  min-width: 540px;
+  border: 0;
+  border-radius: 10px;
+  font-size: 0.84rem;
+}
+
+#clubAdminPanel .cad-table-wrap thead th {
+  padding: 12px 14px;
+  background: #F7F9F1;
+  color: var(--muted);
+  font-size: 0.69rem;
+  letter-spacing: 0.07em;
+}
+
+#clubAdminPanel .cad-table-wrap tbody td {
+  padding: 12px 14px;
+  border-bottom-color: var(--border);
+}
+
+#clubAdminPanel .cad-table-wrap tbody tr {
+  transition: background-color 140ms ease;
+}
+
+#clubAdminPanel .cad-table-wrap tbody tr:hover {
+  background: #FBFCF8;
+}
+
+#clubAdminPanel .cad-badge,
+#clubAdminPanel .cad-badge.scheduled,
+#clubAdminPanel .cad-badge.completed {
+  border: 1px solid #DCE3CA;
+  border-radius: 999px;
+  background: #E6EBCF;
+  color: #556B2F;
+}
+
+#clubAdminPanel .cad-badge.cancelled {
+  border: 1px solid #FECACA;
+  background: #FEF2F2;
+  color: #B91C1C;
+}
+
+#clubAdminPanel .cad-table-wrap tbody td a[data-approve] {
+  color: var(--green);
+  font-weight: 700;
+}
+
+#clubAdminPanel .cad-table-wrap tbody td a[data-reject] {
+  color: #B91C1C;
+  font-weight: 700;
+}
+
+#clubAdminPanel .notice-item {
+  border-color: var(--border);
+  border-radius: 12px;
+  transition: border-color 160ms ease;
+}
+
+#clubAdminPanel .notice-item:hover {
+  border-color: #D5DCC6;
+}
+
+#clubAdminPanel .notice-status {
+  border-color: #DCE3CA;
+  border-radius: 999px;
+  background: #E6EBCF;
+  color: #556B2F;
+}
+
+#clubAdminPanel .notice-date {
+  border-top-color: var(--border);
+}
+
+#clubAdminPanel .cad-empty-tag {
+  border-color: #DCE3CA;
+  border-radius: 999px;
+  background: #E6EBCF;
+  color: #556B2F;
+}
+
+@media (min-width: 1500px) {
+  #clubAdminPanel .cad-shell {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  #clubAdminPanel .cad-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #clubAdminPanel .cad-sidebar {
+    width: 280px;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: none;
+    transition: transform 200ms ease, visibility 200ms ease;
+  }
+
+  #clubAdminPanel .cad-topbar {
+    min-height: 72px;
+  }
+}
+
+@media (max-width: 760px) {
+  #clubAdminPanel .cad-banner {
+    margin: 16px 16px 0;
+    padding: 20px;
+  }
+
+  #clubAdminPanel .cad-stats {
+    padding: 16px 16px 4px;
+  }
+
+  #clubAdminPanel .cad-panel {
+    padding: 16px 16px 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #clubAdminPanel *,
+  #clubAdminPanel *::before,
+  #clubAdminPanel *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
