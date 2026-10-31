@@ -449,16 +449,13 @@ function showPanel(name) {
     });
   });
 
-  /* nav switching */
-  const nav = $(".pd-nav");
-  if (nav) {
-    nav.addEventListener("click", function (e) {
-      const link = e.target.closest("a[data-view]");
-      if (!link) return;
-      e.preventDefault();
-      showPanel(link.getAttribute("data-view"));
-    });
-  }
+  /* nav and shortcut links */
+  document.addEventListener("click", function (e) {
+    const link = e.target.closest("a[data-view]");
+    if (!link) return;
+    e.preventDefault();
+    showPanel(link.getAttribute("data-view"));
+  });
 
   /* burger menu */
   const burger = $("#pdBurger");
