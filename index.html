@@ -120,86 +120,6 @@
     </div>
   </footer>
 
-  <!-- ========== TOURNAMENT REGISTRATION MODAL ========== -->
-  <div class="modal-backdrop" id="tournModal" hidden>
-    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTournTitle">
-      <div class="modal-header">
-        <div>
-          <span class="modal-tag">Tournament Registration</span>
-          <h3 id="modalTournTitle">Register for Tournament</h3>
-          <p id="modalTournSubtitle" class="modal-sub">Fill in the details below to register your team.</p>
-        </div>
-        <button type="button" class="modal-close" id="modalCloseBtn" aria-label="Close modal">&times;</button>
-      </div>
-
-      <div id="modalAlert" class="modal-alert" hidden></div>
-
-      <form id="publicTournamentRegForm" class="modal-form">
-        <input type="hidden" id="modalTournId" name="tournament_id">
-
-        <div class="form-row">
-          <label for="regApplicantType">Registering As</label>
-          <select id="regApplicantType" name="applicant_type" required>
-            <option value="Club">Registered Sports Club</option>
-            <option value="Independent Team">Independent Team / Youth Group</option>
-          </select>
-        </div>
-
-        <div class="form-row">
-          <label for="regTeamName">Team / Club Name *</label>
-          <input type="text" id="regTeamName" name="team_name" placeholder="e.g. Uttara Strikers FC" required>
-        </div>
-
-        <div class="form-grid-2">
-          <div class="form-row">
-            <label for="regContactName">Captain / Contact Person *</label>
-            <input type="text" id="regContactName" name="contact_name" placeholder="Full name" required>
-          </div>
-          <div class="form-row">
-            <label for="regContactPhone">Phone Number *</label>
-            <input type="tel" id="regContactPhone" name="contact_phone" placeholder="01XXXXXXXXX" required>
-          </div>
-        </div>
-
-        <div class="form-grid-2">
-          <div class="form-row">
-            <label for="regContactEmail">Email Address *</label>
-            <input type="email" id="regContactEmail" name="contact_email" placeholder="contact@example.com" required>
-          </div>
-          <div class="form-row">
-            <label for="regDistrict">District *</label>
-            <select id="regDistrict" name="district" required>
-              <option value="">Select District</option>
-              <option>Dhaka</option>
-              <option>Rajshahi</option>
-              <option>Chattogram</option>
-              <option>Sylhet</option>
-              <option>Khulna</option>
-              <option>Barishal</option>
-              <option>Rangpur</option>
-              <option>Mymensingh</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <label for="regPlayerCount">Estimated Squad Size</label>
-          <input type="number" id="regPlayerCount" name="player_count" value="11" min="5" max="35">
-        </div>
-
-        <div class="form-row">
-          <label for="regMessage">Message / Remarks (Optional)</label>
-          <textarea id="regMessage" name="message" rows="2" placeholder="Any additional notes, player roster summary, or contact info..."></textarea>
-        </div>
-
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-primary btn-signup" id="regSubmitBtn">Submit Registration Request</button>
-          <button type="button" class="btn btn-secondary" id="modalCancelBtn">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- ========== PLAYER LIFETIME STATS MODAL ========== -->
   <div class="modal-backdrop" id="playerStatsModal" hidden>
     <div class="modal-box modal-box-wide" role="dialog" aria-modal="true" aria-labelledby="modalPlayerName">
@@ -287,7 +207,7 @@
   <!-- Supabase & Homepage Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-config.js"></script>
-  <script src="js/home.js"></script>
+  <script src="js/home.js?v=5"></script>
 
 </body>
 </html>

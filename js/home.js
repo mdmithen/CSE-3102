@@ -118,13 +118,9 @@
         '<div class="tourn-action">' +
           (isClosed
             ? '<span class="tourn-closed-label">Registration Closed</span>'
-            : '<button type="button" class="btn btn-primary btn-signup btn-tourn-register" ' +
-                'data-tourn-id="' + esc(t.id) + '" ' +
-                'data-tourn-title="' + esc(t.title) + '" ' +
-                'data-tourn-club="' + esc(hostClub) + '" ' +
-                'data-tourn-venue="' + esc(t.venue || '') + '">' +
-                'Register Team →' +
-              '</button>'
+            : '<span class="tourn-closed-label" style="text-align:right; line-height:1.4;">' +
+                'Apply from your<br><b>Club Dashboard → Notice Board</b>' +
+              '</span>'
           ) +
         '</div>' +
       '</article>';
@@ -149,157 +145,6 @@
     });
 
     host.innerHTML = html;
-    bindTournamentButtons();
-  }
-
-  /* ---------- 2. TOURNAMENT REGISTRATION MODAL ---------- */
-
-  var modal = null;
-  var modalCloseBtn = null;
-  var modalCancelBtn = null;
-  var regForm = null;
-  var modalAlert = null;
-
-  function initModal() {
-    modal = document.getElementById('tournModal');
-    modalCloseBtn = document.getElementById('modalCloseBtn');
-    modalCancelBtn = document.getElementById('modalCancelBtn');
-    regForm = document.getElementById('publicTournamentRegForm');
-    modalAlert = document.getElementById('modalAlert');
-
-    if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
-    if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeModal);
-
-    // Close when clicking backdrop
-    if (modal) {
-      modal.addEventListener('click', function (e) {
-        if (e.target === modal) closeModal();
-      });
-    }
-
-    // Close on Escape key
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && modal && !modal.hidden) {
-        closeModal();
-      }
-    });
-
-    if (regForm) {
-      regForm.addEventListener('submit', handleRegistrationSubmit);
-    }
-  }
-
-  function openModal(tournId, title, club, venue) {
-    if (!modal) return;
-
-    var idInput = document.getElementById('modalTournId');
-    var titleEl = document.getElementById('modalTournTitle');
-    var subEl = document.getElementById('modalTournSubtitle');
-
-    if (idInput) idInput.value = tournId;
-    if (titleEl) titleEl.textContent = 'Register for ' + (title || 'Tournament');
-    if (subEl) subEl.textContent = 'Organized by ' + (club || 'District Sports') + (venue ? ' • ' + venue : '');
-
-    if (modalAlert) {
-      modalAlert.hidden = true;
-      modalAlert.textContent = '';
-      modalAlert.className = 'modal-alert';
-    }
-
-    if (regForm) regForm.reset();
-
-    modal.hidden = false;
-    document.body.style.overflow = 'hidden';
-
-    var firstInput = document.getElementById('regTeamName');
-    if (firstInput) setTimeout(function () { firstInput.focus(); }, 100);
-  }
-
-  function closeModal() {
-    if (!modal) return;
-    modal.hidden = true;
-    document.body.style.overflow = '';
-  }
-
-  function bindTournamentButtons() {
-    var btns = document.querySelectorAll('.btn-tourn-register');
-    btns.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var id = btn.getAttribute('data-tourn-id');
-        var title = btn.getAttribute('data-tourn-title');
-        var club = btn.getAttribute('data-tourn-club');
-        var venue = btn.getAttribute('data-tourn-venue');
-        openModal(id, title, club, venue);
-      });
-    });
-  }
-
-  function handleRegistrationSubmit(e) {
-    e.preventDefault();
-    var client = sb();
-    if (!client) {
-      showModalAlert('Supabase is not connected. Please reload the page.', true);
-      return;
-    }
-
-    var tournId = document.getElementById('modalTournId').value;
-    var applicantType = document.getElementById('regApplicantType').value;
-    var teamName = (document.getElementById('regTeamName').value || '').trim();
-    var contactName = (document.getElementById('regContactName').value || '').trim();
-    var contactPhone = (document.getElementById('regContactPhone').value || '').trim();
-    var contactEmail = (document.getElementById('regContactEmail').value || '').trim();
-    var district = document.getElementById('regDistrict').value;
-    var playerCount = parseInt(document.getElementById('regPlayerCount').value, 10) || 11;
-    var message = (document.getElementById('regMessage').value || '').trim();
-
-    if (!teamName || !contactName || !contactPhone || !contactEmail || !district) {
-      showModalAlert('Please fill in all required fields marked with *.', true);
-      return;
-    }
-
-    var submitBtn = document.getElementById('regSubmitBtn');
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Submitting Request…';
-    }
-
-    client.from('tournament_requests').insert([{
-      tournament_id: Number(tournId),
-      applicant_type: applicantType,
-      team_name: teamName,
-      contact_name: contactName,
-      contact_email: contactEmail,
-      contact_phone: contactPhone,
-      district: district,
-      player_count: playerCount,
-      message: message || null,
-      status: 'pending',
-      created_at: new Date().toISOString()
-    }]).then(function (res) {
-      if (res && res.error) throw res.error;
-
-      showModalAlert('🎉 Registration request submitted successfully! The organizing club has received your application.', false);
-      if (regForm) regForm.reset();
-
-      setTimeout(function () {
-        closeModal();
-      }, 2500);
-    }).catch(function (err) {
-      console.error('[TOURN_REG] Submit error:', err);
-      showModalAlert('Could not submit registration: ' + (err.message || 'Please check if the tournament_requests table exists in Supabase.'), true);
-    }).finally(function () {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Registration Request';
-      }
-    });
-  }
-
-  function showModalAlert(text, isError) {
-    if (!modalAlert) return;
-    modalAlert.textContent = text;
-    modalAlert.className = 'modal-alert ' + (isError ? 'modal-alert-error' : 'modal-alert-success');
-    modalAlert.hidden = false;
   }
 
   /* ---------- 3. LOAD UPCOMING MATCHES ---------- */
@@ -349,6 +194,72 @@
 
   var playerStatsCache = [];
 
+  /* A player can own several stat rows: a lifetime row, tournament
+     rows, and one row per match (the host club records match stats).
+     Adding them all together would double count, so per player only
+     one grain is summed:
+       - match rows, when the player has any (they are the finest
+         grain and already hold that match's performance)
+       - otherwise the career / tournament rows
+     The surviving row keeps a real id so the profile modal works. */
+  function aggregatePlayerStats(rows) {
+    var groups = {};
+
+    rows.forEach(function (r) {
+      var key = r.player_id
+        ? ('p:' + r.player_id)
+        : ('n:' + String(r.player_name || '').toLowerCase().trim() + '|' + String(r.club_id || ''));
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(r);
+    });
+
+    var sumFields = ['matches_played', 'goals', 'assists', 'minutes_played',
+                     'clean_sheets', 'yellow_cards', 'red_cards', 'innings',
+                     'runs', 'wickets', 'catches', 'fifties', 'hundreds',
+                     'motm_awards'];
+
+    return Object.keys(groups).map(function (key) {
+      var all = groups[key];
+      var hasMatchRows = all.some(function (r) { return r.match_id; });
+      var used = all.filter(function (r) { return hasMatchRows ? !!r.match_id : !r.match_id; });
+
+      var base = used[0];
+      var out = {};
+      Object.keys(base).forEach(function (k) { out[k] = base[k]; });
+
+      sumFields.forEach(function (f) {
+        out[f] = used.reduce(function (total, r) {
+          return total + (Number(r[f]) || 0);
+        }, 0);
+      });
+
+      // Rating is a quality grade, not a total: weight it by matches
+      var rated = used.filter(function (r) { return r.rating !== null && r.rating !== undefined; });
+      if (rated.length) {
+        var weight = 0, weighted = 0;
+        rated.forEach(function (r) {
+          var w = Math.max(1, Number(r.matches_played) || 1);
+          weight += w;
+          weighted += (parseFloat(r.rating) || 0) * w;
+        });
+        out.rating = weight ? Math.round((weighted / weight) * 100) / 100 : null;
+      }
+
+      // A mixed set keeps the sport it has the most entries in
+      var votes = {};
+      used.forEach(function (r) {
+        var s = r.sport || 'Football';
+        votes[s] = (votes[s] || 0) + 1;
+      });
+      out.sport = Object.keys(votes).sort(function (a, b) { return votes[b] - votes[a]; })[0] || 'Football';
+
+      // Aggregated numbers no longer belong to one scope
+      out.tournament_id = null;
+      out.match_id = null;
+      return out;
+    });
+  }
+
   function loadPlayerRankings() {
     var host = document.getElementById('playerRankings');
     if (!host) return;
@@ -364,12 +275,21 @@
 
       client.from('player_stats')
         .select('*')
-        .order('goals', { ascending: false })
-        .order('rating', { ascending: false })
-        .limit(10)
         .then(function (res) {
-          var stats = (res && res.data) || [];
-          playerStatsCache = stats;
+          var rows = (res && res.data) || [];
+
+          /* One row per player, then sport-aware ordering: football
+             by goals, cricket by runs, ties broken by rating. */
+          var stats = aggregatePlayerStats(rows);
+          stats.sort(function (a, b) {
+            var pa = a.sport === 'Cricket' ? (a.runs || 0) : (a.goals || 0);
+            var pb = b.sport === 'Cricket' ? (b.runs || 0) : (b.goals || 0);
+            if (pb !== pa) return pb - pa;
+            return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
+          });
+
+          playerStatsCache = stats.slice(0, 10);
+          stats = playerStatsCache;
 
           if (!stats.length) {
             host.innerHTML = '<p class="empty-state">No player ranking data recorded yet.</p>';
@@ -379,15 +299,18 @@
           host.innerHTML = stats.map(function (p, idx) {
             var club = clubsMap[p.club_id] || 'Sports Club';
             var rankBadge = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : '#' + (idx + 1)));
-            var g = p.goals || 0;
-            var a = p.assists || 0;
+            var isCrk = p.sport === 'Cricket';
             var r = p.rating || '7.5';
+
+            var statPills = isCrk
+              ? '<span class="stat-pill-highlight">🏏 ' + (p.runs || 0) + ' Runs</span> • <span>🎯 ' + (p.wickets || 0) + ' Wickets</span>'
+              : '<span class="stat-pill-highlight">⚽ ' + (p.goals || 0) + ' Goals</span> • <span>🎯 ' + (p.assists || 0) + ' Assists</span>';
 
             return '<div class="player-ranking-entry" data-player-stat-id="' + esc(p.id) + '">' +
               '<span class="player-rank" style="font-size:1rem; font-weight:700;">' + rankBadge + '</span>' +
               '<div class="player-ranking-info">' +
-                '<div class="player-name"><b>' + esc(p.player_name) + '</b> <span class="player-pos-chip">' + esc(p.position || 'Player') + '</span></div>' +
-                '<div class="player-club">' + esc(club) + ' • <span class="stat-pill-highlight">⚽ ' + g + ' Goals</span> • <span>🎯 ' + a + ' Assists</span> • <span>⭐ ' + r + '</span></div>' +
+                '<div class="player-name"><b>' + esc(p.player_name) + '</b> <span class="player-pos-chip">' + esc(isCrk ? '🏏 ' : '⚽ ') + esc(p.position || 'Player') + '</span></div>' +
+                '<div class="player-club">' + esc(club) + ' • ' + statPills + ' • <span>⭐ ' + r + '</span></div>' +
               '</div>' +
               '<button type="button" class="btn-view-player-profile" data-player-stat-id="' + esc(p.id) + '">View Stats →</button>' +
             '</div>';
@@ -397,6 +320,104 @@
         }).catch(function (err) {
           console.warn('[HOME] Player stats load:', err);
         });
+    });
+  }
+
+  /* ---------- 4b. CLUB RANKINGS ---------- */
+
+  /* Points from completed matches: 3 for a win, 1 for a draw.
+     Goal difference, then goals scored, then name break ties. */
+  function loadClubRankings() {
+    var host = document.getElementById('clubRankings');
+    if (!host) return;
+
+    var client = sb();
+    if (!client) return;
+
+    client.from('clubs').select('id, name, district').then(function (cRes) {
+      var clubs = (cRes && cRes.data) || [];
+      if (!clubs.length) {
+        host.innerHTML = '<p class="empty-state">No club ranking data available.</p>';
+        return;
+      }
+
+      client.from('matches')
+        .select('home_club_id, away_club_id, home_score, away_score, status')
+        .then(function (mRes) {
+          var matches = (mRes && mRes.data) || [];
+
+          var table = {};
+          clubs.forEach(function (c) {
+            table[c.id] = {
+              id: c.id, name: c.name, district: c.district || '',
+              played: 0, won: 0, drawn: 0, lost: 0,
+              gf: 0, ga: 0, points: 0
+            };
+          });
+
+          matches.forEach(function (m) {
+            if (m.status !== 'completed') return;
+            if (m.home_score === null || m.home_score === undefined) return;
+            if (m.away_score === null || m.away_score === undefined) return;
+
+            var home = table[m.home_club_id];
+            var away = table[m.away_club_id];
+            if (!home || !away) return;
+
+            var hs = Number(m.home_score) || 0;
+            var as = Number(m.away_score) || 0;
+
+            home.played++; away.played++;
+            home.gf += hs; home.ga += as;
+            away.gf += as; away.ga += hs;
+
+            if (hs > as) {
+              home.won++; away.lost++; home.points += 3;
+            } else if (hs < as) {
+              away.won++; home.lost++; away.points += 3;
+            } else {
+              home.drawn++; away.drawn++;
+              home.points += 1; away.points += 1;
+            }
+          });
+
+          var ranked = Object.keys(table).map(function (k) { return table[k]; })
+            .filter(function (t) { return t.played > 0; })
+            .sort(function (a, b) {
+              if (b.points !== a.points) return b.points - a.points;
+              var gdA = a.gf - a.ga, gdB = b.gf - b.ga;
+              if (gdB !== gdA) return gdB - gdA;
+              if (b.gf !== a.gf) return b.gf - a.gf;
+              return String(a.name).localeCompare(String(b.name));
+            });
+
+          if (!ranked.length) {
+            host.innerHTML = '<p class="empty-state">No club ranking data available. Rankings appear after a match result is marked completed.</p>';
+            return;
+          }
+
+          host.innerHTML = ranked.slice(0, 10).map(function (t, idx) {
+            var badge = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : '#' + (idx + 1)));
+            var gd = t.gf - t.ga;
+            return '<div class="ranking-entry">' +
+              '<span class="rank" style="font-size:1rem; font-weight:700;">' + badge + '</span>' +
+              '<div class="ranking-club">' +
+                '<b>' + esc(t.name) + '</b>' +
+                (t.district ? ' <small style="color:var(--text-soft);">• ' + esc(t.district) + '</small>' : '') +
+                '<div style="font-size:0.75rem; color:var(--text-soft); margin-top:2px;">' +
+                  'P ' + t.played + ' • W ' + t.won + ' • D ' + t.drawn + ' • L ' + t.lost +
+                  ' • GD ' + (gd > 0 ? '+' + gd : gd) +
+                '</div>' +
+              '</div>' +
+              '<span class="ranking-points" style="font-weight:700;">' + t.points + ' pts</span>' +
+            '</div>';
+          }).join('');
+        }).catch(function (err) {
+          console.warn('[HOME] Club rankings load:', err);
+          host.innerHTML = '<p class="empty-state">Could not load club rankings.</p>';
+        });
+    }).catch(function (err) {
+      console.warn('[HOME] Clubs load for rankings:', err);
     });
   }
 
@@ -454,35 +475,81 @@
       avatarEl.textContent = inits || 'PL';
     }
 
-    var goals = p.goals || 0;
-    var assists = p.assists || 0;
+    var isCrk = p.sport === 'Cricket';
     var matches = p.matches_played || 0;
     var rating = p.rating || '7.5';
-    var minutes = p.minutes_played || (matches * 90);
-    var cleanSheets = p.clean_sheets || 0;
-    var yellow = p.yellow_cards || 0;
-    var red = p.red_cards || 0;
     var motm = p.motm_awards || 0;
     var season = p.season || '2026';
     var scope = p.tournament_id ? 'Tournament ID #' + p.tournament_id : 'Overall Career Lifetime';
 
-    var impact = matches > 0 ? ((goals + assists) / matches).toFixed(2) : '0.00';
+    if (isCrk) {
+      /* Cricket profile: runs/wickets headline, and the career
+         breakdown shows innings, catches, fifties and hundreds
+         instead of minutes and cards. Labels are rewritten so the
+         static markup never lies about what the number is. */
+      var runs = p.runs || 0;
+      var wickets = p.wickets || 0;
 
-    fillEl('modalStatGoals', goals);
-    fillEl('modalStatAssists', assists);
-    fillEl('modalStatMatches', matches);
-    fillEl('modalStatRating', rating);
-    fillEl('modalStatMinutes', minutes + "'");
-    fillEl('modalStatCleanSheets', cleanSheets);
-    fillEl('modalStatYellow', yellow);
-    fillEl('modalStatRed', red);
-    fillEl('modalStatMotm', motm);
-    fillEl('modalStatImpact', impact + ' per match');
-    fillEl('modalStatScope', scope);
-    fillEl('modalStatSeason', season);
+      setModalStat('modalStatGoals', runs, 'Runs Scored', '🏏');
+      setModalStat('modalStatAssists', wickets, 'Wickets', '🎯');
+      fillEl('modalStatMatches', matches);
+      fillEl('modalStatRating', rating);
+      setModalStat('modalStatMinutes', (p.innings || 0), '🏏 Innings');
+      setModalStat('modalStatCleanSheets', (p.catches || 0), '🧤 Catches / Stumpings');
+      setModalStat('modalStatYellow', (p.fifties || 0), '🌟 Fifties (50s)');
+      setModalStat('modalStatRed', (p.hundreds || 0), '💯 Hundreds (100s)');
+      fillEl('modalStatMotm', motm);
+      var cImpact = matches > 0 ? ((runs + wickets) / matches).toFixed(2) : '0.00';
+      setModalStat('modalStatImpact', cImpact + ' per match', 'Runs + Wickets / Match');
+      fillEl('modalStatScope', scope);
+      fillEl('modalStatSeason', season);
+    } else {
+      var goals = p.goals || 0;
+      var assists = p.assists || 0;
+      var minutes = p.minutes_played || (matches * 90);
+      var cleanSheets = p.clean_sheets || 0;
+      var yellow = p.yellow_cards || 0;
+      var red = p.red_cards || 0;
+      var impact = matches > 0 ? ((goals + assists) / matches).toFixed(2) : '0.00';
+
+      // setModalStat (not fillEl) so labels/icons rewritten by a
+      // cricket row are restored when a football row is opened next
+      setModalStat('modalStatGoals', goals, 'Goals Scored', '⚽');
+      setModalStat('modalStatAssists', assists, 'Assists', '🎯');
+      fillEl('modalStatMatches', matches);
+      fillEl('modalStatRating', rating);
+      setModalStat('modalStatMinutes', minutes + "'", '⏱️ Minutes Played');
+      setModalStat('modalStatCleanSheets', cleanSheets, '🧤 Clean Sheets / Saves');
+      setModalStat('modalStatYellow', yellow, '🟨 Yellow Cards');
+      setModalStat('modalStatRed', red, '🟥 Red Cards');
+      fillEl('modalStatMotm', motm);
+      setModalStat('modalStatImpact', impact + ' per match', '📊 Goal Involvement / Match');
+      fillEl('modalStatScope', scope);
+      fillEl('modalStatSeason', season);
+    }
 
     playerModal.hidden = false;
     document.body.style.overflow = 'hidden';
+  }
+
+  /* Sets a modal stat value and, when given, rewrites the label
+     (and icon for the hero cards) next to it - the modal markup is
+     static, so this is how cricket rows get honest labels. */
+  function setModalStat(id, value, label, icon) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = value;
+
+    var card = el.closest ? el.closest('.stat-highlight-card') : null;
+    if (card) {
+      var lbl = card.querySelector('.stat-lbl');
+      var ic = card.querySelector('.stat-icon');
+      if (lbl && label) lbl.textContent = label;
+      if (ic && icon) ic.textContent = icon;
+      return;
+    }
+    var prev = el.previousElementSibling;
+    if (prev && label) prev.textContent = label;
   }
 
   function fillEl(id, val) {
@@ -499,11 +566,11 @@
   /* ---------- INITIALIZE ---------- */
 
   document.addEventListener('DOMContentLoaded', function () {
-    initModal();
     initPlayerModal();
     loadPublicNotices();
     loadUpcomingMatches();
     loadPlayerRankings();
+    loadClubRankings();
   });
 
 })();

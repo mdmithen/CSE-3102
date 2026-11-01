@@ -6,7 +6,7 @@
     <title>District Sports Management System</title>
     <!-- v3 busts the browser cache so the Club Admin redesign always loads -->
     <link rel="stylesheet" href="css/public.css?v=3">
-    <link rel="stylesheet" href="css/club-admin.css?v=3">
+    <link rel="stylesheet" href="css/club-admin.css?v=5">
 </head>
 
 <body class="pub-body">
@@ -225,23 +225,26 @@
                   <!-- ---- panel: Players (existing working features) ---- -->
                   <section class="cad-panel" id="cad-panel-players" data-panel="players" aria-labelledby="cad-nav-players">
 
-                    <!-- Register New Player -->
+                    <!-- Register New Player / Edit Player (one card does both:
+                         js/club-admin.js switches it into edit mode when the
+                         Edit button in the roster below is clicked) -->
                     <article class="cad-card" id="register-player">
                       <div class="cad-card-head">
-                        <h3>Register New Player</h3>
+                        <h3 id="playerFormHeading">Register New Player</h3>
                         <span class="cad-chip cad-chip-quiet">Saves to the club roster</span>
                       </div>
                       <p id="clubMsg" class="cad-msg" role="status"></p>
                       <form id="playerForm" class="cad-form">
+                        <input type="hidden" id="player-edit-id" name="edit_id" value="">
                         <div>
                           <label for="player-name">Player Name</label>
                           <input type="text" id="player-name" name="player_name" placeholder="Player full name" required>
                         </div>
-                        <div>
+                        <div class="player-auth-field">
                           <label for="player-email">Email Address</label>
                           <input type="email" id="player-email" name="player_email" placeholder="player@example.com" required>
                         </div>
-                        <div>
+                        <div class="player-auth-field">
                           <label for="player-password">Password</label>
                           <input type="password" id="player-password" name="player_password" placeholder="Create password" required>
                         </div>
@@ -289,8 +292,9 @@
                           <input type="tel" id="player-contact" name="player_contact" placeholder="01XXXXXXXXX">
                         </div>
                         <div class="cad-form-actions">
-                          <button type="submit">Register Player</button>
-                          <button type="reset">Clear</button>
+                          <button type="submit" id="playerSubmitBtn">Register Player</button>
+                          <button type="reset" id="playerResetBtn">Clear</button>
+                          <button type="button" id="playerCancelBtn" hidden>Cancel Edit</button>
                         </div>
                       </form>
                       <p class="cad-note cad-note-warn">
@@ -313,10 +317,11 @@
                               <th scope="col">Player Name</th>
                               <th scope="col">Position</th>
                               <th scope="col">Status</th>
+                              <th scope="col">Action</th>
                             </tr>
                           </thead>
                           <tbody id="roster-body">
-                            <tr><td colspan="4">Loading roster…</td></tr>
+                            <tr><td colspan="5">Loading roster…</td></tr>
                           </tbody>
                         </table>
                       </div>
@@ -366,7 +371,7 @@
                   <section class="cad-panel" id="notices" data-panel="notices" aria-labelledby="cad-nav-notices">
                     <div class="cad-page-head">
                       <h3 class="cad-page-title">Notice Board</h3>
-                      <p class="cad-page-sub">Important announcements and club updates</p>
+                      <p class="cad-page-sub">Announcements, match invitations, and tournament applications</p>
                     </div>
                     <div class="notice-list" id="noticeList"></div>
                   </section>
@@ -384,21 +389,42 @@
                         <input type="hidden" id="stat-edit-id" name="edit_id" value="">
 
                         <div>
+                          <label for="stat-tourn-select">Scope (Tournament / Match)</label>
+                          <select id="stat-tourn-select" name="tournament_id">
+                            <option value="">Overall / Lifetime Career</option>
+                          </select>
+                          <p class="cad-note" style="margin:6px 0 0; font-size:12px;">
+                            Pick a match or tournament squad to limit the player list.
+                          </p>
+                        </div>
+
+                        <div>
+                          <label for="stat-club-select">Club</label>
+                          <select id="stat-club-select" name="stat_club_id">
+                            <option value="">Your club</option>
+                          </select>
+                          <p class="cad-note" style="margin:6px 0 0; font-size:12px;">
+                            For a tournament your club organizes, you can record stats of any registered club's players.
+                          </p>
+                        </div>
+
+                        <div>
                           <label for="stat-player-select">Select Player *</label>
                           <select id="stat-player-select" name="player_id" required>
                             <option value="">Choose player from roster</option>
                           </select>
                         </div>
 
-                        <div>
+                        <div id="stat-player-name-wrap">
                           <label for="stat-player-name">Player Name (if not in roster)</label>
                           <input type="text" id="stat-player-name" name="player_name" placeholder="Full name">
                         </div>
 
                         <div>
-                          <label for="stat-tourn-select">Tournament / Scope</label>
-                          <select id="stat-tourn-select" name="tournament_id">
-                            <option value="">Overall / Lifetime Career</option>
+                          <label for="stat-sport">Sport *</label>
+                          <select id="stat-sport" name="sport" required>
+                            <option value="Football">⚽ Football</option>
+                            <option value="Cricket">🏏 Cricket</option>
                           </select>
                         </div>
 
@@ -410,9 +436,6 @@
                             <option value="Defender">Defender</option>
                             <option value="Goalkeeper">Goalkeeper</option>
                             <option value="Winger">Winger</option>
-                            <option value="Batsman">Batsman</option>
-                            <option value="Bowler">Bowler</option>
-                            <option value="All-Rounder">All-Rounder</option>
                           </select>
                         </div>
 
@@ -421,34 +444,76 @@
                           <input type="number" id="stat-matches" name="matches_played" value="1" min="0" required>
                         </div>
 
-                        <div>
-                          <label for="stat-goals">Goals Scored (or Runs)</label>
-                          <input type="number" id="stat-goals" name="goals" value="0" min="0" required>
+                        <!-- ==== FOOTBALL-ONLY FIELDS (shown when Sport = Football) ==== -->
+                        <div class="stat-group" id="statGroupFootball"
+                             style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; border-top: 1px dashed var(--border); padding-top: 14px;">
+                          <p style="grid-column: 1 / -1; margin: 0; font-size: 13px; font-weight: bold;">⚽ Football Statistics</p>
+
+                          <div>
+                            <label for="stat-goals">Goals Scored</label>
+                            <input type="number" id="stat-goals" name="goals" value="0" min="0" required>
+                          </div>
+
+                          <div>
+                            <label for="stat-assists">Assists</label>
+                            <input type="number" id="stat-assists" name="assists" value="0" min="0">
+                          </div>
+
+                          <div>
+                            <label for="stat-minutes">Minutes Played</label>
+                            <input type="number" id="stat-minutes" name="minutes_played" value="90" min="0">
+                          </div>
+
+                          <div>
+                            <label for="stat-clean-sheets">Clean Sheets / Saves</label>
+                            <input type="number" id="stat-clean-sheets" name="clean_sheets" value="0" min="0">
+                          </div>
+
+                          <div>
+                            <label for="stat-yellow-cards">Yellow Cards</label>
+                            <input type="number" id="stat-yellow-cards" name="yellow_cards" value="0" min="0">
+                          </div>
+
+                          <div>
+                            <label for="stat-red-cards">Red Cards</label>
+                            <input type="number" id="stat-red-cards" name="red_cards" value="0" min="0">
+                          </div>
                         </div>
 
-                        <div>
-                          <label for="stat-assists">Assists (or Wickets)</label>
-                          <input type="number" id="stat-assists" name="assists" value="0" min="0">
-                        </div>
+                        <!-- ==== CRICKET-ONLY FIELDS (shown when Sport = Cricket) ==== -->
+                        <div class="stat-group" id="statGroupCricket" hidden
+                             style="grid-column: 1 / -1; display: none; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; border-top: 1px dashed var(--border); padding-top: 14px;">
+                          <p style="grid-column: 1 / -1; margin: 0; font-size: 13px; font-weight: bold;">🏏 Cricket Statistics</p>
 
-                        <div>
-                          <label for="stat-minutes">Minutes Played</label>
-                          <input type="number" id="stat-minutes" name="minutes_played" value="90" min="0">
-                        </div>
+                          <div>
+                            <label for="stat-innings">Innings</label>
+                            <input type="number" id="stat-innings" name="innings" value="0" min="0">
+                          </div>
 
-                        <div>
-                          <label for="stat-clean-sheets">Clean Sheets / Saves</label>
-                          <input type="number" id="stat-clean-sheets" name="clean_sheets" value="0" min="0">
-                        </div>
+                          <div>
+                            <label for="stat-runs">Runs Scored</label>
+                            <input type="number" id="stat-runs" name="runs" value="0" min="0" required>
+                          </div>
 
-                        <div>
-                          <label for="stat-yellow-cards">Yellow Cards</label>
-                          <input type="number" id="stat-yellow-cards" name="yellow_cards" value="0" min="0">
-                        </div>
+                          <div>
+                            <label for="stat-wickets">Wickets</label>
+                            <input type="number" id="stat-wickets" name="wickets" value="0" min="0">
+                          </div>
 
-                        <div>
-                          <label for="stat-red-cards">Red Cards</label>
-                          <input type="number" id="stat-red-cards" name="red_cards" value="0" min="0">
+                          <div>
+                            <label for="stat-catches">Catches / Stumpings</label>
+                            <input type="number" id="stat-catches" name="catches" value="0" min="0">
+                          </div>
+
+                          <div>
+                            <label for="stat-fifties">Fifties (50s)</label>
+                            <input type="number" id="stat-fifties" name="fifties" value="0" min="0">
+                          </div>
+
+                          <div>
+                            <label for="stat-hundreds">Hundreds (100s)</label>
+                            <input type="number" id="stat-hundreds" name="hundreds" value="0" min="0">
+                          </div>
                         </div>
 
                         <div>
@@ -493,14 +558,14 @@
                           <thead>
                             <tr>
                               <th scope="col">Player</th>
-                              <th scope="col">Position</th>
+                              <th scope="col">Sport / Position</th>
                               <th scope="col">Tournament / Scope</th>
                               <th scope="col">Matches</th>
-                              <th scope="col">Goals</th>
-                              <th scope="col">Assists</th>
+                              <th scope="col">Goals / Runs</th>
+                              <th scope="col">Assists / Wickets</th>
                               <th scope="col">Rating</th>
-                              <th scope="col">Clean Sheets</th>
-                              <th scope="col">Cards</th>
+                              <th scope="col">CS / Catches</th>
+                              <th scope="col">Cards / 50s-100s</th>
                               <th scope="col">MOTM</th>
                               <th scope="col">Action</th>
                             </tr>
@@ -559,12 +624,24 @@
                               <th scope="col">Date</th>
                               <th scope="col">Venue</th>
                               <th scope="col">Status</th>
+                              <th scope="col">Result</th>
                             </tr>
                           </thead>
                           <tbody id="matchList">
-                            <tr><td colspan="4">Loading matches…</td></tr>
+                            <tr><td colspan="5">Loading matches…</td></tr>
                           </tbody>
                         </table>
+                      </div>
+                    </article>
+
+                    <article class="cad-card" id="runningTournamentsCard">
+                      <div class="cad-card-head">
+                        <h3>Running Tournaments</h3>
+                        <span class="cad-chip" id="runningTournCount">0 tournaments</span>
+                      </div>
+                      <p class="cad-note">Tournaments with approved clubs. Open one to see its clubs and players, then update any player's stats.</p>
+                      <div class="running-tourn-list" id="runningTournamentList">
+                        <div class="cad-empty"><p>Loading tournaments…</p></div>
                       </div>
                     </article>
 
@@ -1467,7 +1544,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/club-admin.js?v=3"></script>
+    <script src="js/club-admin.js?v=13"></script>
     <script>
     (function () {
         if (!window.AUTH) return;

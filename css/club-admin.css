@@ -881,6 +881,26 @@ body.cad-mode #clubs {
   color: var(--muted);
 }
 
+/* Checkbox lists inside the dashboard (match squads, tournament squads).
+   public.css sets `width: 100%` on every `.pub-body input`, which also
+   caught checkboxes: they stretched across the whole row and pushed the
+   player name out of view. Keep checkboxes small and inline. */
+#clubAdminPanel input[type="checkbox"],
+#clubAdminPanel input[type="radio"] {
+  width: auto;
+  min-width: 16px;
+  padding: 0;
+  margin: 0;
+  flex: 0 0 auto;
+  accent-color: var(--green);
+}
+
+#clubAdminPanel .tourn-squad-list label,
+#clubAdminPanel .match-reg-list label {
+  color: var(--text);
+  cursor: pointer;
+}
+
 /* ---------- 8. FORMS ---------- */
 
 #clubAdminPanel .cad-form {
@@ -1744,4 +1764,67 @@ body.cad-mode #clubs {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
+}
+/* ---------- Running tournaments (Matches panel) ---------- */
+#clubAdminPanel .running-tourn-list { display: grid; gap: 12px; }
+
+#clubAdminPanel .running-tourn {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #FFFFFF;
+  overflow: hidden;
+}
+
+#clubAdminPanel .running-tourn-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #F8FAF7;
+  flex-wrap: wrap;
+}
+
+#clubAdminPanel .running-tourn-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+#clubAdminPanel .running-tourn-body {
+  padding: 12px 14px;
+  display: grid;
+  gap: 10px;
+  border-top: 1px dashed var(--border);
+}
+
+#clubAdminPanel .running-club {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+#clubAdminPanel .running-club-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+#clubAdminPanel .running-player {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+
+#clubAdminPanel .running-player:first-of-type { border-top: 0; }
+
+#clubAdminPanel .running-player-stat {
+  font-size: 12px;
+  color: var(--muted);
 }
