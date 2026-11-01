@@ -233,6 +233,78 @@ var AUTH = (function () {
     return "❌ " + (msg || "Login failed. Please try again.");
   }
 
+  /* Check whether a player has been approved by the club manager */
+  function verifyPlayerApproval(user) {
+    var sb = client();
+    if (!sb) {
+      return Promise.resolve({ approved: false, message: "⚠️ Supabase is not connected." });
+    }
+
+    // Demo player account fallback
+    if (user.email === "player@gmail.com") {
+      return Promise.resolve({ approved: true });
+    }
+
+    // 1. Check if the player is already on the club roster (players table)
+    return sb.from("players")
+      .select("id, status")
+      .eq("profile_id", user.id)
+      .maybeSingle()
+      .then(function (playerRes) {
+        if (playerRes && playerRes.data) {
+          return { approved: true };
+        }
+
+        // 2. Not on roster, check join_requests status
+        return sb.from("join_requests")
+          .select("id, status")
+          .eq("player_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle()
+          .then(function (reqRes) {
+            var req = reqRes && reqRes.data ? reqRes.data : null;
+            if (!req) {
+              return {
+                approved: false,
+                message: "❌ আপনার কোনো ক্লাবে জয়েন রিকোয়েস্ট বা অনুমোদিত অ্যাকাউন্ট পাওয়া যায়নি।"
+              };
+            }
+
+            var status = String(req.status || "").toLowerCase();
+            if (status === "approved") {
+              return { approved: true };
+            }
+
+            if (status === "pending") {
+              return {
+                approved: false,
+                message: "⏳ আপনার জয়েন রিকোয়েস্ট এখনো ক্লাব ম্যানেজার অ্যাপ্রুভ করেননি। ম্যানেজার এক্সেপ্ট করার পর আপনি লগইন করতে পারবেন।"
+              };
+            }
+
+            if (status === "rejected") {
+              return {
+                approved: false,
+                message: "❌ আপনার জয়েন রিকোয়েস্টটি ক্লাব কর্তৃপক্ষ প্রত্যাখ্যান (Reject) করেছে।"
+              };
+            }
+
+            return {
+              approved: false,
+              message: "⏳ আপনার অ্যাকাউন্টটি এখনো অনুমোদিত নয়।"
+            };
+          });
+      })
+      .catch(function (err) {
+        console.warn("Player approval check failed:", err);
+        return {
+          approved: false,
+          message: "⚠️ অ্যাকাউন্ট ভেরিফিকেশনে সমস্যা হয়েছে: " + (err && err.message ? err.message : "Error")
+        };
+      });
+  }
+
   /* ---------- public API ---------- */
 
   /* Verify email + password with Supabase, then
@@ -262,6 +334,32 @@ var AUTH = (function () {
       return loadProfile(user).then(function (profile) {
         var role = pickRole(profile, user);
         var name = pickName(profile, user);
+
+        // Player accounts must be approved by the club manager before login is permitted
+        if (role === ROLES.PLAYER) {
+          return verifyPlayerApproval(user).then(function (approval) {
+            if (!approval.approved) {
+              // Sign out immediately so no active session remains in Supabase client
+              return sb.auth.signOut().then(function () {
+                clearSession();
+                return {
+                  ok: false,
+                  message: approval.message || "⏳ আপনার অ্যাকাউন্টটি এখনো অনুমোদিত নয়।"
+                };
+              });
+            }
+
+            setSession({ role: role, name: name, email: user.email });
+
+            return {
+              ok: true,
+              role: role,
+              name: name,
+              email: user.email,
+              redirect: REDIRECTS[role] || LOGIN_PAGE
+            };
+          });
+        }
 
         setSession({ role: role, name: name, email: user.email });
 
@@ -341,6 +439,24 @@ var AUTH = (function () {
           if (!profile) return;
           var role = pickRole(profile, live.user);
           var name = pickName(profile, live.user);
+
+          if (role === ROLES.PLAYER) {
+            return verifyPlayerApproval(live.user).then(function (approval) {
+              if (!approval.approved) {
+                clearSession();
+                return sb.auth.signOut().then(function () {
+                  window.location.replace(LOGIN_PAGE);
+                });
+              }
+              if (role !== cached.role || name !== cached.name) {
+                setSession({ role: role, name: name, email: cached.email });
+                if (role !== cached.role) {
+                  window.location.replace(redirectFor(role));
+                }
+              }
+            });
+          }
+
           if (role !== cached.role || name !== cached.name) {
             setSession({ role: role, name: name, email: cached.email });
             if (role !== cached.role) {

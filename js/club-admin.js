@@ -123,7 +123,7 @@
 
   /* Counts lifted from the live tables so the statistic cards
      can never disagree with the roster / requests below them. */
-  var counts = { players: null, activePlayers: null, pending: null };
+  var counts = { players: null, activePlayers: null, pending: null, equipment: null };
 
   /* ---------- load my club ---------- */
 
@@ -384,7 +384,7 @@
       { label: "Total Players",    value: counts.players, live: true,  foot: "Club roster" },
       { label: "Upcoming Matches", value: null, live: false, foot: "Matches pending" },
       { label: "Pending Requests", value: counts.pending, live: true,  foot: "Awaiting approval" },
-      { label: "Equipment Items",  value: null, live: false, foot: "Equipment pending" }
+      { label: "Equipment Items",  value: counts.equipment, live: true,  foot: "Club inventory" }
     ];
 
     host.innerHTML = cards.map(function (c) {
@@ -1037,8 +1037,15 @@
               resultCell = '<small style="color:var(--muted);">Awaiting host result</small>';
             }
 
+            var matchType = m.match_type || "Friendly Match / Challenge";
+            var isFriendly = /friendly|challenge/i.test(matchType);
+            var typeBadge = isFriendly
+              ? '<span class="cad-chip" style="font-size:11px; background:#FEF3C7; color:#92400E; border:1px solid #FDE68A;">🤝 Friendly</span>'
+              : '<span class="cad-chip" style="font-size:11px; background:#E0F2FE; color:#0369A1; border:1px solid #BAE6FD;">⚽ Regular</span>';
+
             return "<tr>" +
               "<td>" + esc(oppName) + "</td>" +
+              "<td>" + typeBadge + "</td>" +
               "<td>" + esc(formatDateFromISO(m.match_date)) + "</td>" +
               "<td>" + esc(m.venue || "—") + "</td>" +
               "<td><span class=\"cad-badge " + statusClass + "\">" + esc(status) + "</span></td>" +
@@ -1086,6 +1093,7 @@
         if (res && res.error) throw res.error;
         sayMatch("Result saved (" + hs + "–" + as + "). Club Rankings updated on the Welcome page.");
         loadMatches();
+  loadEquipment();
       }).catch(function (err) {
         console.error("[MATCHES] Result save:", err);
         sayMatch("Could not save the result: " + errText(err), true);
@@ -1372,13 +1380,15 @@
       var awayClubId = (document.getElementById("match-away-club").value || "").trim();
       var matchDate = document.getElementById("match-date").value;
       var venue = (document.getElementById("match-venue").value || "").trim();
+      var matchType = (document.getElementById("match-type") ? document.getElementById("match-type").value : "Friendly Match / Challenge").trim();
+      var matchNote = (document.getElementById("match-note") ? document.getElementById("match-note").value : "").trim();
 
-      if (!awayClubId) { sayMatch("Please select an away club.", true); return; }
-      if (!matchDate) { sayMatch("Please select a match date.", true); return; }
+      if (!awayClubId) { sayMatch("Please select an opponent club to challenge.", true); return; }
+      if (!matchDate) { sayMatch("Please select a match date and time.", true); return; }
 
       var btn = matchForm.querySelector('button[type="submit"]');
       if (btn) btn.disabled = true;
-      sayMatch("Scheduling match…");
+      sayMatch("Sending challenge & scheduling match…");
 
       /* Step 1: Insert match */
       sbc.from("matches").insert([{
@@ -1386,6 +1396,8 @@
         away_club_id: Number(awayClubId),
         match_date: matchDate,
         venue: venue || null,
+        match_type: matchType,
+        match_note: matchNote || null,
         status: "scheduled"
       }]).then(function (res) {
         if (res && res.error) throw res.error;
@@ -1397,22 +1409,27 @@
           return;
         }
 
-        /* Step 2: Create notice for all clubs (invites them to register) */
+        /* Step 2: Create challenge / match notice on the Notice Board */
         var awaySelect = document.getElementById("match-away-club");
         var awayName = awaySelect && awaySelect.options[awaySelect.selectedIndex]
           ? awaySelect.options[awaySelect.selectedIndex].text : "Away club";
         var homeName = (document.getElementById("match-home-club").value || "Home club");
 
-        var noticeTitle = "Match Invitation — " + homeName + " vs " + awayName;
-        var noticeBody = "A match has been scheduled and your club is invited to register a squad.\n" +
-          "Home: " + homeName + "\n" +
-          "Away: " + awayName + "\n" +
-          "Date: " + formatDateFromISO(matchDate) + "\n" +
+        var isChallenge = /challenge|friendly/i.test(matchType);
+        var noticeTitle = (isChallenge ? "🤝 Friendly Match Challenge: " : "⚽ Match Invitation: ") + homeName + " vs " + awayName;
+        var noticeBody = (isChallenge
+          ? "⚔️ " + homeName + " has issued a Friendly Match Challenge to " + awayName + "!\n"
+          : "A match has been scheduled and your club is invited to register a squad.\n") +
+          "Match Type: " + matchType + "\n" +
+          "Challenger / Host: " + homeName + "\n" +
+          "Opponent: " + awayName + "\n" +
+          "Date & Time: " + formatDateFromISO(matchDate) + "\n" +
           (venue ? "Venue: " + venue + "\n" : "") +
-          "\nOpen this notice on the Notice Board to pick the players who will play.";
+          (matchNote ? "Note: " + matchNote + "\n" : "") +
+          "\nOpen this notice on the Notice Board to pick and register your squad!";
 
         return sbc.from("notices").insert([{
-          user_id: null, // system notice
+          user_id: null,
           title: noticeTitle,
           body: noticeBody,
           category: "match",
@@ -1422,11 +1439,10 @@
           created_at: new Date().toISOString()
         }]).then(function (noticeRes) {
           if (noticeRes && noticeRes.error) {
-            console.warn("[MATCH] Notice insert:", noticeRes.error.message);
-            // Match was created even if notice failed
+            console.warn("[MATCH] Notice insert warning:", noticeRes.error.message);
           }
 
-          sayMatch("Match scheduled! Notice published to all clubs.");
+          sayMatch(isChallenge ? "✅ Challenge sent & match scheduled! Notice posted on Notice Board." : "✅ Match scheduled! Notice published.");
           matchForm.reset();
           loadMatches();
           loadNotices(); // refresh notices
@@ -2496,7 +2512,11 @@
     var sbc = sb();
     if (!sbc || !document.getElementById("noticeList")) return;
 
-    sbc.from("notices").select("*").order("created_at", { ascending: false }).limit(20)
+    var query = sbc.from("notices").select("*").order("created_at", { ascending: false }).limit(30);
+    if (activeClubId) {
+      query = sbc.from("notices").select("*").or("club_id.eq." + activeClubId + ",club_id.is.null").order("created_at", { ascending: false }).limit(30);
+    }
+    query
       .then(function (res) {
         if (res && res.error) throw res.error;
         lastNotices = (res && res.data) || [];
@@ -2899,17 +2919,45 @@
     }
 
     host.innerHTML = notices.map(function (n) {
+      var isMyNotice = (n.club_id && String(n.club_id) === String(activeClubId));
+      var deleteBtn = isMyNotice
+        ? '<button type="button" class="cad-btn-link is-danger" data-delete-notice="' + esc(n.id) + '" style="margin-left:auto; color:#e5534b; font-size:12px; background:none; border:none; cursor:pointer; font-weight:600;">Delete</button>'
+        : '';
+      var scopeTag = isMyNotice
+        ? '<span class="cad-chip cad-chip-quiet" style="font-size:11px;">Your Club Notice</span>'
+        : (n.club_id ? '<span class="cad-chip cad-chip-quiet" style="font-size:11px;">Club Notice</span>' : '<span class="cad-chip cad-chip-quiet" style="font-size:11px;">General Notice</span>');
+
       return '<article class="notice-item">' +
-        '<div class="notice-head">' +
+        '<div class="notice-head" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">' +
           "<h3>" + esc(n.title) + "</h3>" +
           (n.category ? '<span class="notice-status">' + esc(n.category) + "</span>" : "") +
+          scopeTag +
+          deleteBtn +
         "</div>" +
-        '<p class="notice-body">' + esc(n.body) + "</p>" +
+        '<p class="notice-body" style="white-space:pre-line;">' + esc(n.body) + "</p>" +
         (n.created_at ? '<p class="notice-date">' + esc(formatDateFromISO(n.created_at)) + "</p>" : "") +
         (n.category === "match" ? matchNoticeActions(n) : "") +
         (n.category === "tournament" ? tournamentNoticeActions(n) : "") +
       "</article>";
     }).join("");
+
+    Array.prototype.forEach.call(host.querySelectorAll("button[data-delete-notice]"), function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        var id = btn.getAttribute("data-delete-notice");
+        if (!confirm("Are you sure you want to delete this notice?")) return;
+        var sbc = sb();
+        if (!sbc) return;
+        say("Deleting notice…");
+        sbc.from("notices").delete().eq("id", id).then(function (res) {
+          if (res && res.error) throw res.error;
+          say("Notice deleted successfully.");
+          loadNotices();
+        }).catch(function (err) {
+          say("Could not delete notice: " + errText(err), true);
+        });
+      });
+    });
 
     Array.prototype.forEach.call(host.querySelectorAll("button[data-toggle-squad]"), function (btn) {
       btn.addEventListener("click", function (e) {
@@ -2969,6 +3017,65 @@
     });
   }
 
+
+  /* ---------- publish club notice for players ---------- */
+  var clubNoticeForm = document.getElementById("clubNoticeForm");
+  var noticeFormMsg = document.getElementById("noticeFormMsg");
+
+  function sayNoticeForm(msg, isErr) {
+    if (!noticeFormMsg) return;
+    noticeFormMsg.textContent = msg || "";
+    noticeFormMsg.className = "cad-msg " + (isErr ? "is-error" : "is-ok");
+    if (!msg) noticeFormMsg.className = "cad-msg";
+  }
+
+  if (clubNoticeForm) {
+    clubNoticeForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var sbc = sb();
+      if (!sbc) { sayNoticeForm("Supabase is not connected.", true); return; }
+      if (!activeClubId) { sayNoticeForm("You are not assigned to a club.", true); return; }
+
+      var title = (document.getElementById("notice-title").value || "").trim();
+      var category = (document.getElementById("notice-category").value || "General").trim();
+      var body = (document.getElementById("notice-body").value || "").trim();
+
+      if (!title || !body) {
+        sayNoticeForm("Please enter both notice title and message details.", true);
+        return;
+      }
+
+      var btn = document.getElementById("btnPublishNotice");
+      if (btn) btn.disabled = true;
+      sayNoticeForm("Publishing notice for your players…");
+
+      sbc.auth.getSession().then(function (sessionRes) {
+        var uid = sessionRes && sessionRes.data && sessionRes.data.session && sessionRes.data.session.user
+          ? sessionRes.data.session.user.id
+          : null;
+
+        return sbc.from("notices").insert([{
+          club_id: activeClubId,
+          title: title,
+          body: body,
+          category: category,
+          is_published: true,
+          author_id: uid,
+          created_at: new Date().toISOString()
+        }]);
+      }).then(function (res) {
+        if (res && res.error) throw res.error;
+        sayNoticeForm("✅ Notice published successfully! It is now visible to your players.");
+        clubNoticeForm.reset();
+        loadNotices();
+      }).catch(function (err) {
+        console.error("[CLUB_NOTICE] Insert error:", err);
+        sayNoticeForm("Could not publish notice: " + errText(err), true);
+      }).finally(function () {
+        if (btn) btn.disabled = false;
+      });
+    });
+  }
   /* Save the picked players: one registration row per club+match,
      then replace that club's player list for the match. */
   function saveMatchSquad(matchId) {
@@ -3076,10 +3183,182 @@
 
   /* ---------- views, routing, club switcher, search ---------- */
 
+  /* ---------- Club Equipment Inventory ---------- */
+  var lastEquipment = [];
+  var equipmentForm = document.getElementById("equipmentForm");
+  var equipMsg = document.getElementById("equipMsg");
+
+  function sayEquip(msg, isErr) {
+    if (!equipMsg) return;
+    equipMsg.textContent = msg || "";
+    equipMsg.className = "cad-msg " + (isErr ? "is-error" : "is-ok");
+    if (!msg) equipMsg.className = "cad-msg";
+  }
+
+  function resetEquipForm() {
+    if (!equipmentForm) return;
+    equipmentForm.reset();
+    var idEl = document.getElementById("equip-edit-id");
+    if (idEl) idEl.value = "";
+    var titleEl = document.getElementById("equipFormTitle");
+    if (titleEl) titleEl.textContent = "Add New Equipment";
+    var saveBtn = document.getElementById("btnSaveEquip");
+    if (saveBtn) saveBtn.textContent = "Save Equipment";
+    var cancelBtn = document.getElementById("btnCancelEquip");
+    if (cancelBtn) cancelBtn.style.display = "none";
+  }
+
+  function loadEquipment() {
+    var sbc = sb();
+    var host = document.getElementById("equipTableBody");
+    var countBadge = document.getElementById("equipCountBadge");
+    if (!sbc || !activeClubId || !host) return Promise.resolve();
+
+    return sbc.from("equipment")
+      .select("*")
+      .eq("club_id", activeClubId)
+      .order("name")
+      .then(function (res) {
+        if (res && res.error) throw res.error;
+        var items = (res && res.data) || [];
+        lastEquipment = items;
+
+        counts.equipment = items.length;
+        renderStats();
+
+        if (countBadge) countBadge.textContent = items.length + (items.length === 1 ? " item" : " items");
+
+        if (!items.length) {
+          host.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:24px; color:var(--muted);">No equipment added yet. Fill in the form above to add your first item.</td></tr>';
+          return;
+        }
+
+        host.innerHTML = items.map(function (eq) {
+          var badgeClass = /good|brand new/i.test(eq.condition) ? "completed" : /needs repair|damaged/i.test(eq.condition) ? "cancelled" : "scheduled";
+          return "<tr>" +
+            "<td><b>" + esc(eq.name) + "</b></td>" +
+            "<td><span class=\"cad-chip cad-chip-quiet\" style=\"font-size:11px;\">" + esc(eq.category || "General") + "</span></td>" +
+            "<td><b>" + esc(eq.quantity || 1) + "</b></td>" +
+            "<td><span class=\"cad-badge " + badgeClass + "\">" + esc(eq.condition || "Good") + "</span></td>" +
+            "<td>" + esc(eq.notes || "—") + "</td>" +
+            "<td>" +
+              '<button type="button" class="cad-btn-link" data-edit-equip="' + esc(eq.id) + '" style="margin-right:8px; font-size:12px;">Edit</button>' +
+              '<button type="button" class="cad-btn-link is-danger" data-delete-equip="' + esc(eq.id) + '" style="color:#e5534b; font-size:12px;">Delete</button>' +
+            "</td>" +
+          "</tr>";
+        }).join("");
+
+        Array.prototype.forEach.call(host.querySelectorAll("button[data-edit-equip]"), function (btn) {
+          btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = btn.getAttribute("data-edit-equip");
+            var item = null;
+            for (var i = 0; i < lastEquipment.length; i++) {
+              if (String(lastEquipment[i].id) === String(id)) { item = lastEquipment[i]; break; }
+            }
+            if (!item) return;
+
+            var idInput = document.getElementById("equip-edit-id");
+            if (idInput) idInput.value = item.id;
+            var nameInput = document.getElementById("equip-name");
+            if (nameInput) nameInput.value = item.name || "";
+            var catInput = document.getElementById("equip-category");
+            if (catInput) catInput.value = item.category || "Balls";
+            var qtyInput = document.getElementById("equip-quantity");
+            if (qtyInput) qtyInput.value = item.quantity || 1;
+            var condInput = document.getElementById("equip-condition");
+            if (condInput) condInput.value = item.condition || "Good";
+            var notesInput = document.getElementById("equip-notes");
+            if (notesInput) notesInput.value = item.notes || "";
+
+            var titleEl = document.getElementById("equipFormTitle");
+            if (titleEl) titleEl.textContent = "Edit Equipment Item";
+            var saveBtn = document.getElementById("btnSaveEquip");
+            if (saveBtn) saveBtn.textContent = "Update Equipment";
+            var cancelBtn = document.getElementById("btnCancelEquip");
+            if (cancelBtn) cancelBtn.style.display = "inline-block";
+
+            var formCard = document.getElementById("cad-equipment-form-card");
+            if (formCard) formCard.scrollIntoView({ behavior: "smooth" });
+          });
+        });
+
+        Array.prototype.forEach.call(host.querySelectorAll("button[data-delete-equip]"), function (btn) {
+          btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = btn.getAttribute("data-delete-equip");
+            if (!confirm("Are you sure you want to remove this equipment item?")) return;
+            sayEquip("Removing item…");
+            sbc.from("equipment").delete().eq("id", id).then(function (dRes) {
+              if (dRes && dRes.error) throw dRes.error;
+              sayEquip("Equipment item removed.");
+              loadEquipment();
+            }).catch(function (dErr) {
+              sayEquip("Could not delete item: " + errText(dErr), true);
+            });
+          });
+        });
+      })
+      .catch(function (err) {
+        console.warn("[EQUIPMENT] Manager load error:", err);
+        if (host) host.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--muted);">Could not load equipment.</td></tr>';
+      });
+  }
+
+  if (equipmentForm) {
+    var cancelBtn = document.getElementById("btnCancelEquip");
+    if (cancelBtn) cancelBtn.addEventListener("click", resetEquipForm);
+
+    equipmentForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var sbc = sb();
+      if (!sbc) { sayEquip("Supabase is not connected.", true); return; }
+      if (!activeClubId) { sayEquip("You are not assigned to a club.", true); return; }
+
+      var editId = (document.getElementById("equip-edit-id").value || "").trim();
+      var name = (document.getElementById("equip-name").value || "").trim();
+      var category = (document.getElementById("equip-category").value || "Other").trim();
+      var quantity = parseInt(document.getElementById("equip-quantity").value || "1", 10);
+      var condition = (document.getElementById("equip-condition").value || "Good").trim();
+      var notes = (document.getElementById("equip-notes").value || "").trim();
+
+      if (!name) { sayEquip("Please enter the equipment item name.", true); return; }
+
+      var btn = document.getElementById("btnSaveEquip");
+      if (btn) btn.disabled = true;
+      sayEquip("Saving equipment…");
+
+      var payload = {
+        club_id: activeClubId,
+        name: name,
+        category: category,
+        quantity: quantity || 1,
+        condition: condition,
+        notes: notes || null
+      };
+
+      var op = editId
+        ? sbc.from("equipment").update(payload).eq("id", editId)
+        : sbc.from("equipment").insert([payload]);
+
+      op.then(function (res) {
+        if (res && res.error) throw res.error;
+        sayEquip(editId ? "✅ Equipment updated successfully!" : "✅ Equipment item added to club inventory!");
+        resetEquipForm();
+        loadEquipment();
+      }).catch(function (err) {
+        console.error("[EQUIPMENT] Save error:", err);
+        sayEquip("Could not save equipment: " + errText(err), true);
+      }).finally(function () {
+        if (btn) btn.disabled = false;
+      });
+    });
+  }
+
   /* Every page the sidebar and the URL can address.
      The key matches data-panel, data-tab and data-cad-side. */
   var VIEWS = {
-    club: "club", players: "players", stats: "stats", matches: "matches",
+    club: "club", players: "players", stats: "stats", matches: "matches", tournaments: "tournaments",
     equipment: "equipment", cards: "cards",
     reports: "reports", requests: "requests", notices: "notices"
   };
@@ -3102,7 +3381,12 @@
     showPanel(name);
 
     /* Reopening a live section should not show stale data */
-    if (name === "matches") loadRunningTournaments();
+    if (name === "matches") loadMatches();
+    if (name === "equipment") loadEquipment();
+    if (name === "tournaments") {
+      loadRunningTournaments();
+      loadTournamentsAndRequests();
+    }
     if (name === "stats") loadPlayerStats();
 
     if (!push) return;

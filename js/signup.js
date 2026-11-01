@@ -194,13 +194,19 @@
               }]).then(function (reqRes) {
                 if (reqRes && reqRes.error) throw reqRes.error;
 
-                setSuccess("Account created! Your join request was sent to " + clubName +
-                  ". You can log in once that club approves your request.");
-                form.reset();
+                // Explicitly sign out so player cannot log in before manager approval
+                if (window.AUTH && window.AUTH.clearSession) {
+                  window.AUTH.clearSession();
+                }
+                return sbc.auth.signOut().then(function () {
+                  setSuccess("Account created! Your join request was sent to " + clubName +
+                    ". You can log in once that club approves your request.");
+                  form.reset();
 
-                setTimeout(function () {
-                  window.location.href = "login.html";
-                }, 2200);
+                  setTimeout(function () {
+                    window.location.href = "login.html";
+                  }, 2500);
+                });
               });
             });
         });
