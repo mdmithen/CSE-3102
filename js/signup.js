@@ -5,8 +5,11 @@
 //
 // Flow:
 //  1. sb.auth.signUp() creates the auth user
-//  2. Insert a row into public.users (id, full_name,
-//     email, phone, address, club_name, role)
+//  2. profiles + users rows are written
+//  3. a row is inserted into public.join_requests for the chosen club
+//     (the player does NOT join the roster yet)
+//  4. the club manager approves -> club_approve_request adds the player
+//     to public.players; a rejection deletes the join request.
 // ==========================================
 
 (function () {
@@ -141,7 +144,7 @@
         return;
       }
 
-      /* 2. Save the player profile into profiles + players + users tables */
+      /* 2. Profile (name/phone) and the optional users mirror row */
       return sbc.from("profiles").upsert([{
         id: user.id,
         full_name: fullName,
@@ -149,11 +152,9 @@
       }]).then(function (profRes) {
         if (profRes && profRes.error) {
           console.warn("profiles upsert:", profRes.error.message);
-          setSuccess("Auth account created. You can now log in. (Profile save pending.)");
-          return;
         }
 
-        /* Insert into users table */
+        /* The users table is optional: never block the join request on it */
         return sbc.from("users").upsert([{
           id: user.id,
           full_name: fullName,
@@ -165,11 +166,9 @@
         }]).then(function (userRes) {
           if (userRes && userRes.error) {
             console.warn("users insert:", userRes.error.message);
-            setSuccess("Auth account + profile created. Users table insert pending.");
-            return;
           }
 
-          /* Look up the club id by name */
+          /* 3. Find the club the player picked */
           return sbc.from("clubs")
             .select("id")
             .eq("name", clubName)
@@ -178,29 +177,30 @@
               var clubId = (clubRes && clubRes.data) ? clubRes.data.id : null;
 
               if (!clubId) {
-                setSuccess("Auth account + profile + users created. Club not found — contact your admin.");
-                return;
+                throw new Error('Club "' + clubName + '" was not found. Ask an admin to register it first.');
               }
 
-              /* Add the player to the club roster */
-              return sbc.from("players").insert([{
-                profile_id: user.id,
+              /* 4. Do NOT add the player to the roster here. A join request
+                 goes to the club manager instead; the club approves it and
+                 only then does the player join the roster. A rejection
+                 removes the request (club_reject_request). */
+              return sbc.from("join_requests").insert([{
+                player_id: user.id,
                 club_id: clubId,
-                full_name: fullName,
-                status: "active"
-              }]).then(function (plyRes) {
-                if (plyRes && plyRes.error) {
-                  console.warn("players insert:", plyRes.error.message);
-                  setSuccess("Auth account + profile + users created. Roster insert pending.");
-                  return;
-                }
+                note: address
+                  ? ("Address: " + address + (phone ? " • Phone: " + phone : ""))
+                  : "New player signup request",
+                status: "pending"
+              }]).then(function (reqRes) {
+                if (reqRes && reqRes.error) throw reqRes.error;
 
-                setSuccess("Account created successfully! You can now log in.");
+                setSuccess("Account created! Your join request was sent to " + clubName +
+                  ". You can log in once that club approves your request.");
                 form.reset();
 
                 setTimeout(function () {
                   window.location.href = "login.html";
-                }, 1500);
+                }, 2200);
               });
             });
         });

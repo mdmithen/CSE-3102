@@ -583,6 +583,11 @@
 
   /* ---------- join requests ---------- */
 
+  /* Last loaded requests and applicant names, so Approve/Reject can act
+     on the exact row without another round trip. */
+  var lastRequests = [];
+  var lastRequestNames = {};
+
   function loadRequests() {
     if (!requestsBody || !sb() || !activeClubId) return;
 
@@ -592,6 +597,7 @@
       .order("created_at", { ascending: false })
       .then(function (res) {
         var rows = (res && res.data) || [];
+        lastRequests = rows;
 
         counts.pending = rows.filter(function (r) {
           return String(r.status || "").toLowerCase() === "pending";
@@ -617,6 +623,7 @@
             ((profRes && profRes.data) || []).forEach(function (p) {
               names[p.id] = p.full_name;
             });
+            lastRequestNames = names;
             renderRequests(rows, names);
           });
       })
@@ -668,21 +675,85 @@
     });
   }
 
+  /* Approve / Reject without relying on an RPC response shape:
+     - approve: make sure the player is on the roster, then mark approved
+     - reject : delete the request row (and any roster row it created) */
   function decide(requestId, approve) {
-    var fn = approve ? "club_approve_request" : "club_reject_request";
+    var sbc = sb();
+    if (!sbc || !activeClubId) return;
 
-    sb().rpc(fn, { p_request_id: requestId }).then(function (res) {
-      var data = (res && res.data) || {};
-      if (data.ok) {
-        say(approve ? "Player added to the roster." : "Request rejected.");
+    var req = null;
+    lastRequests.forEach(function (r) {
+      if (String(r.id) === String(requestId)) req = r;
+    });
+
+    if (!req) {
+      say("This request is no longer available. Reload the page.", true);
+      return;
+    }
+
+    if (!approve) {
+      sbc.from("players").delete()
+        .eq("profile_id", req.player_id)
+        .eq("club_id", activeClubId)
+        .then(function (res) {
+          if (res && res.error) throw res.error;
+          return sbc.from("join_requests").delete().eq("id", req.id);
+        })
+        .then(function (res) {
+          if (res && res.error) throw res.error;
+          say("Join request rejected and removed.");
+          loadRequests();
+          loadRoster();
+        })
+        .catch(function (err) {
+          console.error("[REQUESTS] Reject error:", err);
+          say("Could not reject the request: " + errText(err), true);
+        });
+      return;
+    }
+
+    var playerName = lastRequestNames[req.player_id] || "";
+
+    sbc.from("players")
+      .select("id")
+      .eq("profile_id", req.player_id)
+      .eq("club_id", activeClubId)
+      .then(function (res) {
+        if (res && res.error) throw res.error;
+        if (res && res.data && res.data.length) return null; // already on the roster
+
+        var insertRow = {
+          profile_id: req.player_id,
+          club_id: activeClubId,
+          full_name: playerName || "Player",
+          status: "Active"
+        };
+
+        if (playerName) return sbc.from("players").insert([insertRow]);
+
+        // Name missing? Read it from profiles before inserting
+        return sbc.from("profiles").select("full_name").eq("id", req.player_id).maybeSingle()
+          .then(function (pRes) {
+            var nm = (pRes && pRes.data && pRes.data.full_name) || "";
+            insertRow.full_name = nm || "Player";
+            return sbc.from("players").insert([insertRow]);
+          });
+      })
+      .then(function (res) {
+        if (res && res.error) throw res.error;
+        return sbc.from("join_requests").update({ status: "approved" }).eq("id", req.id);
+      })
+      .then(function (res) {
+        if (res && res.error) throw res.error;
+        say("Join request approved — player added to the roster.");
         loadRequests();
         loadRoster();
-      } else {
-        say(data.error || "Could not update the request.", true);
-      }
-    }).catch(function (err) {
-      say(errText(err), true);
-    });
+      })
+      .catch(function (err) {
+        console.error("[REQUESTS] Approve error:", err);
+        say("Could not approve the request: " + errText(err), true);
+      });
   }
 
   /* ---------- register a player / edit a roster player ---------- */
