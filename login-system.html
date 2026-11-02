@@ -6,7 +6,7 @@
     <title>District Sports Management System</title>
     <!-- v3 busts the browser cache so the Club Admin redesign always loads -->
     <link rel="stylesheet" href="css/public.css?v=3">
-    <link rel="stylesheet" href="css/club-admin.css?v=5">
+    <link rel="stylesheet" href="css/club-admin.css?v=8">
 </head>
 
 <body class="pub-body">
@@ -114,13 +114,6 @@
                     </ul>
                   </nav>
 
-                  <!-- Season notice card (static information, matches the reference) -->
-                  <div class="cad-season">
-                    <b>Season 2026</b>
-                    <p>Registration closes in 12 days</p>
-                    <a href="#tournaments" class="cad-season-btn">View Season Guide</a>
-                  </div>
-
                   <div class="cad-side-foot">
                     <p>Signed in as</p>
                     <b id="cadSideWho">Club Admin</b>
@@ -138,23 +131,7 @@
                     <button type="button" class="cad-burger" id="cadBurger"
                             aria-label="Open navigation menu" aria-expanded="false">Menu</button>
 
-                    <div class="cad-search">
-                      <label class="cad-sr" for="cadSearch">Search players, clubs, tournaments</label>
-                      <input type="search" id="cadSearch" placeholder="Search players, clubs, tournaments" autocomplete="off">
-                    </div>
-
                     <div class="cad-top-actions">
-                      <label class="cad-role-picker">
-                        <span class="cad-sr">Signed-in role</span>
-                        <select id="cadRoleSelect" disabled aria-label="Signed-in role">
-                          <option>Club Manager</option>
-                        </select>
-                      </label>
-
-                      <button type="button" class="cad-bell" id="cadBell" aria-label="Pending join requests">
-                        Notifications<em id="cadNotifCount" hidden>0</em>
-                      </button>
-
                       <!-- The signed-in profile block below is filled by the page script -->
                       <div class="cad-profile" id="clubAdminBar" hidden>
                         <span class="cad-avatar" id="cadAvatar" aria-hidden="true">CA</span>
@@ -888,10 +865,20 @@
                   </section>
 
                   <section class="cad-panel" id="cards" data-panel="cards" aria-labelledby="cad-nav-cards">
-                    <article class="cad-card cad-empty">
-                      <h3>Player Cards</h3>
-                      <p>Digital player card printing is planned for a future release.</p>
-                      <span class="cad-empty-tag">Not connected yet</span>
+                    <div class="cad-page-head">
+                      <h3 class="cad-page-title">Player Cards</h3>
+                      <p class="cad-page-sub">Digital cards for every player in your club roster</p>
+                    </div>
+
+                    <article class="cad-card">
+                      <div class="cad-card-head">
+                        <h3>Club Player Cards</h3>
+                        <span class="cad-chip" id="playerCardsCount">0 cards</span>
+                      </div>
+                      <p class="cad-note">Cards are built from the club roster and the player's recorded statistics.</p>
+                      <div class="player-card-grid" id="playerCardsGrid">
+                        <div class="cad-empty"><p>Loading player cards…</p></div>
+                      </div>
                     </article>
                   </section>
 
@@ -1682,7 +1669,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/club-admin.js?v=14"></script>
+    <script src="js/club-admin.js?v=19"></script>
     <script>
     (function () {
         if (!window.AUTH) return;

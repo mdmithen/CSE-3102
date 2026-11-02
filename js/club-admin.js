@@ -370,21 +370,19 @@
     }).join("");
   }
 
-  /* ---------- six statistic cards ----------
+  /* ---------- statistic cards in the header ----------
 
-     Only Total Players and Pending Requests are live, because
-     those are the two tables this page can actually read.
-     The other four show an honest placeholder instead of a
-     made-up number. Cards are text only: label, figure, caption. */
+     Live numbers straight from the club's own tables: roster size,
+     pending join requests and the equipment inventory. Cards are text
+     only: label, figure, caption. */
   function renderStats() {
     var host = document.getElementById("cadStats");
     if (!host) return;
 
     var cards = [
-      { label: "Total Players",    value: counts.players, live: true,  foot: "Club roster" },
-      { label: "Upcoming Matches", value: null, live: false, foot: "Matches pending" },
-      { label: "Pending Requests", value: counts.pending, live: true,  foot: "Awaiting approval" },
-      { label: "Equipment Items",  value: counts.equipment, live: true,  foot: "Club inventory" }
+      { label: "Total Players",    value: counts.players,   live: true, foot: "Club roster" },
+      { label: "Pending Requests", value: counts.pending,   live: true, foot: "Awaiting approval" },
+      { label: "Equipment Items",  value: counts.equipment, live: true, foot: "Club inventory" }
     ];
 
     host.innerHTML = cards.map(function (c) {
@@ -438,6 +436,7 @@
         if (typeof renderNotices === "function" && lastNotices) {
           renderNotices(lastNotices);
         }
+        renderPlayerCards();
       })
       .catch(function (err) {
         rosterBody.innerHTML = '<tr><td colspan="5">Could not load the roster.</td></tr>';
@@ -990,6 +989,9 @@
               match_date: m.match_date,
               venue: m.venue,
               status: m.status,
+              match_type: m.match_type,
+              match_note: m.match_note,
+              challenge_status: m.challenge_status,
               home_club_id: m.home_club_id,
               away_club_id: m.away_club_id,
               opponent: clubMap[oppId] || ("Club #" + oppId),
@@ -1093,7 +1095,6 @@
         if (res && res.error) throw res.error;
         sayMatch("Result saved (" + hs + "–" + as + "). Club Rankings updated on the Welcome page.");
         loadMatches();
-  loadEquipment();
       }).catch(function (err) {
         console.error("[MATCHES] Result save:", err);
         sayMatch("Could not save the result: " + errText(err), true);
@@ -1391,6 +1392,8 @@
       sayMatch("Sending challenge & scheduling match…");
 
       /* Step 1: Insert match */
+      var isChallengeType = /challenge|friendly/i.test(matchType);
+
       sbc.from("matches").insert([{
         home_club_id: homeClubId,
         away_club_id: Number(awayClubId),
@@ -1398,16 +1401,40 @@
         venue: venue || null,
         match_type: matchType,
         match_note: matchNote || null,
+        challenge_status: isChallengeType ? "pending" : "accepted",
         status: "scheduled"
       }]).then(function (res) {
         if (res && res.error) throw res.error;
 
         var matchRow = res && res.data && res.data[0] ? res.data[0] : null;
-        if (!matchRow) {
-          sayMatch("Match created but no data returned.", true);
-          if (btn) btn.disabled = false;
-          return;
+
+        /* If the SELECT policy blocks RETURNING, the row is created but
+           comes back empty. Read the newest matching row instead, so the
+           challenge notice can still be attached to the right match. */
+        function resolveMatchRow() {
+          if (matchRow) return Promise.resolve(matchRow);
+          return sbc.from("matches")
+            .select("*")
+            .eq("home_club_id", homeClubId)
+            .eq("away_club_id", Number(awayClubId))
+            .eq("match_date", matchDate)
+            .order("id", { ascending: false })
+            .limit(1)
+            .then(function (r2) {
+              if (r2 && r2.error) throw r2.error;
+              return (r2 && r2.data && r2.data[0]) ? r2.data[0] : null;
+            });
         }
+
+        return resolveMatchRow().then(function (matchRow2) {
+          if (!matchRow2) {
+            sayMatch("Match saved, but it could not be read back. Check the matches SELECT policy in Supabase.", true);
+            matchForm.reset();
+            loadMatches();
+            if (btn) btn.disabled = false;
+            return;
+          }
+          matchRow = matchRow2;
 
         /* Step 2: Create challenge / match notice on the Notice Board */
         var awaySelect = document.getElementById("match-away-club");
@@ -1434,6 +1461,7 @@
           body: noticeBody,
           category: "match",
           match_id: matchRow.id,
+          club_id: Number(awayClubId), // targeted: goes to the challenged club
           is_published: true,
           author_id: null,
           created_at: new Date().toISOString()
@@ -1447,6 +1475,7 @@
           loadMatches();
           loadNotices(); // refresh notices
           if (btn) btn.disabled = false;
+        });
         });
       }).catch(function (err) {
         console.error("[MATCH] Error:", err);
@@ -2058,6 +2087,7 @@
       });
 
       renderPlayerStatsTable();
+      renderPlayerCards();
     }).catch(function (err) {
       console.warn("[PLAYER_STATS] Load error:", err);
       cadPlayerStatsBody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding: 20px; color: var(--muted);">' +
@@ -2461,6 +2491,98 @@
     cadStatsScopeFilter.addEventListener("change", function () {
       renderPlayerStatsTable();
     });
+  }
+
+  /* ---------- player cards ---------- */
+
+  var playerCardsGrid = document.getElementById("playerCardsGrid");
+  var playerCardsCount = document.getElementById("playerCardsCount");
+
+  function cardInitials(name) {
+    return String(name || "PL").split(/\s+/).filter(Boolean).slice(0, 2)
+      .map(function (w) { return w.charAt(0).toUpperCase(); }).join("") || "PL";
+  }
+
+  /* One summary per player. Same grain rule as the public rankings:
+     match rows when present, otherwise career / tournament rows. */
+  function playerStatSummary(playerId) {
+    var rows = (clubPlayerStatsList || []).filter(function (r) {
+      return String(r.player_id) === String(playerId);
+    });
+    if (!rows.length) return null;
+
+    var matchRows = rows.filter(function (r) { return r.match_id; });
+    var used = matchRows.length ? matchRows : rows.filter(function (r) { return !r.match_id; });
+    if (!used.length) used = rows;
+
+    var nums = { matches_played: 0, goals: 0, assists: 0, runs: 0, wickets: 0 };
+    var weight = 0, weighted = 0, votes = {};
+
+    used.forEach(function (r) {
+      Object.keys(nums).forEach(function (k) {
+        nums[k] += Number(r[k]) || 0;
+      });
+      var w = Math.max(1, Number(r.matches_played) || 1);
+      weight += w;
+      weighted += (parseFloat(r.rating) || 0) * w;
+      var sp = r.sport || "Football";
+      votes[sp] = (votes[sp] || 0) + 1;
+    });
+
+    return {
+      sport: Object.keys(votes).sort(function (a, b) { return votes[b] - votes[a]; })[0] || "Football",
+      nums: nums,
+      rating: weight ? (Math.round((weighted / weight) * 100) / 100).toFixed(2) : "—"
+    };
+  }
+
+  function renderPlayerCards() {
+    if (!playerCardsGrid) return;
+
+    if (playerCardsCount) {
+      playerCardsCount.textContent = lastRoster.length +
+        (lastRoster.length === 1 ? " card" : " cards");
+    }
+
+    if (!lastRoster.length) {
+      playerCardsGrid.innerHTML = '<div class="cad-empty"><h3>No players yet.</h3>' +
+        "<p>Register players on the Players page — their cards appear here automatically.</p></div>";
+      return;
+    }
+
+    playerCardsGrid.innerHTML = lastRoster.map(function (p) {
+      var name = firstVal(p, ["full_name", "name", "player_name"], "") || ("Player #" + p.id);
+      var st = playerStatSummary(p.id);
+      var isCrk = st && st.sport === "Cricket";
+      var status = p.status || "Active";
+      var statusCls = String(status).toLowerCase() === "active" ? "cad-chip-green" : "cad-chip-quiet";
+
+      var body;
+      if (st) {
+        body = '<div class="player-card-sport">' + (isCrk ? "🏏 Cricket" : "⚽ Football") + "</div>" +
+          '<div class="player-card-stats">' +
+            "<div><b>" + st.nums.matches_played + "</b><span>Matches</span></div>" +
+            "<div><b>" + (isCrk ? st.nums.runs : st.nums.goals) + "</b><span>" + (isCrk ? "Runs" : "Goals") + "</span></div>" +
+            "<div><b>" + (isCrk ? st.nums.wickets : st.nums.assists) + "</b><span>" + (isCrk ? "Wickets" : "Assists") + "</span></div>" +
+            "<div><b>⭐ " + st.rating + "</b><span>Rating</span></div>" +
+          "</div>";
+      } else {
+        body = '<p class="player-card-note">No statistics recorded yet — add them on the Player Stats page.</p>';
+      }
+
+      return '<div class="player-card">' +
+          '<div class="player-card-top">' +
+            '<span class="player-card-avatar">' + esc(cardInitials(name)) + "</span>" +
+            '<div class="player-card-id">' +
+              "<b>" + esc(name) + "</b>" +
+              '<span class="player-card-code">PLY-' + ("00" + p.id).slice(-3) +
+                " • " + esc(p.position || "Player") + "</span>" +
+            "</div>" +
+            '<span class="cad-chip ' + statusCls + '">' + esc(status) + "</span>" +
+          "</div>" +
+          body +
+        "</div>";
+    }).join("");
   }
 
   /* ---------- notices ---------- */
@@ -2872,6 +2994,60 @@
       "</div>";
   }
 
+  /* The challenged club accepts the challenge. The challenger club then
+     gets a notice back on its own Notice Board. */
+  function acceptChallenge(matchId) {
+    var sbc = sb();
+    if (!sbc || !activeClubId) return;
+
+    var m = matchFromList(matchId);
+    if (!m) {
+      say("Match not found. Reload the page and try again.", true);
+      return;
+    }
+
+    var myClubName = currentClub() ? firstVal(currentClub(), ["name"], "Our club") : "Our club";
+
+    sbc.from("matches")
+      .update({ challenge_status: "accepted" })
+      .eq("id", matchId)
+      .then(function (res) {
+        if (res && res.error) throw res.error;
+
+        var when = m.match_date ? formatDateFromISO(m.match_date) : "TBD";
+        var body = "✅ " + myClubName + " accepted the challenge from " + m.opponent + ".\n" +
+          "Match: " + m.opponent + " vs " + myClubName + "\n" +
+          "Date & Time: " + when + "\n" +
+          (m.venue ? "Venue: " + m.venue + "\n" : "") +
+          (m.match_note ? "Note: " + m.match_note + "\n" : "") +
+          "\nOpen the Matches page to see the fixture and record the result.";
+
+        return sbc.from("notices").insert([{
+          user_id: null,
+          title: "✅ Challenge Accepted: " + m.opponent + " vs " + myClubName,
+          body: body,
+          category: "match",
+          match_id: Number(matchId),
+          club_id: m.home_club_id,   // notice goes back to the challenger
+          is_published: true,
+          author_id: null,
+          created_at: new Date().toISOString()
+        }]);
+      })
+      .then(function (res) {
+        if (res && res.error) {
+          console.warn("[CHALLENGE] notice to challenger:", res.error.message);
+        }
+        say("Challenge accepted! The challenging club has been notified.");
+        loadMatches();
+        loadNotices();
+      })
+      .catch(function (err) {
+        console.error("[CHALLENGE] accept error:", err);
+        say("Could not accept the challenge: " + errText(err), true);
+      });
+  }
+
   function matchNoticeActions(n) {
     if (!n.match_id) return "";
 
@@ -2894,11 +3070,31 @@
       ? "✓ Squad (" + reg.players.length + " player" + (reg.players.length === 1 ? "" : "s") + ") — Edit"
       : (isHost ? "Select Squad for this Match" : "Register Squad for this Match");
 
+    /* Challenge state: only the challenged club can accept, and the
+       challenger sees the result as soon as it comes back. */
+    var isChallenge = /challenge|friendly/i.test(m.match_type || "");
+    var chStatus = m.challenge_status || (isChallenge ? "pending" : "accepted");
+    var challengeBlock = "";
+
+    if (isChallenge) {
+      if (isHost) {
+        challengeBlock = chStatus === "accepted"
+          ? '<p class="notice-date" style="margin-top:8px;">✅ ' + esc(m.opponent) + " accepted your challenge.</p>"
+          : '<p class="notice-date" style="margin-top:8px;">⏳ Waiting for ' + esc(m.opponent) + " to accept your challenge.</p>";
+      } else if (chStatus === "accepted") {
+        challengeBlock = '<p class="notice-date" style="margin-top:8px;">✅ You accepted this challenge.</p>';
+      } else {
+        challengeBlock = '<div style="margin-top:10px;">' +
+            '<button type="button" class="sa-btn sa-btn-primary" style="padding:6px 12px; font-size:12px;" data-accept-challenge="' + esc(m.id) + '">Accept Challenge</button>' +
+          "</div>";
+      }
+    }
+
     var hint = isHost
       ? '<p class="notice-date" style="margin-top:8px;">🏠 Your club is the host. Pick the players who played, then save the result on the Matches page and their match stats from Player Stats.</p>'
       : '<p class="notice-date" style="margin-top:8px;">Your club is invited to this match. Pick the players who will play.</p>';
 
-    return hint +
+    return challengeBlock + hint +
       '<div style="margin-top:10px;">' +
         '<button type="button" class="sa-btn sa-btn-primary" style="padding:6px 12px; font-size:12px;" data-toggle-squad="' + esc(n.match_id) + '">' + esc(label) + "</button>" +
       "</div>" +
@@ -2908,6 +3104,17 @@
   function renderNotices(notices) {
     var host = document.getElementById("noticeList");
     if (!host) return;
+
+    /* A notice aimed at one club (club_id set) is only shown to that club.
+       A match notice is also shown to the host, because the host needs its
+       own squad picker. General / tournament notices (club_id null) stay
+       visible to every club. */
+    notices = (notices || []).filter(function (n) {
+      if (!n.club_id) return true;
+      if (String(n.club_id) === String(activeClubId)) return true;
+      if (n.match_id && matchFromList(n.match_id)) return true;
+      return false;
+    });
 
     if (!notices.length) {
       host.innerHTML =
@@ -2979,6 +3186,13 @@
       btn.addEventListener("click", function (e) {
         e.preventDefault();
         saveMatchSquad(btn.getAttribute("data-save-squad"));
+      });
+    });
+
+    Array.prototype.forEach.call(host.querySelectorAll("button[data-accept-challenge]"), function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        acceptChallenge(btn.getAttribute("data-accept-challenge"));
       });
     });
 
@@ -3388,6 +3602,7 @@
       loadTournamentsAndRequests();
     }
     if (name === "stats") loadPlayerStats();
+    if (name === "cards") renderPlayerCards();
 
     if (!push) return;
 
@@ -3539,6 +3754,7 @@
       loadPlayerStats();
       loadNotices();   // notices depend on the club (squad registration state)
       loadRunningTournaments();
+      loadEquipment(); // refresh equipment count for the header card
     });
   }
 
@@ -3630,6 +3846,7 @@
       loadPlayerStats();            // load player lifetime & tournament stats
       loadNotices();                // match invitations + squad state for this club
       loadRunningTournaments();     // approved clubs + squads for the host
+      loadEquipment();              // equipment count card in the header
     });
   }).catch(function (err) {
     // Never leave a rejected promise unhandled: report it in the
