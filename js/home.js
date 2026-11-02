@@ -50,10 +50,12 @@
         .then(function (tRes) {
           var tournaments = (tRes && tRes.data) || [];
 
-          // Step 3: Fetch general notices
+          // Step 3: Fetch general notices (public only - club-targeted
+          // notices belong to one club and must not appear here)
           client.from('notices')
             .select('*')
             .eq('is_published', true)
+            .is('club_id', null)
             .order('created_at', { ascending: false })
             .limit(10)
             .then(function (nRes) {
@@ -69,6 +71,7 @@
           client.from('notices')
             .select('*')
             .eq('is_published', true)
+            .is('club_id', null)
             .order('created_at', { ascending: false })
             .limit(10)
             .then(function (nRes) {
@@ -84,6 +87,10 @@
   }
 
   function renderNoticesAndTournaments(host, tournaments, notices, clubsMap) {
+    /* Safety net: a notice aimed at one club never reaches the public
+       page, even if an older query returned it. */
+    notices = (notices || []).filter(function (n) { return !n.club_id; });
+
     if (!tournaments.length && !notices.length) {
       host.innerHTML = '<p class="empty-state">No public notices or tournaments available at this time.</p>';
       return;
